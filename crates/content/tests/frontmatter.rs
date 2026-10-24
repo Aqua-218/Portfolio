@@ -66,7 +66,7 @@ fn 足りない項目はファイル全体の行番号で出る() {
         err,
         Error {
             line: Some(2),
-            message: "missing field `title`".to_owned(),
+            message: "title がありません".to_owned(),
         }
     );
 }
@@ -75,7 +75,7 @@ fn 足りない項目はファイル全体の行番号で出る() {
 fn 知らない項目と型の違いもファイル全体の行番号で出る() {
     let err = parse::<Front>("---\ntitle: ねこ\ntag: [黒]\n---\n").unwrap_err();
     assert_eq!(err.line, Some(3));
-    assert!(err.message.contains("unknown field `tag`"), "{err}");
+    assert!(err.message.contains("知らない項目 tag"), "{err}");
 
     let err = parse::<Front>("---\ntitle: ねこ\ntags: 3\n---\n").unwrap_err();
     assert_eq!(err.line, Some(3));

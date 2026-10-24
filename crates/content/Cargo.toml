@@ -5,6 +5,10 @@ edition.workspace = true
 rust-version.workspace = true
 publish = false
 
+[[bin]]
+name = "content-check"
+path = "src/main.rs"
+
 [lints]
 workspace = true
 

@@ -78,7 +78,7 @@ pub fn parse<T: DeserializeOwned>(src: &str) -> Result<Document<T>, Error> {
             .location()
             .and_then(|l| usize::try_from(l.line()).ok())
             .map(|l| l + 1),
-        message: message_of(&e),
+        message: crate::problem::translate(&message_of(&e)),
     })?;
     Ok(Document {
         front,
