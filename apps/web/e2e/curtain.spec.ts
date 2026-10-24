@@ -115,17 +115,18 @@ test("走る黒猫が幕に足跡を付け、幕が開くころには消える",
     .getByRole("link", { name: "About" })
     .click();
 
-  // 足が着くたびに増えていく
+  // 足が着くたびに増えていく。幕が開き始めると増えなくなるので、増えた直後に見る
   await expect.poll(() => prints.count()).toBeGreaterThan(2);
-  const before = await prints.count();
-  await page.waitForTimeout(500);
-  expect(await prints.count()).toBeGreaterThan(before);
-
-  // 足跡は黒猫より左(通ったあと)にある
   const runner = page.locator("body > span[aria-hidden='true']").last();
-  const cat = (await runner.boundingBox())?.x ?? 0;
-  const first = (await prints.first().boundingBox())?.x ?? 0;
-  expect(first).toBeLessThan(cat);
+  const box = await runner.boundingBox();
+  const xs = await prints.evaluateAll((els) =>
+    els.map((el) => el.getBoundingClientRect().x),
+  );
+
+  // 付けた順に右へ並ぶ。最初の足跡は黒猫より左(通ったあと)、新しい足跡も黒猫の体の下まで
+  expect(xs.at(-1) ?? 0).toBeGreaterThan(xs[0] ?? 0);
+  expect(xs[0] ?? 0).toBeLessThan(box?.x ?? 0);
+  expect(Math.max(...xs)).toBeLessThan((box?.x ?? 0) + (box?.width ?? 0));
 
   await expect.poll(() => idle(page), { timeout: 5000 }).toBe(true);
   await expect(prints).toHaveCount(0);
