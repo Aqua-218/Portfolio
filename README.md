@@ -55,3 +55,4 @@ mainへのマージでrelease-pleaseがRelease PRを作る。依存の更新はR
 - [Rust](docs/rust.md)
 - [Lean](docs/lean.md)
 - [TLA+](docs/tla.md)
+- [コンテンツの形式](docs/content.md)
