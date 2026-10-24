@@ -7,8 +7,11 @@
   },
   "scripts": {
     "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
     "lint": "eslint .",
-    "format": "prettier ."
+    "format": "prettier .",
+    "test": "pnpm -r --if-present test",
+    "check": "pnpm typecheck && pnpm lint && pnpm format --check"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
