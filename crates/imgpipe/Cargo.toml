@@ -9,8 +9,11 @@ publish = false
 workspace = true
 
 [dependencies]
+content = { version = "0.1.0", path = "../content" }
 image = { version = "0.25.10", default-features = false, features = ["jpeg", "png"] }
 # rav1eのアセンブリにはnasmが要るので切る。CIで入れずに済む
 ravif = { version = "0.13.0", default-features = false, features = ["threading"] }
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.154"
 sha2 = "0.11.1"
 webp = { version = "0.3.1", default-features = false }
