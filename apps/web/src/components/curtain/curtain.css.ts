@@ -1,4 +1,4 @@
-import { style } from "@vanilla-extract/css";
+import { keyframes, style } from "@vanilla-extract/css";
 import { vars } from "@/styles/theme.css";
 
 export const curtain = style({
@@ -31,4 +31,21 @@ export const runner = style({
   lineHeight: 0,
   pointerEvents: "none",
   visibility: "hidden",
+});
+
+const fade = keyframes({
+  from: { opacity: 0.4 },
+  to: { opacity: 0 },
+});
+
+/** 走る猫の足跡。つま先を進む向き(右)に向け、少しずつ薄れる */
+export const print = style({
+  position: "absolute",
+  width: "16px",
+  height: "16px",
+  margin: "-8px 0 0 -8px",
+  color: vars.color.ink,
+  lineHeight: 0,
+  rotate: "90deg",
+  animation: `${fade} 1.8s ease-in forwards`,
 });
