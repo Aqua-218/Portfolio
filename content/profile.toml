@@ -1,0 +1,67 @@
+name = "小峯 圭也"
+romaji = "Komine Keiya"
+# 時計とフッターに出す場所
+location = "Tochigi, JP"
+timezone = "Asia/Tokyo"
+
+# 基本のアレコレ
+
+[[fact]]
+label = "名前"
+value = "小峯 圭也"
+sub = "Komine Keiya"
+wide = true
+
+[[fact]]
+label = "学校"
+value = "学校法人角川ドワンゴ学園 N高等学校"
+sub = "11期生"
+wide = true
+
+[[fact]]
+label = "学年"
+value = "高校1年"
+
+[[fact]]
+label = "部活"
+value = "研究部"
+sub = "6期生・情報科学グループ"
+sub_short = "6期生"
+
+[[fact]]
+label = "性別"
+value = "男性"
+
+[[fact]]
+label = "血液型"
+value = "A型"
+
+[[fact]]
+label = "出身地"
+value = "東京"
+
+[[fact]]
+label = "現住地"
+value = "栃木"
+
+# 経歴。古い順
+
+[[career]]
+year = 2025
+title = "U-22 プログラミング・コンテスト 2025"
+note = "経済産業省商務情報政策局長賞を受賞"
+
+[[career]]
+year = 2026
+title = "N高等学校に入学"
+note = "11期生"
+
+[[career]]
+year = 2026
+title = "N高グループ研究部（KdEi研）に入部"
+note = "6期生・情報科学グループ"
+
+[[career]]
+year = 2026
+title = "セキュリティ・キャンプ全国大会 2026"
+note = "Z1ゼミを修了"
