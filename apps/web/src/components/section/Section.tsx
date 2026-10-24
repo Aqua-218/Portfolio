@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { Trail } from "@/components/paw/Trail";
 import { Photo } from "@/components/photo/Photo";
 import { Reveal } from "@/components/reveal/Reveal";
 import { site } from "@/lib/content";
@@ -66,6 +67,7 @@ export function Section({
             <Photo id={photo} sizes="(max-width: 860px) 7.5rem, 17rem" />
           </Reveal>
         )}
+        {page && <Trail className={s.trail} seed={name} angle={75} steps={7} />}
       </div>
       <div className={s.body}>{children}</div>
     </InViewSection>
