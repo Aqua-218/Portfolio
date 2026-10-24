@@ -7,6 +7,8 @@ const PAGES = [
   { name: "skills", path: "/skills/" },
   { name: "work", path: "/work/" },
   { name: "affiliations", path: "/affiliations/" },
+  { name: "events", path: "/events/" },
+  { name: "event", path: "/events/2026-08-10-seccamp/" },
   { name: "shelf", path: "/shelf/" },
   { name: "license", path: "/license/" },
   { name: "cats", path: "/cats/" },
