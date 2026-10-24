@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.5.0](https://github.com/Aqua-218/Portfolio/compare/v0.4.0...v0.5.0) (2026-10-24)
+
+
+### 新しいこと
+
+* **web:** 404を作る ([#170](https://github.com/Aqua-218/Portfolio/issues/170)) ([1629b01](https://github.com/Aqua-218/Portfolio/commit/1629b01cc6f241e283055c0a0bf660431510821e)), closes [#47](https://github.com/Aqua-218/Portfolio/issues/47)
+* **web:** sitemap.xmlとrobots.txtを出す ([#172](https://github.com/Aqua-218/Portfolio/issues/172)) ([00122ce](https://github.com/Aqua-218/Portfolio/commit/00122ce63a4d106fcb3b762587884f7b4e9c6a75)), closes [#49](https://github.com/Aqua-218/Portfolio/issues/49)
+* **web:** Stackを作る ([#169](https://github.com/Aqua-218/Portfolio/issues/169)) ([98e1913](https://github.com/Aqua-218/Portfolio/commit/98e19138e88a2e1c9cc77a67e0cbd95ea904be9e)), closes [#45](https://github.com/Aqua-218/Portfolio/issues/45)
+* **web:** エラーの画面を作り込む ([#173](https://github.com/Aqua-218/Portfolio/issues/173)) ([5eceda2](https://github.com/Aqua-218/Portfolio/commit/5eceda20c04cfaf919c4b5ea3ea009ff18b3bdc7)), closes [#165](https://github.com/Aqua-218/Portfolio/issues/165)
+* **web:** サイトのあちこちに足跡を置く ([#175](https://github.com/Aqua-218/Portfolio/issues/175)) ([fcb8d8c](https://github.com/Aqua-218/Portfolio/commit/fcb8d8c52e69eb431ad8bf2b61af1487c3349554)), closes [#167](https://github.com/Aqua-218/Portfolio/issues/167)
+* **web:** メタデータとOGP画像を出す ([#171](https://github.com/Aqua-218/Portfolio/issues/171)) ([3782a47](https://github.com/Aqua-218/Portfolio/commit/3782a470cef94b41089dea8278cb2365851fb1cf)), closes [#48](https://github.com/Aqua-218/Portfolio/issues/48)
+* **web:** 幕の上を走る猫が足跡を付ける ([#174](https://github.com/Aqua-218/Portfolio/issues/174)) ([f0a42d4](https://github.com/Aqua-218/Portfolio/commit/f0a42d4bca969f1f81235f159a997ab7f732cdc6)), closes [#166](https://github.com/Aqua-218/Portfolio/issues/166)
+
+
+### コンテンツ
+
+* きなこのフォルダの猫の写真を入れる ([#162](https://github.com/Aqua-218/Portfolio/issues/162)) ([4bf822c](https://github.com/Aqua-218/Portfolio/commit/4bf822c0f96975f314f2d6603a2bb82c3aa7bf69))
+* 雷のフォルダの猫の写真を入れる ([#164](https://github.com/Aqua-218/Portfolio/issues/164)) ([da524a1](https://github.com/Aqua-218/Portfolio/commit/da524a1a6e24464aed8db4703b6bda0604e27280))
+
 ## [0.4.0](https://github.com/Aqua-218/Portfolio/compare/v0.3.0...v0.4.0) (2026-10-24)
 
 
