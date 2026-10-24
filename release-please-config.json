@@ -1,0 +1,17 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "release-type": "simple",
+  "include-component-in-tag": false,
+  "bump-minor-pre-major": true,
+  "pull-request-title-pattern": "chore: release ${version}",
+  "changelog-sections": [
+    { "type": "feat", "section": "新しいこと" },
+    { "type": "fix", "section": "直したこと" },
+    { "type": "content", "section": "コンテンツ" },
+    { "type": "docs", "section": "ドキュメント", "hidden": true },
+    { "type": "chore", "section": "設定や道具", "hidden": true }
+  ],
+  "packages": {
+    ".": {}
+  }
+}
