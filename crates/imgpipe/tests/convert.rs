@@ -146,3 +146,36 @@ fn 変換済みは飛ばし中身が変われば作り直す() {
     assert!(third[1].skipped);
     let _ = fs::remove_dir_all(&dir);
 }
+
+#[test]
+fn srcsetと幅と高さを出す() {
+    let dir = workdir("manifest");
+    let src_dir = dir.join("src");
+    fs::create_dir_all(&src_dir).unwrap();
+    fs::write(src_dir.join("kuro.jpg"), jpeg_with_metadata(750, 1000)).unwrap();
+    let done = convert_dir(&src_dir, &dir.join("out")).unwrap();
+    let images = imgpipe::manifest(&done, "/img/cats/");
+    let kuro = &images["kuro"];
+    assert_eq!((kuro.width, kuro.height), (750, 1000));
+
+    let hash = done[0].outputs[0]
+        .path
+        .file_name()
+        .unwrap()
+        .to_str()
+        .unwrap()
+        .split('-')
+        .nth(1)
+        .unwrap()
+        .to_owned();
+    assert_eq!(
+        kuro.webp,
+        format!("/img/cats/kuro-{hash}-480.webp 480w, /img/cats/kuro-{hash}-750.webp 750w")
+    );
+    assert_eq!(
+        kuro.avif,
+        format!("/img/cats/kuro-{hash}-480.avif 480w, /img/cats/kuro-{hash}-750.avif 750w")
+    );
+    assert_eq!(kuro.src, format!("/img/cats/kuro-{hash}-750.webp"));
+    let _ = fs::remove_dir_all(&dir);
+}
