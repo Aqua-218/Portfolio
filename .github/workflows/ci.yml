@@ -145,3 +145,16 @@ jobs:
       - run: lake exe cache get
       # 警告も落とす。sorryが残っていると警告になる
       - run: lake build --wfail
+
+  aeneas:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # CharonとAeneasは、ビルドに時間がかかるので版ごとに取っておく
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/pxcat-aeneas
+          key: aeneas-${{ runner.os }}-${{ hashFiles('proofs/aeneas.env') }}
+      # pxcat-coreからLeanを作り直して、コミットされているものと同じか見る
+      - run: sh proofs/extract.sh
+      - run: git diff --exit-code proofs/PxCat
