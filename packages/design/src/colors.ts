@@ -14,6 +14,8 @@ export const colorNames = [
   "tatami",
   "mike",
   "pxline",
+  "note",
+  "leaf",
 ] as const;
 
 export type ColorName = (typeof colorNames)[number];
@@ -28,6 +30,8 @@ export const light: Palette = {
   tatami: { l: 0.925, c: 0.032, h: 115 }, // 畳：タグ地
   mike: { l: 0.66, c: 0.145, h: 55 }, // 三毛の茶：差し色
   pxline: { l: 0.24, c: 0.015, h: 70 }, // ドット猫の輪郭
+  note: { l: 0.915, c: 0.038, h: 75 }, // 図のメモ(モックの #f2e0c8)
+  leaf: { l: 0.5, c: 0.06, h: 140 }, // コードの型名
 };
 
 export const dark: Palette = {
@@ -38,6 +42,8 @@ export const dark: Palette = {
   tatami: { l: 0.27, c: 0.025, h: 112 },
   mike: { l: 0.76, c: 0.13, h: 60 },
   pxline: { l: 0.82, c: 0.012, h: 95 },
+  note: { l: 0.361, c: 0.034, h: 66 }, // モックの #4a3a2a
+  leaf: { l: 0.5, c: 0.06, h: 140 },
 };
 
 export function toCss({ l, c, h }: Oklch): string {
