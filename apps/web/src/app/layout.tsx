@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Curtain } from "@/components/curtain/Curtain";
 import { Footer } from "@/components/footer/Footer";
 import { Header } from "@/components/header/Header";
+import { Paws } from "@/components/paw/Paws";
 import "@/styles/global.css";
 import { wrap } from "@/styles/layout.css";
 import { geist, lineSeedJp } from "./fonts";
@@ -23,6 +24,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <Footer />
         </div>
         <Curtain />
+        <Paws />
       </body>
     </html>
   );
