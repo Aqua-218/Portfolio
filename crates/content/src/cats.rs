@@ -3,8 +3,10 @@
 use crate::problem::Problem;
 use crate::toml_doc::Source;
 use serde::Deserialize;
+use serde::Serialize;
 use std::collections::{BTreeMap, HashSet};
 use toml::Spanned;
+use ts_rs::TS;
 
 /// 見出しの横に写真を置くページ。
 pub const SECTIONS: [&str; 8] = [
@@ -20,14 +22,16 @@ pub const SECTIONS: [&str; 8] = [
 
 const COATS: [&str; 3] = ["kuro", "kiji", "mike"];
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, TS)]
+#[serde(rename_all = "camelCase")]
 pub struct Photo {
     pub id: String,
     pub alt: String,
     pub coats: Vec<String>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, TS)]
+#[serde(rename_all = "camelCase")]
 pub struct Cats {
     /// Homeのモザイクの4枚
     pub mosaic: Vec<String>,
