@@ -10,6 +10,7 @@ pub mod licenses;
 pub mod problem;
 pub mod profile;
 pub mod shelf;
+pub mod site;
 pub mod skills;
 pub mod toml_doc;
 pub mod work;
