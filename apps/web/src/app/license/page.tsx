@@ -1,4 +1,16 @@
-// 中身は Pages のマイルストーンで作る
+import { Licenses } from "@/components/license/Licenses";
+import { Section } from "@/components/section/Section";
+
 export default function License() {
-  return null;
+  return (
+    <Section
+      name="license"
+      id="p-license"
+      title="License"
+      subtitle="ライセンス・クレジット"
+      page
+    >
+      <Licenses />
+    </Section>
+  );
 }
