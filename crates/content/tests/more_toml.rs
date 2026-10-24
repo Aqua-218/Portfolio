@@ -233,7 +233,7 @@ fn 写真のファイルが足りないか余っている() {
         &problems,
         &[
             (Some(31), "d.jpg がありません"),
-            (None, "e.jpg: cats.toml に載っていません"),
+            (None, "cats.toml に載っていません"),
         ],
     );
 }
@@ -263,7 +263,8 @@ fn 位置情報が残った写真は通さない() {
         jpeg(&[(0xE1, b"Exif\0\0MM\0*GPSLatitude")]),
     ));
     let problems = cats::parse(CATS, &f).unwrap_err();
-    assert_problems(&problems, &[(None, "d.jpg: EXIF が残っています")]);
+    assert_problems(&problems, &[(None, "EXIF が残っています")]);
+    assert_eq!(problems[0].file.as_deref(), Some("cats/d.jpg"));
 }
 
 #[test]
