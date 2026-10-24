@@ -13,6 +13,7 @@ globalStyle("body", {
   fontSize: "1rem",
   lineHeight: 1.8,
   WebkitFontSmoothing: "antialiased",
+  overflowX: "clip",
 });
 
 globalStyle("a", {

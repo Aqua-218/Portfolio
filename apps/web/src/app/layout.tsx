@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { Header } from "@/components/header/Header";
 import "@/styles/global.css";
+import { wrap } from "@/styles/layout.css";
 import { geist, lineSeedJp } from "./fonts";
 
 export const metadata: Metadata = {
@@ -12,7 +14,12 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="ja" className={`${geist.variable} ${lineSeedJp.variable}`}>
-      <body>{children}</body>
+      <body>
+        <div className={wrap}>
+          <Header />
+          <main>{children}</main>
+        </div>
+      </body>
     </html>
   );
 }
