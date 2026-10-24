@@ -12,6 +12,6 @@
     { "type": "chore", "section": "設定や道具", "hidden": true }
   ],
   "packages": {
-    ".": {}
+    ".": { "initial-version": "0.1.0" }
   }
 }
