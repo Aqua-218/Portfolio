@@ -1,6 +1,9 @@
 import { Facts } from "@/components/about/Facts";
 import { Timeline } from "@/components/about/Timeline";
 import { Lead, Section, Sub } from "@/components/section/Section";
+import { pageMeta } from "@/lib/meta";
+
+export const metadata = pageMeta("about");
 
 export default function About() {
   return (

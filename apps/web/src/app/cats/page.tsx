@@ -4,6 +4,9 @@ import { Photo } from "@/components/photo/Photo";
 import { Reveal } from "@/components/reveal/Reveal";
 import * as s from "@/components/section/section.css";
 import { images, site } from "@/lib/content";
+import { pageMeta } from "@/lib/meta";
+
+export const metadata = pageMeta("cats");
 
 export default function Cats() {
   const photos = site().cats.photos.flatMap((p) => {

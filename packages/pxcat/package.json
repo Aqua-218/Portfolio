@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./node": "./src/node.ts"
   },
   "scripts": {
     "build": "cargo build -p pxcat-wasm --target wasm32-unknown-unknown --release --locked && wasm-bindgen --target web --out-dir dist ../../target/wasm32-unknown-unknown/release/pxcat_wasm.wasm",
@@ -11,6 +12,7 @@
     "test": "vitest run"
   },
   "devDependencies": {
+    "@types/node": "24.19.2",
     "typescript": "6.0.3",
     "vitest": "5.0.5"
   }

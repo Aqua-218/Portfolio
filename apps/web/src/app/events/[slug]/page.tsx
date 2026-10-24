@@ -6,6 +6,7 @@ import * as e from "@/components/events/events.css";
 import { Section } from "@/components/section/Section";
 import * as s from "@/components/section/section.css";
 import { site } from "@/lib/content";
+import { pageMeta } from "@/lib/meta";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -20,7 +21,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const ev = site().events.find((x) => x.slug === slug);
-  return { title: ev ? `${ev.title} | 小峯 圭也` : "小峯 圭也" };
+  return pageMeta("events", ev?.title);
 }
 
 export default async function EventPage({ params }: Props) {

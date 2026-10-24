@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { dark, light } from "./colors";
-import { contrastRatio } from "./contrast";
+import { contrastRatio, toHex } from "./contrast";
 
 describe.each([
   ["ライト", light],
@@ -34,5 +34,17 @@ describe("contrastRatio", () => {
     expect(
       contrastRatio({ l: 0, c: 0, h: 0 }, { l: 1, c: 0, h: 0 }),
     ).toBeCloseTo(21, 0);
+  });
+});
+
+describe("toHex", () => {
+  it("白と黒", () => {
+    expect(toHex({ l: 1, c: 0, h: 0 })).toBe("#ffffff");
+    expect(toHex({ l: 0, c: 0, h: 0 })).toBe("#000000");
+  });
+
+  it("Mermaidのメモの色は、モックの#f2e0c8と#4a3a2aになる", () => {
+    expect(toHex(light.note)).toBe("#f2e0c8");
+    expect(toHex(dark.note)).toBe("#4a3a2a");
   });
 });

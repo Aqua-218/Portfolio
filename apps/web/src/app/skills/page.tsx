@@ -7,6 +7,9 @@ import {
   mains,
   ToolRows,
 } from "@/components/skills/Skills";
+import { pageMeta } from "@/lib/meta";
+
+export const metadata = pageMeta("skills");
 
 export default function Skills() {
   return (

@@ -13,13 +13,19 @@ import { Curtain } from "@/components/curtain/Curtain";
 import { Footer } from "@/components/footer/Footer";
 import { Header } from "@/components/header/Header";
 import { Paws } from "@/components/paw/Paws";
+import { OPEN_GRAPH, SITE_NAME, SITE_URL } from "@/lib/meta";
 import "@/styles/global.css";
 import { wrap } from "@/styles/layout.css";
 
+const DESCRIPTION =
+  "高校1年生のソフトウェアエンジニア、小峯圭也のポートフォリオ。写真はぜんぶ猫。";
+
 export const metadata: Metadata = {
-  title: "小峯 圭也",
-  description:
-    "高校1年生のソフトウェアエンジニア、小峯圭也のポートフォリオ。写真はぜんぶ猫。",
+  metadataBase: new URL(SITE_URL),
+  title: SITE_NAME,
+  description: DESCRIPTION,
+  openGraph: { ...OPEN_GRAPH, title: SITE_NAME, description: DESCRIPTION },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

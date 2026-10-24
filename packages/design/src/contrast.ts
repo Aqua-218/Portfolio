@@ -29,3 +29,15 @@ export function contrastRatio(a: Oklch, b: Oklch): number {
   const lb = relativeLuminance(b);
   return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
 }
+
+// sRGBの#rrggbb。CSSの色が使えないところ(OGP画像など)で使う。
+export function toHex(color: Oklch): string {
+  return `#${toLinearSrgb(color)
+    .map((x) => {
+      const v = x <= 0.0031308 ? 12.92 * x : 1.055 * x ** (1 / 2.4) - 0.055;
+      return Math.round(v * 255)
+        .toString(16)
+        .padStart(2, "0");
+    })
+    .join("")}`;
+}
