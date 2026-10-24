@@ -1,0 +1,36 @@
+[[affiliation]]
+group = "org"
+name = "N高グループ研究部（KdEi研）"
+url = "https://nnn.ed.jp/attractiveness/extracurricular/club/kenkyubu/blog/elwq-zu6wfv/"
+tag = "6期生・情報科学G"
+description = "学術研究を志す中高生のためのコミュニティです。情報科学グループに所属しています。"
+
+[[affiliation]]
+group = "org"
+name = "情報処理学会"
+tag = "会員"
+description = "情報処理の分野を扱う学会です。"
+
+[[affiliation]]
+group = "org"
+name = "電子情報通信学会"
+tag = "会員"
+description = "電子・情報・通信の分野を扱う学会です。"
+
+[[affiliation]]
+group = "org"
+name = "明治神宮崇敬会"
+tag = "会員"
+description = "明治神宮を崇敬する人たちの会です。"
+
+[[affiliation]]
+group = "contest"
+name = "U-22 プログラミング・コンテスト 2025"
+tag = "経済産業省商務情報政策局長賞"
+description = "22歳以下を対象にしたプログラミングのコンテストです。2025年大会で経済産業省商務情報政策局長賞を受賞しました。"
+
+[[affiliation]]
+group = "contest"
+name = "セキュリティ・キャンプ全国大会 2026"
+tag = "Z1ゼミ 修了生"
+description = "若い世代向けの情報セキュリティの合宿です。2026年の全国大会でZ1ゼミに参加し、修了しました。"
