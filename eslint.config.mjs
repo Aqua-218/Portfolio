@@ -53,6 +53,10 @@ export default defineConfig([
     files: ["apps/web/**"],
     extends: [nextVitals],
     settings: { next: { rootDir: "apps/web" } },
+    rules: {
+      // 静的エクスポートなので next/image の最適化は使えない。写真は imgpipe で変換している
+      "@next/next/no-img-element": "off",
+    },
   },
   prettier,
 ]);
