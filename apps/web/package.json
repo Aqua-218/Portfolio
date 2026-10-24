@@ -3,14 +3,16 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "typecheck": "next typegen && tsc --noEmit",
-    "e2e": "playwright test",
+    "content": "cd ../.. && cargo run -q -p content --bin content-check -- content --out apps/web/.content/site.json",
+    "dev": "pnpm run content && next dev",
+    "build": "pnpm run content && next build",
+    "typecheck": "pnpm run content && next typegen && tsc --noEmit",
     "test": "vitest run",
+    "e2e": "playwright test",
     "vrt": "sh vrt/run.sh"
   },
   "dependencies": {
+    "@portfolio/content-types": "workspace:*",
     "@portfolio/design": "workspace:*",
     "@portfolio/pxcat": "workspace:*",
     "@vanilla-extract/css": "1.21.3",
