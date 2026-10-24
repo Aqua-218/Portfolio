@@ -4,6 +4,7 @@ import { expect, test } from "@playwright/test";
 const PAGES = [
   { name: "home", path: "/" },
   { name: "about", path: "/about/" },
+  { name: "work", path: "/work/" },
 ] as const;
 
 for (const { name, path } of PAGES) {
