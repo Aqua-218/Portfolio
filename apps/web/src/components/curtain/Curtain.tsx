@@ -6,6 +6,7 @@ import { pawSvg } from "@/components/paw/shape";
 import { PxCat } from "@/components/px-cat/PxCat";
 import { subscribe } from "@/components/px-cat/ticker";
 import * as s from "./curtain.css";
+import * as m from "./machine";
 
 const LABEL: Readonly<Record<string, string>> = {
   "/": "Home",
@@ -90,7 +91,8 @@ export function Curtain() {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    let busy = false;
+    // 幕の状態。変わり方はmachine.tsで、specs/Curtain.tlaと同じ
+    let state = m.initial(normalize(location.pathname));
 
     const until = (path: string) =>
       new Promise<void>((resolve) => {
@@ -102,15 +104,16 @@ export function Curtain() {
       });
 
     async function go(to: string, navigate: () => void) {
-      busy = true;
       setLabel(labelOf(to));
       el?.classList.add(s.busy);
+      state = m.close(state);
       // 幕が閉じている間に、黒猫が2.4秒で横切る
       const runner = runnerRef.current;
+      let catDone = Promise.resolve();
       if (runner && el) {
         runner.style.visibility = "visible";
         const stopPrints = leavePrints(runner, el);
-        void runner
+        catDone = runner
           .animate([{ left: "-120px" }, { left: "calc(100% + 40px)" }], {
             duration: 2400,
             easing: "linear",
@@ -120,20 +123,29 @@ export function Curtain() {
             stopPrints();
           });
       }
+      void catDone.then(() => {
+        state = m.catGone(state);
+      });
       await el?.animate([{ translate: "-101% 0" }, { translate: "0 0" }], {
         duration: 560,
         easing: "cubic-bezier(0.7, 0, 0.3, 1)",
         fill: "forwards",
       }).finished;
-      const done = until(new URL(to, location.href).pathname);
+      state = m.cover(state);
+      const path = new URL(to, location.href).pathname;
+      const done = until(path);
       navigate();
       await done;
+      state = m.navigate(state, normalize(path));
       await wait(1050);
+      state = m.open(state);
       await el?.animate([{ translate: "0 0" }, { translate: "101% 0" }], {
         duration: 760,
         easing: "cubic-bezier(0.65, 0, 0.35, 1)",
         fill: "forwards",
       }).finished;
+      // 黒猫が走り終わるのを待ってから、幕を止める(specs/Curtain.tlaのOpened)
+      await catDone;
       el?.getAnimations().forEach((a) => {
         a.cancel();
       });
@@ -142,11 +154,11 @@ export function Curtain() {
         p.remove();
       });
       el?.classList.remove(s.busy);
-      busy = false;
+      state = m.opened(state);
     }
 
     const onClick = (e: MouseEvent) => {
-      if (busy || reducedMotion() || e.defaultPrevented) return;
+      if (reducedMotion() || e.defaultPrevented) return;
       if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)
         return;
       const a = e.target instanceof Element ? e.target.closest("a") : null;
@@ -159,6 +171,10 @@ export function Curtain() {
       const url = new URL(a.href, location.href);
       if (url.origin !== location.origin) return;
       if (normalize(url.pathname) === normalize(location.pathname)) return;
+      // 幕が動いている間は、幕を出さずにそのまま移る(モックと同じ)
+      const pressed = m.press(state, normalize(url.pathname));
+      state = pressed.state;
+      if (!pressed.curtain) return;
       e.preventDefault();
       e.stopPropagation();
       const to = url.pathname + url.search + url.hash;
@@ -168,7 +184,10 @@ export function Curtain() {
     };
 
     onPopState = (e) => {
-      if (busy || reducedMotion()) return;
+      if (reducedMotion()) return;
+      const pressed = m.press(state, normalize(location.pathname));
+      state = pressed.state;
+      if (!pressed.curtain) return;
       e.stopImmediatePropagation();
       void go(location.pathname, () => {
         replaying = true;
