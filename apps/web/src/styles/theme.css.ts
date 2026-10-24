@@ -52,8 +52,9 @@ function colors(palette: Palette) {
 createGlobalTheme(":root", vars, {
   color: colors(light),
   font: {
-    sans: '"Geist", "LINE Seed JP", "Helvetica Neue", Arial, "Hiragino Sans", "Yu Gothic", sans-serif',
-    jp: '"LINE Seed JP", "Hiragino Sans", "Yu Gothic", sans-serif',
+    // --font-geistと--font-line-seed-jpはnext/font(app/fonts.ts)が入れる
+    sans: 'var(--font-geist), var(--font-line-seed-jp), "Helvetica Neue", Arial, "Hiragino Sans", "Yu Gothic", sans-serif',
+    jp: 'var(--font-line-seed-jp), "Hiragino Sans", "Yu Gothic", sans-serif',
   },
   space: {
     xs: "0.5rem",
