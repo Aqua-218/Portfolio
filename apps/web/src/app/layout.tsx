@@ -1,3 +1,12 @@
+// フォントはリポジトリに入れたものを使い、ビルドで外へ取りに行かない(SIL OFL 1.1)
+import "@fontsource/geist/400.css";
+import "@fontsource/geist/500.css";
+import "@fontsource/geist/600.css";
+import "@fontsource/geist/700.css";
+import "@fontsource/geist/800.css";
+import "@fontsource/line-seed-jp/400.css";
+import "@fontsource/line-seed-jp/700.css";
+import "@fontsource/line-seed-jp/800.css";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Curtain } from "@/components/curtain/Curtain";
@@ -6,7 +15,6 @@ import { Header } from "@/components/header/Header";
 import { Paws } from "@/components/paw/Paws";
 import "@/styles/global.css";
 import { wrap } from "@/styles/layout.css";
-import { geist, lineSeedJp } from "./fonts";
 
 export const metadata: Metadata = {
   title: "小峯 圭也",
@@ -16,7 +24,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="ja" className={`${geist.variable} ${lineSeedJp.variable}`}>
+    <html lang="ja">
       <body>
         <div className={wrap}>
           <Header />
