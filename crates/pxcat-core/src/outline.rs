@@ -31,7 +31,18 @@ const fn filled(frame: &Frame, x: usize, y: usize) -> bool {
     !matches!(frame.get(x - 1, y - 1), Cell::Empty)
 }
 
+/// 格子の`(x, y)`が輪郭か。塗られていないマスのうち、上下左右のどれかが塗られているマス。
+const fn is_edge(frame: &Frame, x: usize, y: usize) -> bool {
+    !filled(frame, x, y)
+        && ((x > 0 && filled(frame, x - 1, y))
+            || filled(frame, x + 1, y)
+            || (y > 0 && filled(frame, x, y - 1))
+            || filled(frame, x, y + 1))
+}
+
 /// 塗られていないマスのうち、上下左右のどれかが塗られているマスを輪郭にする。
+///
+/// 1マスごとの判定は`is_edge`に分けて、ループの中で枝分かれしないようにする(Leanで証明しやすくするため)。
 #[must_use]
 pub const fn outline(frame: &Frame) -> Outline {
     let width = frame.width + 2;
@@ -41,14 +52,7 @@ pub const fn outline(frame: &Frame) -> Outline {
     while y < height {
         let mut x = 0;
         while x < width {
-            if !filled(frame, x, y)
-                && ((x > 0 && filled(frame, x - 1, y))
-                    || filled(frame, x + 1, y)
-                    || (y > 0 && filled(frame, x, y - 1))
-                    || filled(frame, x, y + 1))
-            {
-                cells[y][x] = true;
-            }
+            cells[y][x] = is_edge(frame, x, y);
             x += 1;
         }
         y += 1;
