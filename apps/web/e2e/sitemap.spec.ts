@@ -1,13 +1,13 @@
 import { readdirSync } from "node:fs";
 import { expect, test } from "@playwright/test";
 
-/** out/にあるページ。404と管理画面は除く */
+/** out/にあるページ。404・エラーの画面・管理画面は除く */
 function pages(): string[] {
   const out = new URL("../out/", import.meta.url).pathname;
   return readdirSync(out, { recursive: true, encoding: "utf8" })
     .filter((f) => f === "index.html" || f.endsWith("/index.html"))
     .map((f) => `/${f.replace(/index\.html$/, "")}`)
-    .filter((p) => !/^\/(404|_not-found|admin)\//.test(p))
+    .filter((p) => !/^\/(404|_not-found|admin|errors)\//.test(p))
     .sort();
 }
 
