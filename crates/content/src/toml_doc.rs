@@ -38,7 +38,7 @@ impl<'a> Source<'a> {
         toml::from_str(self.src).map_err(|e| {
             Problem::new(
                 e.span().map(|s| self.line_at(s.start)),
-                e.message().trim().to_owned(),
+                crate::problem::translate(e.message()),
             )
         })
     }
