@@ -3,7 +3,7 @@
 use crate::problem::Problem;
 use crate::toml_doc::{Source, check_icons};
 use serde::Deserialize;
-use std::collections::HashSet;
+use std::collections::{BTreeSet, HashSet};
 use toml::Spanned;
 
 /// 使う頻度。
@@ -42,6 +42,8 @@ pub const COATS: [&str; 3] = ["kuro", "kiji", "mike"];
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Skill {
+    /// 書いてある行。ほかのファイルと突き合わせるときのエラーで使う
+    pub line: usize,
     pub name: String,
     pub category: Category,
     pub level: Level,
@@ -51,6 +53,7 @@ pub struct Skill {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Tool {
+    pub line: usize,
     pub group: String,
     pub name: String,
     pub icons: Vec<String>,
@@ -149,6 +152,7 @@ pub fn parse(text: &str) -> Result<Skills, Vec<Problem>> {
             ));
         }
         skills.push(Skill {
+            line: src.line(&s.name).unwrap_or(1),
             name: s.name.get_ref().clone(),
             category,
             level,
@@ -174,6 +178,7 @@ pub fn parse(text: &str) -> Result<Skills, Vec<Problem>> {
             ));
         }
         tools.push(Tool {
+            line: src.line(&t.name).unwrap_or(1),
             group: t.group.get_ref().clone(),
             name: t.name.get_ref().clone(),
             icons: t
@@ -189,4 +194,37 @@ pub fn parse(text: &str) -> Result<Skills, Vec<Problem>> {
     } else {
         Err(problems)
     }
+}
+
+/// `local:`のアイコンのファイルがあり、`licenses.toml`に載っているか確かめる。
+/// `icon_files`は`content/icons/`にあるSVGの名前(拡張子なし)。
+#[must_use]
+pub fn check_local_icons(
+    skills: &Skills,
+    licensed: &BTreeSet<String>,
+    icon_files: &BTreeSet<String>,
+) -> Vec<Problem> {
+    let used = skills
+        .skills
+        .iter()
+        .map(|s| (s.line, &s.icons))
+        .chain(skills.tools.iter().map(|t| (t.line, &t.icons)));
+    let mut problems = Vec::new();
+    for (line, icons) in used {
+        for name in icons.iter().filter_map(|i| i.strip_prefix("local:")) {
+            if !icon_files.contains(name) {
+                problems.push(Problem::new(
+                    Some(line),
+                    format!("content/icons/{name}.svg がありません"),
+                ));
+            }
+            if !licensed.contains(name) {
+                problems.push(Problem::new(
+                    Some(line),
+                    format!("アイコン「{name}」が licenses.toml の icons に載っていません"),
+                ));
+            }
+        }
+    }
+    problems
 }
