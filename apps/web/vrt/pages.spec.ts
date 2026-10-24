@@ -10,6 +10,7 @@ const PAGES = [
   { name: "events", path: "/events/" },
   { name: "event", path: "/events/2026-08-10-seccamp/" },
   { name: "shelf", path: "/shelf/" },
+  { name: "stack", path: "/stack/" },
   { name: "license", path: "/license/" },
   { name: "cats", path: "/cats/" },
 ] as const;
