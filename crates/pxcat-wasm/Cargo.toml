@@ -12,6 +12,7 @@ crate-type = ["cdylib", "rlib"]
 # そのためworkspaceのlintsを継がず、clippyの設定だけ同じにする
 [lints.clippy]
 pedantic = { level = "warn", priority = -1 }
+doc_markdown = "allow"
 
 [dependencies]
 pxcat-core = { path = "../pxcat-core" }
