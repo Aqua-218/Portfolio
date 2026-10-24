@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.6.0](https://github.com/Aqua-218/Portfolio/compare/v0.5.0...v0.6.0) (2026-10-24)
+
+
+### 新しいこと
+
+* **proofs:** 毛色を変えても形が変わらないことを証明する ([#179](https://github.com/Aqua-218/Portfolio/issues/179)) ([4c70718](https://github.com/Aqua-218/Portfolio/commit/4c70718774412dcc31d87804dbb15253c9341675)), closes [#63](https://github.com/Aqua-218/Portfolio/issues/63)
+* **proofs:** 輪郭が塗りと重ならないことを証明する ([#184](https://github.com/Aqua-218/Portfolio/issues/184)) ([68f2cf3](https://github.com/Aqua-218/Portfolio/commit/68f2cf3a5ac4e2e592f7f316f1cee7ba2c2adf2c)), closes [#61](https://github.com/Aqua-218/Portfolio/issues/61)
+* **proofs:** 輪郭が閉じることを証明する ([#178](https://github.com/Aqua-218/Portfolio/issues/178)) ([07adfa5](https://github.com/Aqua-218/Portfolio/commit/07adfa58a5e10650e6434ebda350c0142bd5bea5)), closes [#62](https://github.com/Aqua-218/Portfolio/issues/62)
+* **specs:** TLCの実行例をVitestで再生する ([#186](https://github.com/Aqua-218/Portfolio/issues/186)) ([04c7ff2](https://github.com/Aqua-218/Portfolio/commit/04c7ff2922054490ac9223e9189a2860964b7b28)), closes [#66](https://github.com/Aqua-218/Portfolio/issues/66)
+* **specs:** 幕が二重に開かないことをTLCで検査する ([#183](https://github.com/Aqua-218/Portfolio/issues/183)) ([03c3efc](https://github.com/Aqua-218/Portfolio/commit/03c3efc2d66244523ecad1c38607ae29675ee0e2)), closes [#65](https://github.com/Aqua-218/Portfolio/issues/65)
+* **specs:** 幕の動きをPlusCalで書く ([#180](https://github.com/Aqua-218/Portfolio/issues/180)) ([a6d3af2](https://github.com/Aqua-218/Portfolio/commit/a6d3af2f721b31d83681f7ab9bca03e056cea0ac)), closes [#64](https://github.com/Aqua-218/Portfolio/issues/64)
+* **web:** Stackの数字を検査の結果から出す ([#188](https://github.com/Aqua-218/Portfolio/issues/188)) ([8872cc8](https://github.com/Aqua-218/Portfolio/commit/8872cc88162bd7eb16fa56572f5974758281973a)), closes [#68](https://github.com/Aqua-218/Portfolio/issues/68)
+
+
+### 直したこと
+
+* **web:** 幕の足跡のe2eテストが揺れるのを直す ([#182](https://github.com/Aqua-218/Portfolio/issues/182)) ([0b52aad](https://github.com/Aqua-218/Portfolio/commit/0b52aad7a2a32d756216957b9f8d176b691fb70c))
+
 ## [0.5.0](https://github.com/Aqua-218/Portfolio/compare/v0.4.0...v0.5.0) (2026-10-24)
 
 
