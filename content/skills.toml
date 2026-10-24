@@ -1,0 +1,330 @@
+# 言語と定理証明・形式手法。同じ category の中はレベルの高い順に並べる
+
+[[skill]]
+name = "Rust"
+category = "lang"
+level = "main"
+icons = ["simpleicons:rust"]
+coat = "mike"
+
+[[skill]]
+name = "C"
+category = "lang"
+level = "main"
+icons = ["simpleicons:c"]
+coat = "kuro"
+
+[[skill]]
+name = "TypeScript / JavaScript"
+category = "lang"
+level = "often"
+icons = ["simpleicons:typescript", "simpleicons:javascript"]
+
+[[skill]]
+name = "Python"
+category = "lang"
+level = "often"
+icons = ["simpleicons:python"]
+
+[[skill]]
+name = "Shell / Bash"
+category = "lang"
+level = "often"
+icons = ["simpleicons:gnubash"]
+
+[[skill]]
+name = "C++"
+category = "lang"
+level = "can"
+icons = ["simpleicons:cplusplus"]
+
+[[skill]]
+name = "アセンブリ"
+category = "lang"
+level = "can"
+
+[[skill]]
+name = "Go"
+category = "lang"
+level = "can"
+icons = ["simpleicons:go"]
+
+[[skill]]
+name = "Java"
+category = "lang"
+level = "can"
+icons = ["simpleicons:openjdk"]
+
+[[skill]]
+name = "Kotlin"
+category = "lang"
+level = "can"
+icons = ["simpleicons:kotlin"]
+
+[[skill]]
+name = "Zig"
+category = "lang"
+level = "can"
+icons = ["simpleicons:zig"]
+
+[[skill]]
+name = "C#"
+category = "lang"
+level = "can"
+icons = ["local:csharp"]
+
+[[skill]]
+name = "OCaml"
+category = "lang"
+level = "touched"
+icons = ["simpleicons:ocaml"]
+
+[[skill]]
+name = "Lean"
+category = "formal"
+level = "main"
+icons = ["local:lean"]
+coat = "kiji"
+
+[[skill]]
+name = "Coq / Rocq"
+category = "formal"
+level = "can"
+icons = ["local:rocq"]
+
+[[skill]]
+name = "Ada / SPARK"
+category = "formal"
+level = "can"
+
+[[skill]]
+name = "Isabelle"
+category = "formal"
+level = "can"
+
+[[skill]]
+name = "Agda"
+category = "formal"
+level = "can"
+icons = ["local:agda"]
+
+[[skill]]
+name = "TLA+"
+category = "formal"
+level = "can"
+
+[[skill]]
+name = "SMT ソルバ（Z3 など）"
+category = "formal"
+level = "can"
+
+# そのほか。グループは最初に出てきた順に並ぶ
+
+[[tool]]
+group = "分野"
+name = "形式検証"
+
+[[tool]]
+group = "分野"
+name = "低レイヤー"
+
+[[tool]]
+group = "分野"
+name = "セキュリティ"
+
+[[tool]]
+group = "分野"
+name = "AI・LLM"
+
+[[tool]]
+group = "低レイヤー"
+name = "x86 / RISC-V などの ISA"
+icons = ["simpleicons:riscv"]
+
+[[tool]]
+group = "低レイヤー"
+name = "コンパイラ・処理系"
+
+[[tool]]
+group = "低レイヤー"
+name = "OS・カーネル"
+
+[[tool]]
+group = "低レイヤー"
+name = "LLVM"
+icons = ["simpleicons:llvm"]
+
+[[tool]]
+group = "低レイヤー"
+name = "QEMU"
+icons = ["simpleicons:qemu"]
+
+[[tool]]
+group = "低レイヤー"
+name = "eBPF"
+icons = ["local:ebpf"]
+
+[[tool]]
+group = "低レイヤー"
+name = "WebAssembly"
+icons = ["simpleicons:webassembly"]
+
+[[tool]]
+group = "セキュリティ"
+name = "リバースエンジニアリング"
+
+[[tool]]
+group = "セキュリティ"
+name = "暗号"
+
+[[tool]]
+group = "セキュリティ"
+name = "AI セキュリティ"
+
+[[tool]]
+group = "Web"
+name = "React"
+icons = ["simpleicons:react"]
+
+[[tool]]
+group = "Web"
+name = "Next.js"
+icons = ["simpleicons:nextdotjs"]
+
+[[tool]]
+group = "Web"
+name = "Node.js"
+icons = ["simpleicons:nodedotjs"]
+
+[[tool]]
+group = "Web"
+name = "Tailwind CSS"
+icons = ["simpleicons:tailwindcss"]
+
+[[tool]]
+group = "アプリ"
+name = "Swift / SwiftUI"
+icons = ["simpleicons:swift"]
+
+[[tool]]
+group = "アプリ"
+name = "Flutter"
+icons = ["simpleicons:flutter"]
+
+[[tool]]
+group = "アプリ"
+name = "React Native"
+icons = ["simpleicons:react"]
+
+[[tool]]
+group = "アプリ"
+name = "Tauri / Electron"
+icons = ["simpleicons:tauri", "simpleicons:electron"]
+
+[[tool]]
+group = "インフラ・クラウド"
+name = "Linux"
+icons = ["simpleicons:linux"]
+
+[[tool]]
+group = "インフラ・クラウド"
+name = "Docker"
+icons = ["simpleicons:docker"]
+
+[[tool]]
+group = "インフラ・クラウド"
+name = "Kubernetes"
+icons = ["simpleicons:kubernetes"]
+
+[[tool]]
+group = "インフラ・クラウド"
+name = "Terraform"
+icons = ["simpleicons:terraform"]
+
+[[tool]]
+group = "インフラ・クラウド"
+name = "Nginx"
+icons = ["simpleicons:nginx"]
+
+[[tool]]
+group = "インフラ・クラウド"
+name = "Nix"
+icons = ["simpleicons:nixos"]
+
+[[tool]]
+group = "インフラ・クラウド"
+name = "Google Cloud"
+icons = ["simpleicons:googlecloud"]
+
+[[tool]]
+group = "インフラ・クラウド"
+name = "Azure"
+icons = ["local:azure"]
+
+[[tool]]
+group = "インフラ・クラウド"
+name = "Cloudflare"
+icons = ["simpleicons:cloudflare"]
+
+[[tool]]
+group = "インフラ・クラウド"
+name = "Vercel"
+icons = ["simpleicons:vercel"]
+
+[[tool]]
+group = "データベース"
+name = "PostgreSQL"
+icons = ["simpleicons:postgresql"]
+
+[[tool]]
+group = "データベース"
+name = "MySQL"
+icons = ["simpleicons:mysql"]
+
+[[tool]]
+group = "データベース"
+name = "SQLite"
+icons = ["simpleicons:sqlite"]
+
+[[tool]]
+group = "データベース"
+name = "Redis"
+icons = ["simpleicons:redis"]
+
+[[tool]]
+group = "AI"
+name = "PyTorch"
+icons = ["simpleicons:pytorch"]
+
+[[tool]]
+group = "AI"
+name = "Hugging Face"
+icons = ["simpleicons:huggingface"]
+
+[[tool]]
+group = "AI"
+name = "CUDA"
+icons = ["simpleicons:nvidia"]
+
+[[tool]]
+group = "AI"
+name = "LLM の API・SDK"
+
+[[tool]]
+group = "AI"
+name = "RAG・エージェント開発"
+
+[[tool]]
+group = "ツール"
+name = "Git / GitHub"
+icons = ["simpleicons:github"]
+
+[[tool]]
+group = "ツール"
+name = "GitHub Actions"
+icons = ["simpleicons:githubactions"]
+
+[[tool]]
+group = "ツール"
+name = "VS Code"
+icons = ["local:vscode"]
