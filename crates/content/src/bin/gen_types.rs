@@ -2,6 +2,7 @@
 //!
 //! 型ごとに`<名前>.ts`を書き、全部をまとめて読める`index.ts`も書く。
 
+use content::images::ImageManifest;
 use content::site::Site;
 use std::fmt::Write as _;
 use std::fs;
@@ -22,7 +23,7 @@ fn main() -> ExitCode {
         return ExitCode::FAILURE;
     }
     let cfg = ts_rs::Config::new().with_out_dir(&dir);
-    if let Err(e) = Site::export_all(&cfg) {
+    if let Err(e) = Site::export_all(&cfg).and_then(|()| ImageManifest::export_all(&cfg)) {
         eprintln!("型を書き出せません: {e}");
         return ExitCode::FAILURE;
     }
