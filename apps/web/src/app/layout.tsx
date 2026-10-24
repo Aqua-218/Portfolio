@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { Footer } from "@/components/footer/Footer";
 import { Header } from "@/components/header/Header";
 import "@/styles/global.css";
 import { wrap } from "@/styles/layout.css";
@@ -18,6 +19,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <div className={wrap}>
           <Header />
           <main>{children}</main>
+          <Footer />
         </div>
       </body>
     </html>
