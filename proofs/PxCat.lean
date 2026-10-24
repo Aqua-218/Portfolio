@@ -1,4 +1,5 @@
 import PxCat.Closed
+import PxCat.Coat
 
 /-!
 # ドット猫の証明
@@ -8,4 +9,5 @@ import PxCat.Closed
 - `PxCat/Outline.lean`: `outline`が、格子の各マスに`edge`(輪郭になる条件)を書くこと
 - `PxCat/Frames.lean`: `frame`が、絵の文字のとおりのマスを作ること
 - `PxCat/Closed.lean`: どのコマでも輪郭が閉じていること(`outline_closed`)
+- `PxCat/Coat.lean`: 毛色を変えても形が変わらないこと(`paint_shape`)
 -/
