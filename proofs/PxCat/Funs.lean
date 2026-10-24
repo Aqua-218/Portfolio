@@ -1224,8 +1224,55 @@ def outline.filled
         | sprite.Cell.Closed => ok false
       ok (¬ b)
 
+/-- [pxcat_core::outline::is_edge]:
+    Source: 'crates/pxcat-core/src/outline.rs', lines 35:0-41:1 -/
+def outline.is_edge
+  (frame : sprite.Frame) (x : Std.Usize) (y : Std.Usize) : Result Bool := do
+  let b ← outline.filled frame x y
+  if b
+  then ok false
+  else
+    if x > 0#usize
+    then
+      let i ← x - 1#usize
+      let b1 ← outline.filled frame i y
+      if b1
+      then ok true
+      else
+        let i1 ← x + 1#usize
+        let b2 ← outline.filled frame i1 y
+        if b2
+        then ok true
+        else
+          if y > 0#usize
+          then
+            let i2 ← y - 1#usize
+            let b3 ← outline.filled frame x i2
+            if b3
+            then ok true
+            else let i3 ← y + 1#usize
+                 outline.filled frame x i3
+          else let i2 ← y + 1#usize
+               outline.filled frame x i2
+    else
+      let i ← x + 1#usize
+      let b1 ← outline.filled frame i y
+      if b1
+      then ok true
+      else
+        if y > 0#usize
+        then
+          let i1 ← y - 1#usize
+          let b2 ← outline.filled frame x i1
+          if b2
+          then ok true
+          else let i2 ← y + 1#usize
+               outline.filled frame x i2
+        else let i1 ← y + 1#usize
+             outline.filled frame x i1
+
 /-- [pxcat_core::outline::outline]: loop body 1:
-    Source: 'crates/pxcat-core/src/outline.rs', lines 43:8-53:9
+    Source: 'crates/pxcat-core/src/outline.rs', lines 54:8-57:9
     Visibility: public -/
 @[rust_loop_body]
 def outline.outline_loop0_loop0.body
@@ -1238,110 +1285,16 @@ def outline.outline_loop0_loop0.body
   := do
   if x < width
   then
-    let b ← outline.filled { width := i, height := i1, cells := a } x y
-    let cells1 ←
-      if b
-      then ok cells
-      else
-        if x > 0#usize
-        then
-          do
-          let i2 ← x - 1#usize
-          let b1 ←
-            outline.filled { width := i, height := i1, cells := a } i2 y
-          if b1
-          then
-            let (a1, index_mut_back) ← Array.index_mut_usize cells y
-            let a2 ← Array.update a1 x true
-            ok (index_mut_back a2)
-          else
-            let i3 ← x + 1#usize
-            let b2 ←
-              outline.filled { width := i, height := i1, cells := a } i3 y
-            if b2
-            then
-              let (a1, index_mut_back) ← Array.index_mut_usize cells y
-              let a2 ← Array.update a1 x true
-              ok (index_mut_back a2)
-            else
-              if y > 0#usize
-              then
-                let i4 ← y - 1#usize
-                let b3 ←
-                  outline.filled { width := i, height := i1, cells := a } x i4
-                if b3
-                then
-                  let (a1, index_mut_back) ← Array.index_mut_usize cells y
-                  let a2 ← Array.update a1 x true
-                  ok (index_mut_back a2)
-                else
-                  let i5 ← y + 1#usize
-                  let b4 ←
-                    outline.filled { width := i, height := i1, cells := a } x
-                      i5
-                  if b4
-                  then
-                    let (a1, index_mut_back) ← Array.index_mut_usize cells y
-                    let a2 ← Array.update a1 x true
-                    ok (index_mut_back a2)
-                  else ok cells
-              else
-                let i4 ← y + 1#usize
-                let b3 ←
-                  outline.filled { width := i, height := i1, cells := a } x i4
-                if b3
-                then
-                  let (a1, index_mut_back) ← Array.index_mut_usize cells y
-                  let a2 ← Array.update a1 x true
-                  ok (index_mut_back a2)
-                else ok cells
-        else
-          do
-          let i2 ← x + 1#usize
-          let b1 ←
-            outline.filled { width := i, height := i1, cells := a } i2 y
-          if b1
-          then
-            let (a1, index_mut_back) ← Array.index_mut_usize cells y
-            let a2 ← Array.update a1 x true
-            ok (index_mut_back a2)
-          else
-            if y > 0#usize
-            then
-              let i3 ← y - 1#usize
-              let b2 ←
-                outline.filled { width := i, height := i1, cells := a } x i3
-              if b2
-              then
-                let (a1, index_mut_back) ← Array.index_mut_usize cells y
-                let a2 ← Array.update a1 x true
-                ok (index_mut_back a2)
-              else
-                let i4 ← y + 1#usize
-                let b3 ←
-                  outline.filled { width := i, height := i1, cells := a } x i4
-                if b3
-                then
-                  let (a1, index_mut_back) ← Array.index_mut_usize cells y
-                  let a2 ← Array.update a1 x true
-                  ok (index_mut_back a2)
-                else ok cells
-            else
-              let i3 ← y + 1#usize
-              let b2 ←
-                outline.filled { width := i, height := i1, cells := a } x i3
-              if b2
-              then
-                let (a1, index_mut_back) ← Array.index_mut_usize cells y
-                let a2 ← Array.update a1 x true
-                ok (index_mut_back a2)
-              else ok cells
+    let b ← outline.is_edge { width := i, height := i1, cells := a } x y
+    let (a1, index_mut_back) ← Array.index_mut_usize cells y
+    let a2 ← Array.update a1 x b
     let x1 ← x + 1#usize
-    ok (cont (cells1, x1))
+    let a3 := index_mut_back a2
+    ok (cont (a3, x1))
   else ok (done cells)
 
 /-- [pxcat_core::outline::outline]: loop 1:
-    Source: 'crates/pxcat-core/src/outline.rs', lines 43:8-53:9
+    Source: 'crates/pxcat-core/src/outline.rs', lines 54:8-57:9
     Visibility: public -/
 @[rust_loop]
 def outline.outline_loop0_loop0
@@ -1357,7 +1310,7 @@ def outline.outline_loop0_loop0
     (cells, x)
 
 /-- [pxcat_core::outline::outline]: loop body 0:
-    Source: 'crates/pxcat-core/src/outline.rs', lines 41:4-55:5
+    Source: 'crates/pxcat-core/src/outline.rs', lines 52:4-59:5
     Visibility: public -/
 @[rust_loop_body]
 def outline.outline_loop0.body
@@ -1376,7 +1329,7 @@ def outline.outline_loop0.body
   else ok (done cells)
 
 /-- [pxcat_core::outline::outline]: loop 0:
-    Source: 'crates/pxcat-core/src/outline.rs', lines 41:4-55:5
+    Source: 'crates/pxcat-core/src/outline.rs', lines 52:4-59:5
     Visibility: public -/
 @[rust_loop]
 def outline.outline_loop0
@@ -1392,7 +1345,7 @@ def outline.outline_loop0
     (cells, y)
 
 /-- [pxcat_core::outline::outline]:
-    Source: 'crates/pxcat-core/src/outline.rs', lines 36:0-61:1
+    Source: 'crates/pxcat-core/src/outline.rs', lines 47:0-65:1
     Visibility: public -/
 def outline.outline (frame : sprite.Frame) : Result outline.Outline := do
   let width ← frame.width + 2#usize
