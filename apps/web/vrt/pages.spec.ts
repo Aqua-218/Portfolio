@@ -9,6 +9,7 @@ const PAGES = [
   { name: "affiliations", path: "/affiliations/" },
   { name: "shelf", path: "/shelf/" },
   { name: "license", path: "/license/" },
+  { name: "cats", path: "/cats/" },
 ] as const;
 
 for (const { name, path } of PAGES) {
@@ -17,9 +18,20 @@ for (const { name, path } of PAGES) {
     // フォントとドット猫が出そろってから撮る
     await page.evaluate(() => document.fonts.ready);
     await expect(page.locator("header svg.px-svg")).toBeAttached();
+    // 画面の外の写真も先に読ませる。遅延読み込みのままだと、撮るときのスクロールで読み込みが揺れる
+    await page.evaluate(() => {
+      for (const im of document.querySelectorAll<HTMLImageElement>(
+        'img[loading="lazy"]',
+      )) {
+        im.loading = "eager";
+      }
+    });
     // 写真が全部読めてから撮る
     await page.waitForFunction(() =>
       [...document.images].every((im) => im.complete && im.naturalWidth > 0),
+    );
+    await page.evaluate(() =>
+      Promise.all([...document.images].map((im) => im.decode())),
     );
     await expect(page).toHaveScreenshot(`${name}.png`, { fullPage: true });
   });
