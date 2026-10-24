@@ -1,0 +1,14 @@
+[tools]
+node = "24.22.1"
+pnpm = "12.15.0"
+rust = "1.99.1"
+java = "temurin-25.0.5+8.0.LTS"
+
+# elanは単体のバイナリしか配っていない。elan-initとして走らせて、lean・lakeのプロキシを作る
+[tools."github:leanprover/elan"]
+version = "4.2.4"
+bin = "elan"
+postinstall = 'ln -sf "$MISE_TOOL_INSTALL_PATH/elan" "$MISE_TOOL_INSTALL_PATH/elan-init" && "$MISE_TOOL_INSTALL_PATH/elan-init" -y --no-modify-path --default-toolchain none'
+
+[env]
+_.path = ["{{ env.ELAN_HOME | default(value = env.HOME ~ '/.elan') }}/bin"]
