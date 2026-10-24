@@ -1,0 +1,28 @@
+[[company]]
+slug = "transwith"
+prefix = "株式会社"
+name = "TransWith"
+url = "https://transwith.jp/"
+description = "中小企業向けに、SES、IT顧問（CIO代行・情シス支援）、システム開発やプロダクト導入の支援をしている会社です。"
+tagline = "中小企業のDXを、AIとプロフェッショナル人材で実現する。"
+founded = "2022-11"
+location = "東京都港区"
+
+[[company]]
+slug = "idatenase"
+prefix = "株式会社"
+name = "IDATENase"
+url = "https://idatenase.com/"
+description = "東大発のスタートアップです。生命科学や化学の知見とAIを組み合わせて、創薬・再生医療・素材・製造などの課題に合わせたオーダーメイドのAIを作っています。"
+tagline = "AI for Science, Science for AI"
+founded = "2024-09"
+location = "東京都文京区"
+
+[[company]]
+slug = "epicai"
+prefix = "株式会社"
+name = "EpicAI"
+url = "https://epicai.co.jp/"
+description = "建設・製造・インフラ産業を中心に、AIエージェントを実際の業務に組み込むチームです。"
+founded = "2023-12"
+location = "東京都文京区"
