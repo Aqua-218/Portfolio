@@ -1,7 +1,10 @@
 import { expect, test } from "@playwright/test";
 
 // 中身ができたページから足していく
-const PAGES = [{ name: "home", path: "/" }] as const;
+const PAGES = [
+  { name: "home", path: "/" },
+  { name: "about", path: "/about/" },
+] as const;
 
 for (const { name, path } of PAGES) {
   test(name, async ({ page }) => {

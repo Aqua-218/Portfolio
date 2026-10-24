@@ -1,4 +1,22 @@
-// 中身は Pages のマイルストーンで作る
+import { Facts } from "@/components/about/Facts";
+import { Timeline } from "@/components/about/Timeline";
+import { Lead, Section, Sub } from "@/components/section/Section";
+
 export default function About() {
-  return null;
+  return (
+    <Section
+      name="about"
+      id="p-about"
+      title="About"
+      subtitle="基本のアレコレ"
+      page
+    >
+      <Lead>
+        東京生まれ、栃木在住の高校1年生です。N高等学校に通いながら、ソフトウェアエンジニアとして3社の開発に関わっています。
+      </Lead>
+      <Facts />
+      <Sub id="about-history">経歴</Sub>
+      <Timeline />
+    </Section>
+  );
 }
