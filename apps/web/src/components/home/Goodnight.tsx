@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, type ReactNode } from "react";
+import { HiddenCat } from "@/components/hidden-cat/HiddenCat";
 import { useInView } from "@/components/reveal/useInView";
 import * as s from "./home.css";
 
@@ -16,6 +17,7 @@ export function Goodnight({ children }: { children: ReactNode }) {
       >
         {children}
       </figure>
+      <HiddenCat />
     </div>
   );
 }
