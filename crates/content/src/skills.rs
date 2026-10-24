@@ -3,11 +3,14 @@
 use crate::problem::Problem;
 use crate::toml_doc::{Source, check_icons};
 use serde::Deserialize;
+use serde::Serialize;
 use std::collections::{BTreeSet, HashSet};
 use toml::Spanned;
+use ts_rs::TS;
 
 /// 使う頻度。
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, TS)]
+#[serde(rename_all = "lowercase")]
 pub enum Level {
     Main,
     Often,
@@ -29,7 +32,8 @@ impl Level {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, TS)]
+#[serde(rename_all = "lowercase")]
 pub enum Category {
     /// 言語
     Lang,
@@ -40,8 +44,11 @@ pub enum Category {
 /// のぞく猫の毛色。
 pub const COATS: [&str; 3] = ["kuro", "kiji", "mike"];
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, TS)]
+#[serde(rename_all = "camelCase")]
 pub struct Skill {
+    #[serde(skip)]
+    #[ts(skip)]
     /// 書いてある行。ほかのファイルと突き合わせるときのエラーで使う
     pub line: usize,
     pub name: String,
@@ -51,15 +58,19 @@ pub struct Skill {
     pub coat: Option<String>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, TS)]
+#[serde(rename_all = "camelCase")]
 pub struct Tool {
+    #[serde(skip)]
+    #[ts(skip)]
     pub line: usize,
     pub group: String,
     pub name: String,
     pub icons: Vec<String>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, TS)]
+#[serde(rename_all = "camelCase")]
 pub struct Skills {
     pub skills: Vec<Skill>,
     pub tools: Vec<Tool>,
