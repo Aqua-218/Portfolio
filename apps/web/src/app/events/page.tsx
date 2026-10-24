@@ -1,5 +1,8 @@
 import { EventYears } from "@/components/events/Events";
 import { Lead, Section } from "@/components/section/Section";
+import { pageMeta } from "@/lib/meta";
+
+export const metadata = pageMeta("events");
 
 export default function Events() {
   return (
