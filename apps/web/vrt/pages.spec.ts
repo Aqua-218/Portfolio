@@ -9,6 +9,10 @@ for (const { name, path } of PAGES) {
     // フォントとドット猫が出そろってから撮る
     await page.evaluate(() => document.fonts.ready);
     await expect(page.locator("header svg.px-svg")).toBeAttached();
+    // 写真が全部読めてから撮る
+    await page.waitForFunction(() =>
+      [...document.images].every((im) => im.complete && im.naturalWidth > 0),
+    );
     await expect(page).toHaveScreenshot(`${name}.png`, { fullPage: true });
   });
 }
