@@ -24,3 +24,22 @@ describe("render", () => {
     );
   });
 });
+
+describe("コードの色", () => {
+  it.each([
+    ["rust", "fn main() {}"],
+    ["typescript", "const x: number = 1;"],
+    ["lean4", "theorem t : 1 = 1 := rfl"],
+    ["tla", "Init == x = 0 \\* はじめ"],
+  ])("%sに猫のテーマで色がつく", async (lang, code) => {
+    const html = await render("```" + lang + "\n" + code + "\n```");
+    expect(html).toContain('class="shiki cat"');
+    expect(html).toContain("var(--shiki-token-");
+  });
+
+  it("知らない言語は色なしで出す", async () => {
+    const html = await render("```nyan\nにゃー\n```");
+    expect(html).toContain("にゃー");
+    expect(html).not.toContain("var(--shiki-token-");
+  });
+});
