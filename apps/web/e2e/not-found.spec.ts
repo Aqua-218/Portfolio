@@ -4,6 +4,7 @@ test("ないページでは迷子の猫が出て、トップに戻れる", async
   await page.emulateMedia({ reducedMotion: "reduce" });
   const res = await page.goto("/nai/");
   expect(res?.status()).toBe(404);
+  await expect(page).toHaveTitle("404 | 小峯 圭也");
   await expect(page.getByRole("heading", { name: "404" })).toBeVisible();
   await expect(
     page.getByText(
