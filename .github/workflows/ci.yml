@@ -118,3 +118,27 @@ jobs:
           name: vrt-diff
           path: apps/web/test-results/
           retention-days: 7
+
+  lean:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: proofs
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: jdx/mise-action@8418fedb1110381a0d3ba51a7a415d7c1b884550 # v5.2.2
+        with:
+          install_args: github:leanprover/elan
+      # elanが入れたlean・lakeのプロキシ
+      - run: echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.elan/toolchains
+            proofs/.lake
+          key: lean-${{ runner.os }}-${{ hashFiles('proofs/lean-toolchain', 'proofs/lake-manifest.json') }}
+          restore-keys: lean-${{ runner.os }}-
+      # Mathlibは手元でビルドせず、ビルドしたものを取ってくる
+      - run: lake exe cache get
+      # 警告も落とす。sorryが残っていると警告になる
+      - run: lake build --wfail
