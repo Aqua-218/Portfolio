@@ -5,7 +5,13 @@ import { defineConfig, globalIgnores } from "eslint/config";
 import tseslint from "typescript-eslint";
 
 export default defineConfig([
-  globalIgnores(["**/.next/", "**/out/", "**/next-env.d.ts", "target/"]),
+  globalIgnores([
+    "**/.next/",
+    "**/out/",
+    "**/next-env.d.ts",
+    "target/",
+    "packages/pxcat/dist/",
+  ]),
   js.configs.recommended,
   tseslint.configs.strictTypeChecked,
   {

@@ -8,7 +8,7 @@ const withVanillaExtract = createVanillaExtractPlugin({
 const config: NextConfig = {
   output: "export",
   trailingSlash: true,
-  transpilePackages: ["@portfolio/design"],
+  transpilePackages: ["@portfolio/design", "@portfolio/pxcat"],
 };
 
 export default withVanillaExtract(config);

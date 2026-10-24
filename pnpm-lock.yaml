@@ -193,6 +193,9 @@ importers:
       '@portfolio/design':
         specifier: workspace:*
         version: link:../../packages/design
+      '@portfolio/pxcat':
+        specifier: workspace:*
+        version: link:../../packages/pxcat
       '@vanilla-extract/css':
         specifier: 1.21.3
         version: 1.21.3
@@ -230,6 +233,12 @@ importers:
       vitest:
         specifier: 5.0.5
         version: 5.0.5(@types/node@24.19.2)(vite@8.3.5(@types/node@24.19.2))
+
+  packages/pxcat:
+    devDependencies:
+      typescript:
+        specifier: 6.0.3
+        version: 6.0.3
 
 packages:
 
