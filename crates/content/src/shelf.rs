@@ -3,10 +3,14 @@
 use crate::problem::Problem;
 use crate::toml_doc::Source;
 use serde::Deserialize;
+use serde::Serialize;
 use std::collections::HashSet;
 use toml::Spanned;
+use ts_rs::TS;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, TS)]
+#[serde(rename_all = "lowercase")]
+#[ts(rename = "ShelfKind")]
 pub enum Kind {
     Drama,
     Anime,
@@ -14,7 +18,9 @@ pub enum Kind {
     Book,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(rename = "ShelfWork")]
 pub struct Work {
     pub kind: Kind,
     pub title: String,

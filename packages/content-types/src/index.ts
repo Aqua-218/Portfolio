@@ -1,0 +1,21 @@
+// gen-typesが書き出した。手で直さない
+export type { Affiliation } from "./Affiliation";
+export type { AffiliationGroup } from "./AffiliationGroup";
+export type { Career } from "./Career";
+export type { Category } from "./Category";
+export type { Cats } from "./Cats";
+export type { Company } from "./Company";
+export type { Event } from "./Event";
+export type { Fact } from "./Fact";
+export type { Level } from "./Level";
+export type { License } from "./License";
+export type { LicenseGroup } from "./LicenseGroup";
+export type { Photo } from "./Photo";
+export type { Profile } from "./Profile";
+export type { ShelfKind } from "./ShelfKind";
+export type { ShelfWork } from "./ShelfWork";
+export type { Site } from "./Site";
+export type { Skill } from "./Skill";
+export type { Skills } from "./Skills";
+export type { Tool } from "./Tool";
+export type { YearNote } from "./YearNote";

@@ -1,0 +1,15 @@
+{
+  "name": "@portfolio/content-types",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "gen": "cargo run -q -p content --bin gen-types -- src && prettier --write src",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "6.0.3"
+  }
+}

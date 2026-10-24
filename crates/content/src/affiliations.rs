@@ -3,9 +3,13 @@
 use crate::problem::Problem;
 use crate::toml_doc::Source;
 use serde::Deserialize;
+use serde::Serialize;
 use toml::Spanned;
+use ts_rs::TS;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, TS)]
+#[serde(rename_all = "lowercase")]
+#[ts(rename = "AffiliationGroup")]
 pub enum Group {
     /// 所属団体
     Org,
@@ -13,7 +17,8 @@ pub enum Group {
     Contest,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, TS)]
+#[serde(rename_all = "camelCase")]
 pub struct Affiliation {
     pub group: Group,
     pub name: String,

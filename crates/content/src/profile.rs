@@ -3,9 +3,12 @@
 use crate::problem::Problem;
 use crate::toml_doc::Source;
 use serde::Deserialize;
+use serde::Serialize;
 use toml::Spanned;
+use ts_rs::TS;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, TS)]
+#[serde(rename_all = "camelCase")]
 pub struct Fact {
     pub label: String,
     pub value: String,
@@ -15,14 +18,16 @@ pub struct Fact {
     pub wide: bool,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, TS)]
+#[serde(rename_all = "camelCase")]
 pub struct Career {
     pub year: u16,
     pub title: String,
     pub note: Option<String>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, TS)]
+#[serde(rename_all = "camelCase")]
 pub struct Profile {
     pub name: String,
     pub romaji: String,

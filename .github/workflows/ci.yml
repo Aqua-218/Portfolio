@@ -57,6 +57,9 @@ jobs:
       # 型チェックがwasm-bindgenの作る型を読むので、先にビルドする
       - run: pnpm --filter @portfolio/pxcat build
       - run: pnpm check
+      # Rustの型からTSの型を作り直して、コミットされているものと同じか見る
+      - run: pnpm --filter @portfolio/content-types gen
+      - run: git diff --exit-code packages/content-types
       - run: cargo fmt --all --check
       - run: cargo clippy --workspace --all-targets --locked -- -D warnings
 

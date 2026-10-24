@@ -1,5 +1,6 @@
 //! 日付。`YYYY-MM-DD`と`YYYY-MM`を読む。
 
+use serde::{Serialize, Serializer};
 use std::fmt;
 
 /// 実在する日付。
@@ -80,5 +81,25 @@ impl YearMonth {
         let year = digits::<u16>(y, 4)?;
         let month = digits::<u8>(m, 2)?;
         (1..=12).contains(&month).then_some(Self { year, month })
+    }
+}
+
+impl fmt::Display for YearMonth {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{:04}-{:02}", self.year, self.month)
+    }
+}
+
+/// JSONでは`YYYY-MM-DD`の文字列にする。
+impl Serialize for Date {
+    fn serialize<S: Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
+        s.collect_str(self)
+    }
+}
+
+/// JSONでは`YYYY-MM`の文字列にする。
+impl Serialize for YearMonth {
+    fn serialize<S: Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
+        s.collect_str(self)
     }
 }

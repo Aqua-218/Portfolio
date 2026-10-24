@@ -4,14 +4,19 @@ use crate::events::Event;
 use crate::problem::Problem;
 use crate::toml_doc::Source;
 use serde::Deserialize;
+use serde::Serialize;
 use std::collections::HashSet;
 use toml::Spanned;
+use ts_rs::TS;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, TS)]
+#[serde(rename_all = "camelCase")]
 pub struct YearNote {
     /// 年度(4月に始まる年)
     pub year: u16,
     pub note: String,
+    #[serde(skip)]
+    #[ts(skip)]
     /// 書いてある行。ほかのファイルと突き合わせるときのエラーで使う
     pub line: usize,
 }
