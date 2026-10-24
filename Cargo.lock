@@ -537,8 +537,11 @@ dependencies = [
 name = "imgpipe"
 version = "0.1.0"
 dependencies = [
+ "content",
  "image",
  "ravif",
+ "serde",
+ "serde_json",
  "sha2",
  "webp",
 ]

@@ -6,6 +6,7 @@ pub mod date;
 pub mod event_years;
 pub mod events;
 pub mod frontmatter;
+pub mod images;
 pub mod licenses;
 pub mod problem;
 pub mod profile;

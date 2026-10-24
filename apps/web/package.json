@@ -4,8 +4,9 @@
   "type": "module",
   "scripts": {
     "content": "cd ../.. && cargo run -q -p content --bin content-check -- content --out apps/web/.content/site.json",
-    "dev": "pnpm run content && next dev",
-    "build": "pnpm run content && next build",
+    "images": "cd ../.. && cargo run -q -p imgpipe -- content/cats apps/web/public/img/cats --url-prefix /img/cats --manifest apps/web/.content/images.json",
+    "dev": "pnpm run content && pnpm run images && next dev",
+    "build": "pnpm run content && pnpm run images && next build",
     "typecheck": "pnpm run content && next typegen && tsc --noEmit",
     "test": "vitest run",
     "e2e": "playwright test",

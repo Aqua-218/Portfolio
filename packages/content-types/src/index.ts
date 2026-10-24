@@ -7,6 +7,8 @@ export type { Cats } from "./Cats";
 export type { Company } from "./Company";
 export type { Event } from "./Event";
 export type { Fact } from "./Fact";
+export type { Image } from "./Image";
+export type { ImageManifest } from "./ImageManifest";
 export type { Level } from "./Level";
 export type { License } from "./License";
 export type { LicenseGroup } from "./LicenseGroup";
