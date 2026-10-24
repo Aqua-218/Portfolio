@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { HiddenCatHint } from "@/components/hidden-cat/HiddenCat";
 import * as s from "./footer.css";
 
 const SITEMAP = [
@@ -125,6 +126,7 @@ export function Footer() {
             License
           </Link>
         </span>
+        <HiddenCatHint />
         <span>Tochigi, JP</span>
       </footer>
     </>
