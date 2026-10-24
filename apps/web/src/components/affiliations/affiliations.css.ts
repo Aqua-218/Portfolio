@@ -4,6 +4,8 @@ import { vars } from "@/styles/theme.css";
 export const groups = style({
   display: "grid",
   gap: "2.75rem",
+  // モックでは右の列が写真の列の高さまで伸び、まとまりの間も均等に広がる
+  height: "100%",
 });
 
 export const name = style({
