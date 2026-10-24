@@ -4,7 +4,9 @@ use crate::date::Date;
 use crate::frontmatter;
 use crate::problem::Problem;
 use serde::Deserialize;
+use serde::Serialize;
 use serde_saphyr::Spanned;
+use ts_rs::TS;
 
 #[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -17,12 +19,15 @@ struct Front {
 }
 
 /// 検証したイベント。
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, TS)]
+#[serde(rename_all = "camelCase")]
 pub struct Event {
     /// ファイル名(拡張子なし)
     pub slug: String,
     pub title: String,
+    #[ts(as = "String")]
     pub date: Date,
+    #[ts(as = "Option<String>")]
     pub end: Option<Date>,
     pub venue: String,
     pub tags: Vec<String>,
