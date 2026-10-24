@@ -144,3 +144,12 @@ export const sub = style({
   fontWeight: 700,
   color: vars.color.ink,
 });
+
+/** まとまりの小さな見出し(モックの h3) */
+export const groupHeading = style({
+  margin: "0 0 0.85rem",
+  fontFamily: vars.font.jp,
+  fontSize: "0.8125rem",
+  fontWeight: 400,
+  color: vars.color.muted,
+});

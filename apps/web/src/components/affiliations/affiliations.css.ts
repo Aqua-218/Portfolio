@@ -6,14 +6,6 @@ export const groups = style({
   gap: "2.75rem",
 });
 
-export const heading = style({
-  margin: "0 0 0.85rem",
-  fontFamily: vars.font.jp,
-  fontSize: "0.8125rem",
-  fontWeight: 400,
-  color: vars.color.muted,
-});
-
 export const name = style({
   fontFamily: vars.font.jp,
   fontWeight: 700,

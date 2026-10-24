@@ -1,6 +1,7 @@
 import type { Affiliation, AffiliationGroup } from "@portfolio/content-types";
 import { Reveal } from "@/components/reveal/Reveal";
 import * as r from "@/components/rows/rows.css";
+import { groupHeading } from "@/components/section/section.css";
 import { site } from "@/lib/content";
 import * as s from "./affiliations.css";
 
@@ -37,7 +38,7 @@ export function Affiliations({ detail = false }: { detail?: boolean }) {
         const items = all.filter((a) => a.group === group);
         return (
           <div key={group} id={detail ? id : undefined}>
-            <h3 className={s.heading}>{label}</h3>
+            <h3 className={groupHeading}>{label}</h3>
             {detail ? (
               <ul className={s.orgList}>
                 {items.map((a, i) => (
