@@ -136,3 +136,20 @@ coats = ["mike"]
 id = "kinako-16"
 alt = "畳の部屋で猫たちがそれぞれのお皿でごはんを食べている"
 coats = ["mike", "kuro", "kiji"]
+
+# 雷のフォルダから(2026-10-24 に取り込んだ。きなこのフォルダと同じ写真は除いた)
+
+[[photo]]
+id = "kaminari-01"
+alt = "机の下で目をまん丸にしてこちらを見る黒い子猫"
+coats = ["kuro"]
+
+[[photo]]
+id = "kaminari-02"
+alt = "ソファの上でキジ白の猫が黒猫を抱きしめている"
+coats = ["kiji", "kuro"]
+
+[[photo]]
+id = "kaminari-03"
+alt = "ソファの上でキジ白の猫と黒猫が寄りそってくつろいでいる"
+coats = ["kiji", "kuro"]
