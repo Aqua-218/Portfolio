@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { PxCat } from "@/components/px-cat/PxCat";
 import * as s from "./curtain.css";
 
 const LABEL: Readonly<Record<string, string>> = {
@@ -27,6 +28,8 @@ function labelOf(path: string): string {
   return LABEL[p] ?? LABEL[`/${p.split("/")[1] ?? ""}`] ?? "";
 }
 
+const RUN = ["runA", "runB"] as const;
+
 const wait = (ms: number) =>
   new Promise<void>((resolve) => setTimeout(resolve, ms));
 
@@ -49,6 +52,7 @@ export function Curtain() {
   const router = useRouter();
   const pathname = usePathname();
   const ref = useRef<HTMLDivElement>(null);
+  const runnerRef = useRef<HTMLSpanElement>(null);
   const [label, setLabel] = useState("");
   const arrived = useRef<((path: string) => void) | undefined>(undefined);
 
@@ -74,6 +78,19 @@ export function Curtain() {
       busy = true;
       setLabel(labelOf(to));
       el?.classList.add(s.busy);
+      // 幕が閉じている間に、黒猫が2.4秒で横切る
+      const runner = runnerRef.current;
+      if (runner) {
+        runner.style.visibility = "visible";
+        void runner
+          .animate([{ left: "-120px" }, { left: "calc(100% + 40px)" }], {
+            duration: 2400,
+            easing: "linear",
+          })
+          .finished.then(() => {
+            runner.style.visibility = "hidden";
+          });
+      }
       await el?.animate([{ translate: "-101% 0" }, { translate: "0 0" }], {
         duration: 560,
         easing: "cubic-bezier(0.7, 0, 0.3, 1)",
@@ -137,8 +154,13 @@ export function Curtain() {
   }, [router]);
 
   return (
-    <div ref={ref} className={s.curtain} aria-hidden="true">
-      <span className={s.label}>{label}</span>
-    </div>
+    <>
+      <div ref={ref} className={s.curtain} aria-hidden="true">
+        <span className={s.label}>{label}</span>
+      </div>
+      <span ref={runnerRef} className={s.runner} aria-hidden="true">
+        <PxCat frames={RUN} coat="kuro" pixel={5} motion="run" />
+      </span>
+    </>
   );
 }
