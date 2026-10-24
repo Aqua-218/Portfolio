@@ -6,6 +6,7 @@ const PAGES = [
   { name: "about", path: "/about/" },
   { name: "work", path: "/work/" },
   { name: "affiliations", path: "/affiliations/" },
+  { name: "shelf", path: "/shelf/" },
 ] as const;
 
 for (const { name, path } of PAGES) {
