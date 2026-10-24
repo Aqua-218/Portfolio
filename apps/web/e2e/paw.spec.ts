@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
-const paws = "body > div:has(> svg ellipse)";
+// クリックの肉球は28pxのSVG。フッターの足跡とは別
+const paws = 'body > div:has(> svg[width="28"] ellipse)';
 
 /** ハイドレーションが済むまで待つ。ロゴの猫が描かれていれば済んでいる。 */
 async function open(page: Page) {

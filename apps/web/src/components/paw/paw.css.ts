@@ -23,3 +23,13 @@ export const paw = style({
     },
   },
 });
+
+/** あちこちの足跡。文字や写真の邪魔をしないよう、薄く、押せなくする */
+export const trail = style({
+  display: "block",
+  color: vars.color.muted,
+  fill: "currentColor",
+  opacity: 0.22,
+  pointerEvents: "none",
+  userSelect: "none",
+});

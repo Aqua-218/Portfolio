@@ -130,6 +130,14 @@ globalStyle(`${cat} img[src*="kijishiro-tatami"]`, {
   objectPosition: "82% 45%",
 });
 
+/** 写真の下の余白に、猫が歩いていった足跡。スマホの幅では写真が横に来るので出さない */
+export const trail = style({
+  margin: "2.5rem 0 0 3rem",
+  "@media": {
+    "(max-width: 860px)": { display: "none" },
+  },
+});
+
 export const body = style({
   minWidth: 0,
 });
