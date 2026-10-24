@@ -1,5 +1,8 @@
 import { Lead, Section } from "@/components/section/Section";
 import { Shelf as List } from "@/components/shelf/Shelf";
+import { pageMeta } from "@/lib/meta";
+
+export const metadata = pageMeta("shelf");
 
 export default function Shelf() {
   return (
