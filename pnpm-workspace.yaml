@@ -1,3 +1,6 @@
 packages:
   - apps/*
   - packages/*
+allowBuilds:
+  # ビルド済みのバイナリを使うので、インストールのスクリプトはいらない
+  unrs-resolver: false
