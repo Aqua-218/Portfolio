@@ -4,10 +4,13 @@ use crate::date::YearMonth;
 use crate::problem::Problem;
 use crate::toml_doc::Source;
 use serde::Deserialize;
+use serde::Serialize;
 use std::collections::HashSet;
 use toml::Spanned;
+use ts_rs::TS;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, TS)]
+#[serde(rename_all = "camelCase")]
 pub struct Company {
     pub slug: String,
     pub prefix: Option<String>,
@@ -15,6 +18,7 @@ pub struct Company {
     pub url: String,
     pub description: String,
     pub tagline: Option<String>,
+    #[ts(as = "String")]
     pub founded: YearMonth,
     pub location: String,
 }
