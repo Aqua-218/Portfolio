@@ -1,0 +1,27 @@
+State 1: <Initial predicate>
+/\ opening = 0
+/\ moves = 0
+/\ page = 0
+/\ busy = FALSE
+/\ running = FALSE
+/\ phase = "idle"
+/\ pc = (0 :> "Run" @@ 1 :> "Press" @@ 2 :> "Press")
+
+State 2: <Press>
+/\ opening = 0
+/\ moves = 0
+/\ page = 0
+/\ busy = TRUE
+/\ running = FALSE
+/\ phase = "idle"
+/\ pc = (0 :> "Run" @@ 1 :> "Close" @@ 2 :> "Press")
+
+State 3: <Press>
+/\ opening = 0
+/\ moves = 1
+/\ page = 2
+/\ busy = TRUE
+/\ running = FALSE
+/\ phase = "idle"
+/\ pc = (0 :> "Run" @@ 1 :> "Close" @@ 2 :> "Done")
+

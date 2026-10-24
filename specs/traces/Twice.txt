@@ -1,0 +1,90 @@
+State 1: <Initial predicate>
+/\ opening = 0
+/\ moves = 0
+/\ page = 0
+/\ busy = FALSE
+/\ running = FALSE
+/\ phase = "idle"
+/\ pc = (0 :> "Run" @@ 1 :> "Press" @@ 2 :> "Press")
+
+State 2: <Press>
+/\ opening = 0
+/\ moves = 0
+/\ page = 0
+/\ busy = TRUE
+/\ running = FALSE
+/\ phase = "idle"
+/\ pc = (0 :> "Run" @@ 1 :> "Close" @@ 2 :> "Press")
+
+State 3: <Close>
+/\ opening = 0
+/\ moves = 0
+/\ page = 0
+/\ busy = TRUE
+/\ running = TRUE
+/\ phase = "closing"
+/\ pc = (0 :> "Run" @@ 1 :> "Covered" @@ 2 :> "Press")
+
+State 4: <Run>
+/\ opening = 0
+/\ moves = 0
+/\ page = 0
+/\ busy = TRUE
+/\ running = TRUE
+/\ phase = "closing"
+/\ pc = (0 :> "CatGone" @@ 1 :> "Covered" @@ 2 :> "Press")
+
+State 5: <CatGone>
+/\ opening = 0
+/\ moves = 0
+/\ page = 0
+/\ busy = TRUE
+/\ running = FALSE
+/\ phase = "closing"
+/\ pc = (0 :> "Run" @@ 1 :> "Covered" @@ 2 :> "Press")
+
+State 6: <Covered>
+/\ opening = 0
+/\ moves = 0
+/\ page = 0
+/\ busy = TRUE
+/\ running = FALSE
+/\ phase = "covered"
+/\ pc = (0 :> "Run" @@ 1 :> "Navigate" @@ 2 :> "Press")
+
+State 7: <Navigate>
+/\ opening = 0
+/\ moves = 1
+/\ page = 1
+/\ busy = TRUE
+/\ running = FALSE
+/\ phase = "covered"
+/\ pc = (0 :> "Run" @@ 1 :> "Open" @@ 2 :> "Press")
+
+State 8: <Open>
+/\ opening = 1
+/\ moves = 1
+/\ page = 1
+/\ busy = TRUE
+/\ running = FALSE
+/\ phase = "opening"
+/\ pc = (0 :> "Run" @@ 1 :> "Opened" @@ 2 :> "Press")
+
+State 9: <Press>
+/\ opening = 1
+/\ moves = 2
+/\ page = 2
+/\ busy = TRUE
+/\ running = FALSE
+/\ phase = "opening"
+/\ pc = (0 :> "Run" @@ 1 :> "Opened" @@ 2 :> "Done")
+
+State 10: <Opened>
+/\ opening = 0
+/\ moves = 2
+/\ page = 2
+/\ busy = FALSE
+/\ running = FALSE
+/\ phase = "idle"
+/\ pc = (0 :> "Run" @@ 1 :> "Done" @@ 2 :> "Done")
+

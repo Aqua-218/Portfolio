@@ -37,3 +37,24 @@ echo "$out" | grep -q "Invariant NoDoubleOpen is violated" || {
   exit 1
 }
 echo "CurtainBroken.cfg は NoDoubleOpen で落ちた(期待どおり)"
+
+# 実行例。CurtainTrace*.cfgの条件を破るまでの最短の実行例を、traces/に保存する。
+# 幕の実装のテスト(Vitest)がこれを読んで再生する。同じものが出るよう、ワーカーは1つにする
+mkdir -p traces
+for cfg in CurtainTrace*.cfg; do
+  name=${cfg#CurtainTrace}
+  name=${name%.cfg}
+  out=$(java -cp "$jar" tlc2.TLC -workers 1 -metadir "$meta/$name" -config "$cfg" Curtain 2>&1 || true)
+  echo "$out" | grep -q "Invariant Not$name is violated" || {
+    echo "$out" >&2
+    echo "$cfg から実行例が出なかった" >&2
+    exit 1
+  }
+  # 「State 1: <Initial predicate>」から状態の並びだけを取り出し、行番号などは落とす
+  echo "$out" |
+    sed -n '/^State 1:/,/states generated/p' |
+    grep -v 'states generated' |
+    sed -E 's/^(State [0-9]+: <[A-Za-z]+( predicate)?)[^>]*>/\1>/' \
+      >"traces/$name.txt"
+  echo "traces/$name.txt に実行例を書き出した"
+done
