@@ -3,9 +3,13 @@
 use crate::problem::Problem;
 use crate::toml_doc::Source;
 use serde::Deserialize;
+use serde::Serialize;
 use toml::Spanned;
+use ts_rs::TS;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, TS)]
+#[serde(rename_all = "lowercase")]
+#[ts(rename = "LicenseGroup")]
 pub enum Group {
     /// アイコン
     Icons,
@@ -17,7 +21,8 @@ pub enum Group {
     Others,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, TS)]
+#[serde(rename_all = "camelCase")]
 pub struct License {
     pub group: Group,
     pub name: String,
