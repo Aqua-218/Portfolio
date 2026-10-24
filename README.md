@@ -15,16 +15,18 @@ pnpm install
 
 ## コマンド
 
-| コマンド                                                | すること                                                |
-| ------------------------------------------------------- | ------------------------------------------------------- |
-| `pnpm build`                                            | 全パッケージをビルドする。サイトは`apps/web/out/`に出る |
-| `pnpm check`                                            | 型チェック・ESLint・Prettierの検査をまとめて走らせる    |
-| `pnpm format --write`                                   | Prettierで整形する                                      |
-| `pnpm test`                                             | TypeScriptのテストを走らせる                            |
-| `cargo build`                                           | Rustのクレートをビルドする                              |
-| `cargo test`                                            | Rustのテストを走らせる                                  |
-| `cargo clippy --workspace --all-targets -- -D warnings` | clippyを警告ゼロで通す                                  |
-| `cargo fmt --all`                                       | rustfmtで整形する                                       |
+| コマンド                                                | すること                                                                                                       |
+| ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `pnpm build`                                            | 全パッケージをビルドする。サイトは`apps/web/out/`に出る                                                        |
+| `pnpm check`                                            | 型チェック・ESLint・Prettierの検査をまとめて走らせる                                                           |
+| `pnpm format --write`                                   | Prettierで整形する                                                                                             |
+| `pnpm test`                                             | TypeScriptのテストを走らせる                                                                                   |
+| `cargo build`                                           | Rustのクレートをビルドする                                                                                     |
+| `cargo test`                                            | Rustのテストを走らせる                                                                                         |
+| `cargo clippy --workspace --all-targets -- -D warnings` | clippyを警告ゼロで通す                                                                                         |
+| `cargo fmt --all`                                       | rustfmtで整形する                                                                                              |
+| `pnpm --filter @portfolio/web e2e`                      | Playwrightでe2eテストを走らせる。先に`pnpm build`する                                                          |
+| `pnpm --filter @portfolio/web vrt`                      | 見た目テストをDockerの中で走らせる。先に`pnpm build`する。基準画像を作り直すときは`--update-snapshots`を付ける |
 
 `cd apps/web && pnpm dev`で開発用のサーバーが立つ。
 

@@ -30,6 +30,11 @@ jobs:
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: site
+          path: apps/web/out/
+          retention-days: 3
       - run: cargo build --workspace --all-targets --locked
       - run: cargo build -p pxcat-wasm --target wasm32-unknown-unknown --locked
 
@@ -78,3 +83,35 @@ jobs:
       - run: pnpm build
       - run: pnpm --filter @portfolio/web exec playwright install --with-deps chromium
       - run: pnpm --filter @portfolio/web e2e
+
+  vrt:
+    needs: build
+    runs-on: ubuntu-latest
+    # 手元のpnpm vrtと同じイメージで撮り、フォントの描画をそろえる
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
+      options: --ipc=host
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: jdx/mise-action@8418fedb1110381a0d3ba51a7a415d7c1b884550 # v5.2.2
+        with:
+          install_args: node pnpm
+      - id: pnpm-store
+        run: echo "path=$(pnpm store path)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: pnpm-vrt-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-vrt-${{ runner.os }}-
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: site
+          path: apps/web/out/
+      - run: pnpm --filter @portfolio/web exec playwright test -c playwright.vrt.config.ts
+      - if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: vrt-diff
+          path: apps/web/test-results/
+          retention-days: 7
