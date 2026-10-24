@@ -15,10 +15,13 @@ export const vars = createThemeContract({
     tatami: null,
     mike: null,
     pxline: null,
+    note: null,
+    leaf: null,
   },
   font: {
     sans: null,
     jp: null,
+    mono: null,
   },
   space: {
     xs: null,
@@ -46,6 +49,8 @@ function colors(palette: Palette) {
     tatami: toCss(palette.tatami),
     mike: toCss(palette.mike),
     pxline: toCss(palette.pxline),
+    note: toCss(palette.note),
+    leaf: toCss(palette.leaf),
   };
 }
 
@@ -54,6 +59,7 @@ createGlobalTheme(":root", vars, {
   font: {
     sans: '"Geist", "LINE Seed JP", "Helvetica Neue", Arial, "Hiragino Sans", "Yu Gothic", sans-serif',
     jp: '"LINE Seed JP", "Hiragino Sans", "Yu Gothic", sans-serif',
+    mono: '"Geist Mono", ui-monospace, "SFMono-Regular", Menlo, monospace',
   },
   space: {
     xs: "0.5rem",
