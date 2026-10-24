@@ -3,3 +3,5 @@ pnpm-lock.yaml
 .github/ISSUE_TEMPLATE/
 # release-pleaseが書き直す
 CHANGELOG.md
+# Lakeが書き出す
+proofs/lake-manifest.json
