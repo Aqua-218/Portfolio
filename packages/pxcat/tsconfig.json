@@ -6,7 +6,8 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "noEmit": true,
-    "allowJs": false
+    "allowJs": false,
+    "types": ["node"]
   },
   "include": ["src"]
 }
