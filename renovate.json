@@ -43,6 +43,22 @@
       "matchPackageNames": ["/lean4/", "/mathlib/i", "/aeneas/i", "/charon/i"],
       "dependencyDashboardApproval": true,
       "automerge": false
+    },
+    {
+      "description": "enginesの範囲は手で決める",
+      "matchDepTypes": ["engines"],
+      "enabled": false
+    },
+    {
+      "description": "typescript-eslintがTypeScript 6.1未満にしか対応していない",
+      "matchPackageNames": ["typescript"],
+      "allowedVersions": "<6.1"
+    },
+    {
+      "description": "Node 24(mise.toml)に合わせる",
+      "matchPackageNames": ["@types/node"],
+      "allowedVersions": "<25"
     }
-  ]
+  ],
+  "separateMajorMinor": false
 }
