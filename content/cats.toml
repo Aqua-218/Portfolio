@@ -1,0 +1,56 @@
+# Homeのモザイクの4枚。左上から
+mosaic = ["koneko", "futari", "mike-face", "kijishiro-tatami"]
+# Homeのいちばん下の1枚
+goodnight = "kijishiro-bed"
+
+# 各ページの見出しの横の1枚
+[sections]
+about = "kijishiro-stand"
+skills = "kijishiro-tatami"
+work = "kuro"
+affiliations = "mike-cage"
+events = "futari"
+shelf = "mike-face"
+stack = "kuro"
+license = "koneko"
+
+# Catsのギャラリーにはこの順に並ぶ
+[[photo]]
+id = "koneko"
+alt = "三毛の子猫が黒い子猫の頭をなめている"
+coats = ["mike", "kuro"]
+
+[[photo]]
+id = "mike-face"
+alt = "ケージの中からこちらを見上げる三毛猫"
+coats = ["mike"]
+
+[[photo]]
+id = "kuro"
+alt = "ピンクの鈴をくわえてこちらを見上げる黒猫"
+coats = ["kuro"]
+
+[[photo]]
+id = "kijishiro-tatami"
+alt = "畳の上で横になってこちらを見るキジ白の猫"
+coats = ["kiji"]
+
+[[photo]]
+id = "futari"
+alt = "ドアの前で並んで振り返る黒猫と三毛猫"
+coats = ["kuro", "mike"]
+
+[[photo]]
+id = "kijishiro-stand"
+alt = "赤い首輪に鈴をつけて見上げるキジ白の猫"
+coats = ["kiji"]
+
+[[photo]]
+id = "kijishiro-bed"
+alt = "オレンジの毛布の上で仰向けにくつろぐキジ白の猫"
+coats = ["kiji"]
+
+[[photo]]
+id = "mike-cage"
+alt = "ケージのベッドでくつろぐ三毛猫"
+coats = ["mike"]
