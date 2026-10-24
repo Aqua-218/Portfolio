@@ -1,4 +1,5 @@
 import type { Event } from "@portfolio/content-types";
+import { render } from "@portfolio/markdown";
 import Link from "next/link";
 import * as a from "@/components/about/about.css";
 import { Reveal } from "@/components/reveal/Reveal";
@@ -24,16 +25,8 @@ function fiscalYear(event: Event): number {
   return Number(m) >= 4 ? Number(y) : Number(y) - 1;
 }
 
-/** 本文を段落に分ける。Markdownの処理は #69 で入れる */
-function paragraphs(body: string): string[] {
-  return body
-    .split(/\r?\n\s*\r?\n/)
-    .map((p) => p.trim())
-    .filter((p) => p !== "");
-}
-
 /** イベント1件。`link`を付けると、タイトルから1件のページへ行ける。 */
-export function EventItem({
+export async function EventItem({
   event,
   link = false,
   delay = 0,
@@ -58,11 +51,10 @@ export function EventItem({
           {tag && <span className={`${r.tag} ${s.tag}`}>{tag}</span>}
         </p>
         <p className={s.venue}>@ {event.venue}</p>
-        <div className={s.body}>
-          {paragraphs(event.body).map((p) => (
-            <p key={p}>{p}</p>
-          ))}
-        </div>
+        <div
+          className={s.body}
+          dangerouslySetInnerHTML={{ __html: await render(event.body) }}
+        />
       </div>
     </Reveal>
   );
