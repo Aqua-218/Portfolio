@@ -190,6 +190,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@portfolio/content-types':
+        specifier: workspace:*
+        version: link:../../packages/content-types
       '@portfolio/design':
         specifier: workspace:*
         version: link:../../packages/design
