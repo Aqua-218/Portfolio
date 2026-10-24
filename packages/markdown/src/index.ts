@@ -1,7 +1,9 @@
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeSlug from "rehype-slug";
 import rehypeStringify from "rehype-stringify";
+import rehypeKatex from "rehype-katex";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
@@ -17,7 +19,11 @@ async function processor() {
     unified()
       .use(remarkParse)
       .use(remarkGfm)
+      // $...$と$$...$$を数式にする
+      .use(remarkMath)
       .use(remarkRehype)
+      // 数式はビルド時にMathMLにする。ブラウザが描くので、KaTeXのCSSとフォントはいらない
+      .use(rehypeKatex, { output: "mathml" })
       // 見出しにidをつけ、見出しそのものをそのidへのリンクにする
       .use(rehypeSlug)
       .use(rehypeAutolinkHeadings, { behavior: "wrap" })
