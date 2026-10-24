@@ -14,6 +14,7 @@ import { Footer } from "@/components/footer/Footer";
 import { Header } from "@/components/header/Header";
 import { Paws } from "@/components/paw/Paws";
 import { OPEN_GRAPH, SITE_NAME, SITE_URL } from "@/lib/meta";
+import "@/styles/code.css";
 import "@/styles/global.css";
 import { wrap } from "@/styles/layout.css";
 
