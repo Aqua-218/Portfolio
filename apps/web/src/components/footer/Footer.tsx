@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { HiddenCatHint } from "@/components/hidden-cat/HiddenCat";
+import { Trail } from "@/components/paw/Trail";
 import * as s from "./footer.css";
 
 const SITEMAP = [
@@ -92,6 +93,7 @@ export function Footer() {
 
   return (
     <>
+      <Trail className={s.trail} seed="footer" angle={0} steps={8} wobble={6} />
       <nav className={s.sitemap} aria-labelledby="sm-h">
         <h2 className={s.heading} id="sm-h">
           サイトマップ
