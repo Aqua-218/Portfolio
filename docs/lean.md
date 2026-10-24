@@ -9,7 +9,9 @@
 ## Aeneasが作るファイル
 
 - `proofs/PxCat/Funs.lean`は`pxcat-core`からCharonとAeneasで作る。手で直さない
-- `pxcat-core`を変えたら作り直し、差分ごとコミットする
+- `pxcat-core`を変えたら`sh proofs/extract.sh`で作り直し、差分ごとコミットする。CIでも作り直して、差分がないか見る
+- CharonとAeneasの版は`proofs/aeneas.env`で決める。Aeneasは`lakefile.toml`と同じコミットにする
+- Aeneasが作るLeanでは、Rustのモジュール名がそのまま名前空間になる。引数にモジュールと同じ名前(`coat`など)を付けると名前がぶつかるので避ける
 
 ## 証明
 
