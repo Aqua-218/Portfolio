@@ -1,21 +1,24 @@
 import Link from "next/link";
-import { PxCat } from "@/components/px-cat/PxCat";
+import { PxCat, type PxCatProps } from "@/components/px-cat/PxCat";
 import { more } from "@/components/section/section.css";
 import * as s from "./lost.css";
 
-const SIT = ["sitA", "sitB"] as const;
+export type LostCat = Pick<PxCatProps, "frames" | "coat" | "motion">;
 
-/** 迷子の猫のいるエラーの画面。404のほかのエラーにも使う(#165) */
-export function Lost({ code, message }: { code: string; message: string }) {
+/** なければ、座る黒猫 */
+const SIT: LostCat = { frames: ["sitA", "sitB"], coat: "kuro", motion: "sit" };
+
+interface LostProps {
+  code: string;
+  message: string;
+  cat?: LostCat;
+}
+
+/** 迷子の猫のいるエラーの画面。404とほかのエラーで使う */
+export function Lost({ code, message, cat = SIT }: LostProps) {
   return (
     <section className={s.lost} aria-labelledby="lost-code">
-      <PxCat
-        className={s.cat}
-        frames={SIT}
-        coat="kuro"
-        pixel={6}
-        motion="sit"
-      />
+      <PxCat className={s.cat} pixel={6} {...cat} />
       <h1 className={s.code} id="lost-code">
         {code}
       </h1>
