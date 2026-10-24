@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { Curtain } from "@/components/curtain/Curtain";
 import { Footer } from "@/components/footer/Footer";
 import { Header } from "@/components/header/Header";
 import "@/styles/global.css";
@@ -21,6 +22,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <main>{children}</main>
           <Footer />
         </div>
+        <Curtain />
       </body>
     </html>
   );
