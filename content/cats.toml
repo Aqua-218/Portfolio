@@ -54,3 +54,85 @@ coats = ["kiji"]
 id = "mike-cage"
 alt = "ケージのベッドでくつろぐ三毛猫"
 coats = ["mike"]
+
+# きなこのフォルダから(2026-10-24 に取り込んだ)
+
+[[photo]]
+id = "kinako-01"
+alt = "黒い子猫と三毛の子猫が寄りそって寝そべっている"
+coats = ["kuro", "mike"]
+
+[[photo]]
+id = "kinako-02"
+alt = "黒いいすの上で三毛の子猫と黒猫が並んでこちらを見ている"
+coats = ["mike", "kuro"]
+
+[[photo]]
+id = "kinako-03"
+alt = "黒いいすの上で黒猫と三毛猫がからまって眠っている"
+coats = ["kuro", "mike"]
+
+[[photo]]
+id = "kinako-04"
+alt = "ピンクのいすの上で三毛猫とキジ白の猫と黒猫が重なって寝ている"
+coats = ["mike", "kiji", "kuro"]
+
+[[photo]]
+id = "kinako-05"
+alt = "ピンクのいすの上で三毛猫とキジ白の猫に黒猫がくっついて寝ている"
+coats = ["mike", "kiji", "kuro"]
+
+[[photo]]
+id = "kinako-06"
+alt = "ピンクのいすの上でキジ白の猫と三毛猫がこちらを見て、手前で黒猫が寝ている"
+coats = ["kiji", "mike", "kuro"]
+
+[[photo]]
+id = "kinako-07"
+alt = "ピンクのいすの上で目を丸くしたキジ白の猫と三毛猫、手前で丸くなる黒猫"
+coats = ["kiji", "mike", "kuro"]
+
+[[photo]]
+id = "kinako-08"
+alt = "畳の上で猫たちが並んでごはんを食べている"
+coats = ["mike", "kuro", "kiji"]
+
+[[photo]]
+id = "kinako-09"
+alt = "三毛猫と黒猫がごはんを食べている"
+coats = ["mike", "kuro"]
+
+[[photo]]
+id = "kinako-10"
+alt = "上から見た、畳の上で猫たちがごはんを食べているところ"
+coats = ["mike", "kuro", "kiji"]
+
+[[photo]]
+id = "kinako-11"
+alt = "畳の上で猫たちがごはん皿に顔をうずめている"
+coats = ["kuro", "kiji", "mike"]
+
+[[photo]]
+id = "kinako-12"
+alt = "黒いいすの上で黒猫と三毛猫が丸くなって寝ている"
+coats = ["kuro", "mike"]
+
+[[photo]]
+id = "kinako-13"
+alt = "日だまりの窓辺で黒猫と三毛猫がくっついて寝ている"
+coats = ["kuro", "mike"]
+
+[[photo]]
+id = "kinako-14"
+alt = "日だまりの窓辺で横になってこちらを見る三毛猫"
+coats = ["mike"]
+
+[[photo]]
+id = "kinako-15"
+alt = "窓辺のカーテンの前で三毛猫が仰向けで伸びている"
+coats = ["mike"]
+
+[[photo]]
+id = "kinako-16"
+alt = "畳の部屋で猫たちがそれぞれのお皿でごはんを食べている"
+coats = ["mike", "kuro", "kiji"]
