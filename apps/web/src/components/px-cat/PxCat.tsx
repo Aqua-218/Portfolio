@@ -1,8 +1,16 @@
 "use client";
 
-import { boxSize, render, type Coat, type FrameName } from "@portfolio/pxcat";
+import {
+  boxSize,
+  frameIndex,
+  render,
+  type Coat,
+  type FrameName,
+  type Motion,
+} from "@portfolio/pxcat";
 import { useEffect, useRef } from "react";
 import { pxCat } from "./px-cat.css";
+import { nextBlinker, reducedMotion, showFrame, subscribe } from "./ticker";
 
 export interface PxCatProps {
   /** 重ねるコマ。最初のコマだけ見える。描き直さないよう、毎回同じ配列を渡す */
@@ -10,23 +18,40 @@ export interface PxCatProps {
   coat: Coat;
   /** 1マスの大きさ(px) */
   pixel?: number;
+  /** コマの切り替え方。なければ動かない */
+  motion?: Motion;
   className?: string;
 }
 
 /** ドット猫。Wasmが読めるまでは、同じ大きさの場所だけ取っておく。 */
-export function PxCat({ frames, coat, pixel = 3, className }: PxCatProps) {
+export function PxCat({
+  frames,
+  coat,
+  pixel = 3,
+  motion,
+  className,
+}: PxCatProps) {
   const ref = useRef<HTMLSpanElement>(null);
   const { width, height } = boxSize(frames, pixel);
 
   useEffect(() => {
     let alive = true;
+    let unsubscribe: (() => void) | undefined;
     void render(frames, coat, pixel).then((svg) => {
-      if (alive && ref.current) ref.current.innerHTML = svg;
+      const el = ref.current;
+      if (!alive || !el) return;
+      el.innerHTML = svg;
+      if (motion === undefined || reducedMotion()) return;
+      const index = motion === "blink" ? nextBlinker() : 0;
+      unsubscribe = subscribe((n) => {
+        showFrame(el, frameIndex(motion, n, index));
+      });
     });
     return () => {
       alive = false;
+      unsubscribe?.();
     };
-  }, [frames, coat, pixel]);
+  }, [frames, coat, pixel, motion]);
 
   return (
     <span

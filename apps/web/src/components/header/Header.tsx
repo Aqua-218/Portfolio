@@ -24,7 +24,13 @@ export function Header() {
   return (
     <header className={s.top}>
       <Link className={s.logo} href="/" aria-label="小峯圭也（ホームへ）">
-        <PxCat className={s.logoCat} frames={PEEK} coat="kuro" pixel={4} />
+        <PxCat
+          className={s.logoCat}
+          frames={PEEK}
+          coat="kuro"
+          pixel={4}
+          motion="blink"
+        />
         <span className={s.logoTxt} aria-hidden="true">
           とっぷへ
         </span>

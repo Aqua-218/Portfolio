@@ -1,5 +1,7 @@
 import init, { svg } from "../dist/pxcat_wasm.js";
 
+export { frameIndex, TICK_MS, type Motion } from "./motion";
+
 /** コマ名。crates/pxcat-wasmのparse_frameと同じ。 */
 export type FrameName =
   | "runA"
