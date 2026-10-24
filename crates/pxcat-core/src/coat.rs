@@ -60,9 +60,11 @@ pub const fn mike_patch(x: usize, y: usize) -> Patch {
 }
 
 /// `(x, y)`のマスの色。何もないマスなら`None`。
+///
+/// 引数を`coat`にすると、Aeneasが作るLeanでモジュールの`coat`と名前がぶつかるので`fur`にする。
 #[must_use]
-pub const fn paint(coat: Coat, cell: Cell, x: usize, y: usize) -> Option<Rgb> {
-    match coat {
+pub const fn paint(fur: Coat, cell: Cell, x: usize, y: usize) -> Option<Rgb> {
+    match fur {
         Coat::Kuro => match cell {
             Cell::Empty => None,
             Cell::Fur => Some(rgb(0x21_1d1a)),
