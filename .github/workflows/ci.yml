@@ -158,3 +158,19 @@ jobs:
       # pxcat-coreからLeanを作り直して、コミットされているものと同じか見る
       - run: sh proofs/extract.sh
       - run: git diff --exit-code proofs/PxCat
+
+  tlc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: jdx/mise-action@8418fedb1110381a0d3ba51a7a415d7c1b884550 # v5.2.2
+        with:
+          install_args: java
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/pxcat-tla
+          key: tla-${{ runner.os }}-${{ hashFiles('specs/tlc.sh') }}
+      # PlusCalを変換し直して検査する。壊した設定で落ちることも見る
+      - run: sh specs/tlc.sh
+      # 変換したTLAがコミットされているものと同じか見る
+      - run: git diff --exit-code specs
