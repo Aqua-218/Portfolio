@@ -1,0 +1,16 @@
+[package]
+name = "imgpipe"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+publish = false
+
+[lints]
+workspace = true
+
+[dependencies]
+image = { version = "0.25.10", default-features = false, features = ["jpeg", "png"] }
+# rav1eのアセンブリにはnasmが要るので切る。CIで入れずに済む
+ravif = { version = "0.13.0", default-features = false, features = ["threading"] }
+sha2 = "0.11.1"
+webp = { version = "0.3.1", default-features = false }
