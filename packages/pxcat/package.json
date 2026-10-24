@@ -7,9 +7,11 @@
   },
   "scripts": {
     "build": "cargo build -p pxcat-wasm --target wasm32-unknown-unknown --release --locked && wasm-bindgen --target web --out-dir dist ../../target/wasm32-unknown-unknown/release/pxcat_wasm.wasm",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "devDependencies": {
-    "typescript": "6.0.3"
+    "typescript": "6.0.3",
+    "vitest": "5.0.5"
   }
 }
