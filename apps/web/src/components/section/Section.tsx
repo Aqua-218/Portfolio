@@ -43,7 +43,9 @@ export function Section({
   const photo = site().cats.sections[name];
   return (
     <InViewSection
-      className={page ? `${s.sec} ${s.page}` : s.sec}
+      className={
+        page ? `${s.sec} ${s.page}` : more ? `${s.sec} ${s.home}` : s.sec
+      }
       inClass={s.inView}
       aria-labelledby={id}
     >
