@@ -2,6 +2,9 @@ import { Lead, Section, Sub } from "@/components/section/Section";
 import { Counters } from "@/components/stack/Counters";
 import { Diagram } from "@/components/stack/Diagram";
 import { More, Samples, Tiles, Waste } from "@/components/stack/Stack";
+import { pageMeta } from "@/lib/meta";
+
+export const metadata = pageMeta("stack");
 
 export default function Stack() {
   return (
