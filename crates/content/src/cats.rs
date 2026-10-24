@@ -181,25 +181,24 @@ fn check_places(src: &Source<'_>, problems: &mut Vec<Problem>, raw: &Raw, ids: &
 fn check_files(problems: &mut Vec<Problem>, files: &[(String, Vec<u8>)], ids: &HashSet<String>) {
     for (name, bytes) in files {
         let Some(id) = name.strip_suffix(".jpg") else {
-            problems.push(Problem::new(
-                None,
-                format!("content/cats/{name}: 写真は .jpg にしてください"),
-            ));
+            problems.push(
+                Problem::new(None, "写真は .jpg にしてください").in_file(format!("cats/{name}")),
+            );
             continue;
         };
         if !ids.contains(id) {
-            problems.push(Problem::new(
-                None,
-                format!("content/cats/{name}: cats.toml に載っていません"),
-            ));
+            problems.push(
+                Problem::new(None, "cats.toml に載っていません").in_file(format!("cats/{name}")),
+            );
         }
         if let Some(kind) = metadata_in_jpeg(bytes) {
-            problems.push(Problem::new(
-                None,
-                format!(
-                    "content/cats/{name}: {kind} が残っています。位置情報などのメタデータを消してください"
-                ),
-            ));
+            problems.push(
+                Problem::new(
+                    None,
+                    format!("{kind} が残っています。位置情報などのメタデータを消してください"),
+                )
+                .in_file(format!("cats/{name}")),
+            );
         }
     }
 }
