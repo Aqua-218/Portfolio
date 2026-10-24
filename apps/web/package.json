@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@portfolio/design": "workspace:*",
+    "@portfolio/pxcat": "workspace:*",
     "@vanilla-extract/css": "1.21.3",
     "next": "16.4.2",
     "react": "19.3.1",
