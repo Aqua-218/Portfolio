@@ -6,6 +6,12 @@ const curtain = (page: Page) =>
     .filter({ has: page.locator("span") })
     .last();
 
+/** ハイドレーションが済むまで待つ。ロゴの猫が描かれていれば済んでいる。 */
+async function open(page: Page) {
+  await page.goto("/");
+  await expect(page.locator("header svg.px-svg")).toBeAttached();
+}
+
 /** 幕が動き終わって、画面の外にいるか。 */
 async function idle(page: Page): Promise<boolean> {
   return curtain(page).evaluate((el) => {
@@ -23,7 +29,7 @@ async function covering(page: Page): Promise<boolean> {
 }
 
 test("リンクを押すと幕が閉じてから開く", async ({ page }) => {
-  await page.goto("/");
+  await open(page);
   await page
     .getByRole("navigation", { name: "ページ" })
     .getByRole("link", { name: "About" })
@@ -41,7 +47,7 @@ test("リンクを押すと幕が閉じてから開く", async ({ page }) => {
 });
 
 test("戻るボタンでも幕が閉じてから開く", async ({ page }) => {
-  await page.goto("/");
+  await open(page);
   await page
     .getByRole("navigation", { name: "ページ" })
     .getByRole("link", { name: "About" })
@@ -65,7 +71,7 @@ test("戻るボタンでも幕が閉じてから開く", async ({ page }) => {
 
 test("動きを減らす設定では幕を出さない", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/");
+  await open(page);
   await page
     .getByRole("navigation", { name: "ページ" })
     .getByRole("link", { name: "About" })
@@ -75,7 +81,7 @@ test("動きを減らす設定では幕を出さない", async ({ page }) => {
 });
 
 test("幕が閉じている間に黒猫が2.4秒で横切る", async ({ page }) => {
-  await page.goto("/");
+  await open(page);
   const runner = page.locator("body > span[aria-hidden='true']").last();
   await expect(runner).toBeHidden();
 
