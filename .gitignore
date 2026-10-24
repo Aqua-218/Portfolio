@@ -4,3 +4,5 @@ target/
 out/
 next-env.d.ts
 *.tsbuildinfo
+# wasm-bindgenが作る
+packages/pxcat/dist/
