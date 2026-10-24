@@ -129,8 +129,11 @@ jobs:
       - uses: jdx/mise-action@8418fedb1110381a0d3ba51a7a415d7c1b884550 # v5.2.2
         with:
           install_args: github:leanprover/elan
-      # elanが入れたlean・lakeのプロキシ
-      - run: echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      # lean・lakeのプロキシ。miseをキャッシュから戻したときはpostinstallが走らないので、なければ作る
+      - run: |
+          test -x "$HOME/.elan/bin/lake" ||
+            "$(mise where github:leanprover/elan)/elan-init" -y --no-modify-path --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: |
