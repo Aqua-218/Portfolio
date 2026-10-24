@@ -15,3 +15,21 @@ apps/web/.content/
 apps/web/public/img/cats/
 # content/icons/ から写す
 apps/web/public/icons/
+# Lake(Lean)のビルドの置き場
+proofs/.lake/
+# PlusCalの変換が残す元のファイルと、TLCの作業場所
+specs/*.old
+specs/states/
+# 写真を取り込むときに直下に置くzipや元の写真・動画。取り込んだものはcontent/に入る
+/*.zip
+/*.jpg
+/*.jpeg
+/*.png
+/*.heic
+/*.mp4
+/*.mov
+# OSとエディタ
+.DS_Store
+*.swp
+.vscode/
+.idea/
