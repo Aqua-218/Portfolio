@@ -1,0 +1,106 @@
+# ライセンス・クレジット。icons には、このライセンスで使っている local: のアイコンを書く
+[[license]]
+group = "icons"
+name = "Simple Icons"
+url = "https://simpleicons.org/"
+license = "CC0 1.0"
+note = "Skills ページの言語・技術のアイコンの多くに使っています。ロゴの形と色は変えていません。"
+
+[[license]]
+group = "icons"
+name = "Rust のロゴ"
+url = "https://www.rust-lang.org/policies/media-guide"
+license = "CC BY-SA 4.0"
+note = "Rust Foundation のメディアガイドに沿って使っています。"
+
+[[license]]
+group = "icons"
+name = "Zig のロゴ"
+url = "https://github.com/ziglang/logo"
+license = "CC BY-SA 4.0"
+note = "Zig Software Foundation のロゴです。"
+
+[[license]]
+group = "icons"
+name = "Git のロゴ"
+url = "https://git-scm.com/downloads/logos"
+license = "CC BY 3.0"
+note = "Git Logo by Jason Long."
+
+[[license]]
+group = "icons"
+name = "devicon"
+url = "https://devicon.dev/"
+license = "MIT"
+note = "C#・Azure・VS Code・Playwright のアイコンに使っています。"
+icons = ["csharp", "azure", "vscode", "playwright"]
+
+[[license]]
+group = "icons"
+name = "Lean のロゴ"
+url = "https://github.com/leanprover-community/leanprover-community.github.io"
+license = "MIT"
+note = "Lean prover Community のサイトにあるロゴです。"
+icons = ["lean"]
+
+[[license]]
+group = "icons"
+name = "Rocq のロゴ"
+url = "https://github.com/rocq-prover/rocq-prover.org"
+license = "Unlicense"
+note = "rocq-prover.org のロゴです。"
+icons = ["rocq"]
+
+[[license]]
+group = "icons"
+name = "Agda のロゴ"
+url = "https://github.com/agda/agda"
+license = "Agda のライセンス（MIT 系）"
+note = "Agda のリポジトリにあるロゴです。白い背景だけ外して使っています。"
+icons = ["agda"]
+
+[[license]]
+group = "icons"
+name = "eBPF のロゴ"
+url = "https://github.com/ebpf-io/ebpf.io-website"
+license = "CC BY 4.0"
+note = "ebpf.io のサイトにあるロゴです。"
+icons = ["ebpf"]
+
+[[license]]
+group = "icons"
+name = "Tauri のロゴ"
+url = "https://tauri.app/"
+license = "CC BY-NC-ND 4.0"
+note = "The Tauri Programme のロゴです。非営利のこのサイトで、変えずに使っています。"
+
+[[license]]
+group = "fonts"
+name = "Geist"
+url = "https://fonts.google.com/specimen/Geist"
+license = "SIL OFL 1.1"
+note = "英字の本文と見出しに使っています。"
+
+[[license]]
+group = "fonts"
+name = "LINE Seed JP"
+url = "https://fonts.google.com/specimen/LINE+Seed+JP"
+license = "SIL OFL 1.1"
+note = "日本語の本文と見出しに使っています。"
+
+[[license]]
+group = "site"
+name = "猫の写真"
+license = "© 小峯圭也"
+note = "サイト内の写真は、すべて本人が用意した猫の写真です。"
+
+[[license]]
+group = "site"
+name = "ドット絵の猫・デザイン・文章"
+license = "© 2026 小峯圭也"
+note = "このサイトのために作ったオリジナルです。"
+
+[[license]]
+group = "others"
+name = "作品名・会社名・団体名"
+note = "Shelf の作品名や、Work・Affiliations の会社名・団体名は、それぞれの権利者のものです。表紙やキービジュアルは、出版社の許可が確認できなかったので載せていません。"
