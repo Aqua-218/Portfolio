@@ -13,6 +13,7 @@ const PAGES = [
   { name: "stack", path: "/stack/" },
   { name: "license", path: "/license/" },
   { name: "cats", path: "/cats/" },
+  { name: "404", path: "/nai/" },
 ] as const;
 
 for (const { name, path } of PAGES) {
