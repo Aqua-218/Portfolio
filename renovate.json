@@ -1,0 +1,48 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":semanticCommitTypeAll(chore)",
+    ":semanticCommitScope(deps)"
+  ],
+  "timezone": "Asia/Tokyo",
+  "schedule": ["before 9am on monday"],
+  "minimumReleaseAge": "3 days",
+  "dependencyDashboard": true,
+  "rangeStrategy": "pin",
+  "packageRules": [
+    {
+      "description": "npmはまとめて1つのPRにする",
+      "matchManagers": ["npm"],
+      "groupName": "npm"
+    },
+    {
+      "description": "Cargoはまとめて1つのPRにする",
+      "matchManagers": ["cargo"],
+      "groupName": "Cargo"
+    },
+    {
+      "description": "GitHub Actionsはまとめて1つのPRにする",
+      "matchManagers": ["github-actions"],
+      "groupName": "GitHub Actions"
+    },
+    {
+      "description": "miseで入れるツールはまとめて1つのPRにする",
+      "matchManagers": ["mise"],
+      "groupName": "mise"
+    },
+    {
+      "description": "devDependenciesのpatchとminorは、CIが通ればマージする",
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "automerge": true,
+      "automergeType": "pr"
+    },
+    {
+      "description": "Lean・Mathlib・Aeneas・Charonは証明が崩れやすいので、Dependency Dashboardで承認したときだけ上げる",
+      "matchPackageNames": ["/lean4/", "/mathlib/i", "/aeneas/i", "/charon/i"],
+      "dependencyDashboardApproval": true,
+      "automerge": false
+    }
+  ]
+}
