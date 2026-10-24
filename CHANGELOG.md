@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.4.0](https://github.com/Aqua-218/Portfolio/compare/v0.3.0...v0.4.0) (2026-10-24)
+
+
+### 新しいこと
+
+* **web:** Aboutを作る ([#150](https://github.com/Aqua-218/Portfolio/issues/150)) ([0c9eae2](https://github.com/Aqua-218/Portfolio/commit/0c9eae2a821d22512e7ba087ad8c7fdadfe015d5)), closes [#38](https://github.com/Aqua-218/Portfolio/issues/38)
+* **web:** Affiliationsを作る ([#153](https://github.com/Aqua-218/Portfolio/issues/153)) ([42a0375](https://github.com/Aqua-218/Portfolio/commit/42a03757b6dbd4ec480cb5cc0f1e7989109a6b22)), closes [#41](https://github.com/Aqua-218/Portfolio/issues/41)
+* **web:** Catsを作る ([#158](https://github.com/Aqua-218/Portfolio/issues/158)) ([e9a7a84](https://github.com/Aqua-218/Portfolio/commit/e9a7a84866773886817fc3443d720b83a8c3239c)), closes [#44](https://github.com/Aqua-218/Portfolio/issues/44)
+* **web:** Eventsの一覧と詳細を作る ([#159](https://github.com/Aqua-218/Portfolio/issues/159)) ([7c20a19](https://github.com/Aqua-218/Portfolio/commit/7c20a19703d3e7c42049f80f9237448bd1a414a2)), closes [#42](https://github.com/Aqua-218/Portfolio/issues/42)
+* **web:** Homeを作る ([#160](https://github.com/Aqua-218/Portfolio/issues/160)) ([0b40aca](https://github.com/Aqua-218/Portfolio/commit/0b40aca781f23ebc1692558847e73495ccd7933d)), closes [#37](https://github.com/Aqua-218/Portfolio/issues/37)
+* **web:** Licenseを作る ([#155](https://github.com/Aqua-218/Portfolio/issues/155)) ([1b32208](https://github.com/Aqua-218/Portfolio/commit/1b3220894f13b2e8c29fe4c4fbe4e0203e956dda)), closes [#46](https://github.com/Aqua-218/Portfolio/issues/46)
+* **web:** Shelfを作る ([#154](https://github.com/Aqua-218/Portfolio/issues/154)) ([a2b9e28](https://github.com/Aqua-218/Portfolio/commit/a2b9e28148e726c09bd047c4880cc1c26d534ab9)), closes [#43](https://github.com/Aqua-218/Portfolio/issues/43)
+* **web:** Skillsを作る ([#157](https://github.com/Aqua-218/Portfolio/issues/157)) ([ed0b16d](https://github.com/Aqua-218/Portfolio/commit/ed0b16d0ae5799781de47726cfb2b21df9575eff)), closes [#39](https://github.com/Aqua-218/Portfolio/issues/39)
+* **web:** Workを作る ([#152](https://github.com/Aqua-218/Portfolio/issues/152)) ([1728de5](https://github.com/Aqua-218/Portfolio/commit/1728de51beb1f7bd38280f5785fe8e262a6b0a3d)), closes [#40](https://github.com/Aqua-218/Portfolio/issues/40)
+* **web:** 隠し猫を1匹置く ([#161](https://github.com/Aqua-218/Portfolio/issues/161)) ([2215c88](https://github.com/Aqua-218/Portfolio/commit/2215c88e4802a250ed3fb85823293d1946e2e8ce)), closes [#58](https://github.com/Aqua-218/Portfolio/issues/58)
+
 ## [0.3.0](https://github.com/Aqua-218/Portfolio/compare/v0.2.0...v0.3.0) (2026-10-24)
 
 
