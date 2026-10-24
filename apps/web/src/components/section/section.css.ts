@@ -22,6 +22,11 @@ export const page = style({
   marginTop: "clamp(0.5rem, 2vw, 1.5rem)",
 });
 
+/** Homeの抜粋。モックではセクションの上に線を引かない */
+export const home = style({
+  borderTop: 0,
+});
+
 /** 画面に入った。見出しの下線を伸ばす */
 export const inView = style({});
 
