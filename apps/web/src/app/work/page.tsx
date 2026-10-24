@@ -1,6 +1,9 @@
 import { Lead, Section } from "@/components/section/Section";
 import { Companies } from "@/components/work/Work";
 import { site } from "@/lib/content";
+import { pageMeta } from "@/lib/meta";
+
+export const metadata = pageMeta("work");
 
 export default function Work() {
   return (
