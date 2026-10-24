@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/Aqua-218/Portfolio/compare/v0.2.0...v0.3.0) (2026-10-24)
+
+
+### 新しいこと
+
+* **web:** 写真のモザイクとパララックスを作る ([#148](https://github.com/Aqua-218/Portfolio/issues/148)) ([1793c14](https://github.com/Aqua-218/Portfolio/commit/1793c14a7d1a99dc3d6c990c3e613ec6438f34db)), closes [#21](https://github.com/Aqua-218/Portfolio/issues/21)
+
 ## [0.2.0](https://github.com/Aqua-218/Portfolio/compare/v0.1.0...v0.2.0) (2026-10-24)
 
 
