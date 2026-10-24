@@ -5,4 +5,3 @@ pnpm-lock.yaml
 CHANGELOG.md
 # Lakeが書き出す
 proofs/lake-manifest.json
-proofs/.lake/
