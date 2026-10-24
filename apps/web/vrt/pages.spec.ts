@@ -16,6 +16,8 @@ const PAGES = [
 
 for (const { name, path } of PAGES) {
   test(name, async ({ page }) => {
+    // Homeの時計が毎回同じ時刻を出すよう、時計を止めておく
+    await page.clock.setFixedTime(new Date("2026-10-24T12:34:56+09:00"));
     await page.goto(path);
     // フォントとドット猫が出そろってから撮る
     await page.evaluate(() => document.fonts.ready);
