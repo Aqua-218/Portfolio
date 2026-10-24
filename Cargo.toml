@@ -11,3 +11,10 @@ unsafe_code = "forbid"
 
 [workspace.lints.clippy]
 pedantic = { level = "warn", priority = -1 }
+# 日本語の中の英単語(WebPなど)を、ひとつながりの語とみなして誤検知する
+doc_markdown = "allow"
+
+# 依存のクレート(画像のエンコーダーなど)は、開発中とテストでも最適化してビルドする。
+# 最適化しないとAVIFの書き出しがとても遅い
+[profile.dev.package."*"]
+opt-level = 3
