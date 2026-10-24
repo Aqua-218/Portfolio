@@ -1,10 +1,10 @@
 import { expect, test } from "@playwright/test";
 
-test("8枚が並び、押すと大きく見られる", async ({ page }) => {
+test("写真が全部並び、押すと大きく見られる", async ({ page }) => {
   await page.goto("/cats/");
   await expect(page.locator("header svg.px-svg")).toBeAttached();
   const opens = page.getByRole("button", { name: "写真を大きく見る" });
-  await expect(opens).toHaveCount(8);
+  await expect(opens).toHaveCount(24);
 
   await opens.first().click();
   const dialog = page.getByRole("dialog");
