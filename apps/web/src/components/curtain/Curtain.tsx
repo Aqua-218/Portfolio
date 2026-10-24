@@ -2,7 +2,9 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { pawSvg } from "@/components/paw/shape";
 import { PxCat } from "@/components/px-cat/PxCat";
+import { subscribe } from "@/components/px-cat/ticker";
 import * as s from "./curtain.css";
 
 const LABEL: Readonly<Record<string, string>> = {
@@ -35,6 +37,31 @@ const wait = (ms: number) =>
 
 function reducedMotion(): boolean {
   return matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+/**
+ * 走る猫の足が着くたびに(猫の動きと同じ間隔で)、幕に足跡を付ける。左右の足で交互に少し上下にずらす。
+ * 幕が閉じきっている間だけ付ける。足跡は幕の中に置くので、幕が開くときは幕と一緒に出ていく。
+ * 止める関数を返す。
+ */
+function leavePrints(runner: HTMLElement, curtain: HTMLElement): () => void {
+  return subscribe((n) => {
+    const box = curtain.getBoundingClientRect();
+    // 閉じる途中や開く途中に付けると、幕と一緒に流れてしまう
+    if (Math.abs(box.left) > 1) return;
+    const cat = runner.getBoundingClientRect();
+    const x = cat.left + cat.width * 0.3;
+    if (x < 0 || x > box.width) return;
+    const print = document.createElement("span");
+    print.className = s.print;
+    print.innerHTML = pawSvg(16);
+    print.style.left = `${String(x)}px`;
+    print.style.top = `${String(cat.bottom - box.top + (n % 2 === 0 ? 4 : 14))}px`;
+    print.addEventListener("animationend", () => {
+      print.remove();
+    });
+    curtain.appendChild(print);
+  });
 }
 
 // 戻る・進むのときは、Next.jsより先にpopstateを受け取って止め、幕を閉じてから流し直す。
@@ -80,8 +107,9 @@ export function Curtain() {
       el?.classList.add(s.busy);
       // 幕が閉じている間に、黒猫が2.4秒で横切る
       const runner = runnerRef.current;
-      if (runner) {
+      if (runner && el) {
         runner.style.visibility = "visible";
+        const stopPrints = leavePrints(runner, el);
         void runner
           .animate([{ left: "-120px" }, { left: "calc(100% + 40px)" }], {
             duration: 2400,
@@ -89,6 +117,7 @@ export function Curtain() {
           })
           .finished.then(() => {
             runner.style.visibility = "hidden";
+            stopPrints();
           });
       }
       await el?.animate([{ translate: "-101% 0" }, { translate: "0 0" }], {
@@ -107,6 +136,10 @@ export function Curtain() {
       }).finished;
       el?.getAnimations().forEach((a) => {
         a.cancel();
+      });
+      // 薄れきる前に幕が開いたときの残り
+      el?.querySelectorAll(`.${s.print}`).forEach((p) => {
+        p.remove();
       });
       el?.classList.remove(s.busy);
       busy = false;
