@@ -10,13 +10,16 @@ use crate::profile::{self, Profile};
 use crate::shelf::{self, Work};
 use crate::skills::{self, Skills};
 use crate::work::{self, Company};
+use serde::Serialize;
 use std::collections::BTreeSet;
 use std::fmt;
 use std::fs;
 use std::path::Path;
+use ts_rs::TS;
 
 /// 検証の済んだ中身。
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, TS)]
+#[serde(rename_all = "camelCase")]
 pub struct Site {
     pub profile: Profile,
     pub skills: Skills,
