@@ -86,3 +86,11 @@ export const footLink = style({
     },
   },
 });
+
+/** 区切りの線の上を、右のほうへ歩いていった足跡。上の中身に重ならないよう、場所を取って置く */
+export const trail = style({
+  marginLeft: "auto",
+  marginRight: "8%",
+  maxWidth: "60%",
+  height: "auto",
+});
