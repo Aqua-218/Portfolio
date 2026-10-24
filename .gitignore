@@ -11,3 +11,5 @@ apps/web/test-results/
 apps/web/playwright-report/
 # content-checkが書き出す
 apps/web/.content/
+# imgpipeが書き出す
+apps/web/public/img/cats/
