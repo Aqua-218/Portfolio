@@ -106,3 +106,38 @@ test("幕が閉じている間に黒猫が2.4秒で横切る", async ({ page }) 
   expect(elapsed).toBeGreaterThan(2000);
   expect(elapsed).toBeLessThan(3500);
 });
+
+test("走る黒猫が幕に足跡を付け、幕が開くころには消える", async ({ page }) => {
+  await open(page);
+  const prints = curtain(page).locator("span:has(svg ellipse)");
+  await page
+    .getByRole("navigation", { name: "ページ" })
+    .getByRole("link", { name: "About" })
+    .click();
+
+  // 足が着くたびに増えていく
+  await expect.poll(() => prints.count()).toBeGreaterThan(2);
+  const before = await prints.count();
+  await page.waitForTimeout(500);
+  expect(await prints.count()).toBeGreaterThan(before);
+
+  // 足跡は黒猫より左(通ったあと)にある
+  const runner = page.locator("body > span[aria-hidden='true']").last();
+  const cat = (await runner.boundingBox())?.x ?? 0;
+  const first = (await prints.first().boundingBox())?.x ?? 0;
+  expect(first).toBeLessThan(cat);
+
+  await expect.poll(() => idle(page), { timeout: 5000 }).toBe(true);
+  await expect(prints).toHaveCount(0);
+});
+
+test("動きを減らす設定では足跡も出さない", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await open(page);
+  await page
+    .getByRole("navigation", { name: "ページ" })
+    .getByRole("link", { name: "About" })
+    .click();
+  await expect(page).toHaveURL("/about/");
+  await expect(curtain(page).locator("span:has(svg ellipse)")).toHaveCount(0);
+});
