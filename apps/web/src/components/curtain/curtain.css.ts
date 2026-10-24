@@ -21,3 +21,14 @@ export const label = style({
   fontSize: "clamp(2rem, 6vw, 3.5rem)",
   letterSpacing: "-0.04em",
 });
+
+export const runner = style({
+  position: "fixed",
+  top: "calc(50% + 2.75rem)",
+  left: "-120px",
+  zIndex: 101,
+  color: vars.color.pxline,
+  lineHeight: 0,
+  pointerEvents: "none",
+  visibility: "hidden",
+});
