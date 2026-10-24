@@ -196,3 +196,58 @@ pub fn convert_dir(in_dir: &Path, out_dir: &Path) -> Result<Vec<Converted>, Erro
     sources.sort();
     sources.iter().map(|s| convert(s, out_dir)).collect()
 }
+
+/// `srcset`の1つ。`<url> <幅>w`を幅の小さい順に、カンマでつなぐ。
+fn srcset(outputs: &[&Output], url_prefix: &str) -> String {
+    let mut sorted: Vec<&&Output> = outputs.iter().collect();
+    sorted.sort_by_key(|o| o.width);
+    sorted
+        .iter()
+        .filter_map(|o| {
+            let file = o.path.file_name()?.to_str()?;
+            Some(format!(
+                "{}/{file} {}w",
+                url_prefix.trim_end_matches('/'),
+                o.width
+            ))
+        })
+        .collect::<Vec<_>>()
+        .join(", ")
+}
+
+/// 変換した結果から、ページが読む`srcset`・幅・高さを作る。`url_prefix`は出力のフォルダのURL。
+#[must_use]
+pub fn manifest(done: &[Converted], url_prefix: &str) -> content::images::Images {
+    let mut images = content::images::Images::new();
+    for c in done {
+        let Some(id) = c.source.file_stem().and_then(|s| s.to_str()) else {
+            continue;
+        };
+        let by_ext = |ext: &str| -> Vec<&Output> {
+            c.outputs
+                .iter()
+                .filter(|o| o.path.extension().is_some_and(|e| e == ext))
+                .collect()
+        };
+        let webp = by_ext("webp");
+        let avif = by_ext("avif");
+        let Some(largest) = webp.iter().max_by_key(|o| o.width) else {
+            continue;
+        };
+        let src = srcset(&[*largest], url_prefix)
+            .rsplit_once(' ')
+            .map(|(url, _)| url.to_owned())
+            .unwrap_or_default();
+        images.insert(
+            id.to_owned(),
+            content::images::Image {
+                width: largest.width,
+                height: largest.height,
+                avif: srcset(&avif, url_prefix),
+                webp: srcset(&webp, url_prefix),
+                src,
+            },
+        );
+    }
+    images
+}
