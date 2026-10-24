@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { ERRORS } from "../src/lib/errors";
 
 // 中身ができたページから足していく
 const PAGES = [
@@ -14,7 +15,11 @@ const PAGES = [
   { name: "license", path: "/license/" },
   { name: "cats", path: "/cats/" },
   { name: "404", path: "/nai/" },
-] as const;
+  ...Object.keys(ERRORS).map((code) => ({
+    name: code,
+    path: `/errors/${code}/`,
+  })),
+];
 
 for (const { name, path } of PAGES) {
   test(name, async ({ page }) => {
