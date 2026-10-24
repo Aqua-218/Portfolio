@@ -4,3 +4,5 @@ packages:
 allowBuilds:
   # ビルド済みのバイナリを使うので、インストールのスクリプトはいらない
   unrs-resolver: false
+  esbuild: false
+  "@swc/core": false
