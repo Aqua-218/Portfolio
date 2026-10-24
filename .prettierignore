@@ -1,3 +1,5 @@
 pnpm-lock.yaml
 # 空のチェックボックスの後ろの空白を残す
 .github/ISSUE_TEMPLATE/
+# release-pleaseが書き直す
+CHANGELOG.md
