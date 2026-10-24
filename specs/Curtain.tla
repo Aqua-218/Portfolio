@@ -12,6 +12,8 @@ EXTENDS Naturals
 
 \* 押すクリックの数
 CONSTANT Clicks
+\* 幕が動いている間のクリックを無視するか。CurtainBroken.cfgでFALSEにして、検査が落ちることを確かめる
+CONSTANT IgnoreWhileBusy
 
 (* --algorithm Curtain
 variables
@@ -30,7 +32,7 @@ process Click \in 1..Clicks
 begin
     Press:
         \* 幕が動いている間は何もしない
-        if ~busy then
+        if ~(IgnoreWhileBusy /\ busy) then
             busy := TRUE;
     Close:
             phase := "closing";
@@ -69,7 +71,7 @@ Init == (* Global variables *)
         /\ pc = [self \in ProcSet |-> "Press"]
 
 Press(self) == /\ pc[self] = "Press"
-               /\ IF ~busy
+               /\ IF ~(IgnoreWhileBusy /\ busy)
                      THEN /\ busy' = TRUE
                           /\ pc' = [pc EXCEPT ![self] = "Close"]
                      ELSE /\ pc' = [pc EXCEPT ![self] = "Done"]
