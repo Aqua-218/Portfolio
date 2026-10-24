@@ -73,3 +73,30 @@ test("動きを減らす設定では幕を出さない", async ({ page }) => {
   await expect(page).toHaveURL("/about/");
   expect(await covering(page)).toBe(false);
 });
+
+test("幕が閉じている間に黒猫が2.4秒で横切る", async ({ page }) => {
+  await page.goto("/");
+  const runner = page.locator("body > span[aria-hidden='true']").last();
+  await expect(runner).toBeHidden();
+
+  const start = Date.now();
+  await page
+    .getByRole("navigation", { name: "ページ" })
+    .getByRole("link", { name: "About" })
+    .click();
+  await expect(runner).toBeVisible();
+  // 黒猫がWasmで描かれている
+  await expect(runner.locator("svg.px-svg")).toBeAttached();
+
+  // 左から右へ進む
+  const x1 = (await runner.boundingBox())?.x ?? 0;
+  await page.waitForTimeout(600);
+  const x2 = (await runner.boundingBox())?.x ?? 0;
+  expect(x2).toBeGreaterThan(x1);
+
+  // 横切ったら消える
+  await expect(runner).toBeHidden({ timeout: 4000 });
+  const elapsed = Date.now() - start;
+  expect(elapsed).toBeGreaterThan(2000);
+  expect(elapsed).toBeLessThan(3500);
+});
