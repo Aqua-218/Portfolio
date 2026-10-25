@@ -5,6 +5,7 @@ import * as s from "./admin.css";
 import { Contents } from "./Contents";
 import { Editor } from "./Editor";
 import { PhotoDraft } from "./PhotoDraft";
+import { Settings } from "./Settings";
 
 /**
  * ログインに失敗したときの文。Workerからは記号(?error=owner など)だけが来る。
@@ -34,6 +35,8 @@ export function Login() {
   const [error, setError] = useState<string | undefined>();
   /** 開いているファイル。なければ一覧 */
   const [open, setOpen] = useState<string | undefined>();
+  /** 設定を開いているか */
+  const [settings, setSettings] = useState(false);
 
   useEffect(() => {
     const code = new URLSearchParams(location.search).get("error");
@@ -73,12 +76,29 @@ export function Login() {
           <button
             type="button"
             className={s.button}
+            aria-pressed={settings}
+            onClick={() => {
+              setSettings(true);
+              setOpen(undefined);
+            }}
+          >
+            設定
+          </button>
+          <button
+            type="button"
+            className={s.button}
             onClick={() => void logout()}
           >
             ログアウト
           </button>
         </div>
-        {open === undefined ? (
+        {settings ? (
+          <Settings
+            onBack={() => {
+              setSettings(false);
+            }}
+          />
+        ) : open === undefined ? (
           <Contents onOpen={setOpen} />
         ) : open.endsWith(".jpg") ? (
           // 写真は、足した下書きだけ開ける
