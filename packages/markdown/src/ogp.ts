@@ -139,7 +139,7 @@ export function rehypeLinkCards() {
       const host = new URL(url).host;
       node.tagName = "a";
       node.properties = {
-        className: ["lcard"],
+        className: ogp?.image ? ["lcard", "lcard-img"] : ["lcard"],
         href: url,
         target: "_blank",
         rel: ["noopener"],
@@ -148,6 +148,24 @@ export function rehypeLinkCards() {
         span("lc-t", ogp?.title ?? host),
         ...(ogp?.description ? [span("lc-d", ogp.description)] : []),
         span("lc-u", host),
+        // 画像は相手のサイトにこのページを知らせないよう、リファラーなしで読む。
+        // 読めなかったときは、サイトの側で画像を外して画像なしのカードにする
+        ...(ogp?.image
+          ? [
+              {
+                type: "element" as const,
+                tagName: "img",
+                properties: {
+                  className: ["lc-img"],
+                  src: ogp.image,
+                  alt: "",
+                  loading: "lazy",
+                  referrerPolicy: "no-referrer",
+                },
+                children: [],
+              },
+            ]
+          : []),
       ];
     }
   };

@@ -80,6 +80,21 @@ describe("リンクカード", () => {
     expect(calls).toBe(1);
   });
 
+  it("画像があれば、リファラーなしで読む画像をつける", async () => {
+    const ogp = new OgpCache(cacheFile(), () =>
+      Promise.resolve({
+        title: "猫",
+        description: "",
+        image: "https://example.com/cat.png",
+      }),
+    );
+    const html = await render("https://example.com/", { ogp });
+    expect(html).toContain('class="lcard lcard-img"');
+    expect(html).toContain(
+      '<img class="lc-img" src="https://example.com/cat.png" alt="" loading="lazy" referrerpolicy="no-referrer">',
+    );
+  });
+
   it("キャッシュを渡さなければカードにしない", async () => {
     expect(await render("https://simpleicons.org/")).not.toContain("lcard");
   });
