@@ -13,6 +13,7 @@ export const colorNames = [
   "line",
   "tatami",
   "mike",
+  "mikeText",
   "pxline",
   "note",
   "leaf",
@@ -31,6 +32,8 @@ export const light: Palette = {
   line: { l: 0.885, c: 0.016, h: 112 },
   tatami: { l: 0.925, c: 0.032, h: 115 }, // 畳：タグ地
   mike: { l: 0.66, c: 0.145, h: 55 }, // 三毛の茶：差し色
+  // 差し色の文字(今いるページ・日付など)。mikeのままでは地とのコントラストが3:1しかないので、少し濃くする
+  mikeText: { l: 0.55, c: 0.13, h: 55 },
   pxline: { l: 0.24, c: 0.015, h: 70 }, // ドット猫の輪郭
   note: { l: 0.915, c: 0.038, h: 75 }, // 図のメモ(モックの #f2e0c8)
   leaf: { l: 0.5, c: 0.06, h: 140 }, // コードの型名
@@ -46,6 +49,7 @@ export const dark: Palette = {
   line: { l: 0.31, c: 0.014, h: 80 },
   tatami: { l: 0.27, c: 0.025, h: 112 },
   mike: { l: 0.76, c: 0.13, h: 60 },
+  mikeText: { l: 0.76, c: 0.13, h: 60 }, // 暗い地ではmikeのままで足りる
   pxline: { l: 0.82, c: 0.012, h: 95 },
   note: { l: 0.361, c: 0.034, h: 66 }, // モックの #4a3a2a
   leaf: { l: 0.5, c: 0.06, h: 140 },
