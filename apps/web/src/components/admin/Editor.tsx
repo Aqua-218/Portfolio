@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import * as s from "./admin.css";
 import { type EventDoc, parse, serialize } from "./frontmatter";
 import { readFile } from "./github";
+import { Preview } from "./Preview";
 import { byField, type Field } from "./validate";
 
 type State =
@@ -25,6 +26,12 @@ function current(state: State): string | null {
 /** 1つのファイルを編集する。保存は下書きのブランチへ(#86) */
 export function Editor({ path, onBack }: { path: string; onBack: () => void }) {
   const [state, setState] = useState<State>({ kind: "loading" });
+  /** プレビューを出しているか */
+  const [previewing, setPreviewing] = useState(false);
+  const slug = path.replace(/^.*\//, "").replace(/\.md$/, "");
+  /** プレビューできるのはMarkdownだけ */
+  const canPreview =
+    path.endsWith(".md") && (state.kind === "event" || state.kind === "text");
 
   useEffect(() => {
     let alive = true;
@@ -126,7 +133,39 @@ export function Editor({ path, onBack }: { path: string; onBack: () => void }) {
         </p>
       )}
 
-      {state.kind === "event" && (
+      {canPreview && (
+        <div className={s.tabs}>
+          <button
+            type="button"
+            className={s.tab}
+            aria-pressed={!previewing}
+            onClick={() => {
+              setPreviewing(false);
+            }}
+          >
+            編集
+          </button>
+          <button
+            type="button"
+            className={s.tab}
+            aria-pressed={previewing}
+            onClick={() => {
+              setPreviewing(true);
+            }}
+          >
+            プレビュー
+          </button>
+        </div>
+      )}
+
+      {previewing && state.kind === "event" && (
+        <Preview slug={slug} meta={state.doc.meta} body={state.doc.body} />
+      )}
+      {previewing && state.kind === "text" && (
+        <Preview slug={slug} body={state.text} />
+      )}
+
+      {!previewing && state.kind === "event" && (
         <div className={s.fields}>
           <label className={s.field}>
             タイトル
@@ -213,7 +252,7 @@ export function Editor({ path, onBack }: { path: string; onBack: () => void }) {
         </div>
       )}
 
-      {state.kind === "text" && (
+      {!previewing && state.kind === "text" && (
         <>
           <label className={s.field}>
             中身

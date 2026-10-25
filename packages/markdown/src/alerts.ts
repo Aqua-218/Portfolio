@@ -1,8 +1,21 @@
-import { renderSync } from "@portfolio/pxcat/node";
 import type { Coat, FrameName } from "@portfolio/pxcat";
 import type { Element, ElementContent, Root } from "hast";
 import { fromHtml } from "hast-util-from-html";
 import { visit } from "unist-util-visit";
+import type { VFile } from "vfile";
+
+/** ドット猫のSVGを描く。ビルドではpxcatのrenderSync、ブラウザではWasmのrender */
+export type CatDrawer = (
+  frame: FrameName,
+  coat: Coat,
+) => string | Promise<string>;
+
+declare module "vfile" {
+  interface DataMap {
+    /** アラートの猫の描き方。なければ猫なし */
+    cat: CatDrawer;
+  }
+}
 
 /** アラートの種類ごとの猫。NOTEはモックの見本と同じ、のぞく三毛 */
 const CATS = {
@@ -19,10 +32,14 @@ function isKind(s: string): s is Kind {
   return s in CATS;
 }
 
-/** ドット猫のSVG。ビルド時に描いて埋め込む */
-function cat(kind: Kind): ElementContent[] {
+/** ドット猫のSVG。描いて埋め込む */
+async function cat(
+  kind: Kind,
+  draw: CatDrawer | undefined,
+): Promise<ElementContent[]> {
+  if (!draw) return [];
   const { frame, coat } = CATS[kind];
-  const svg = renderSync([frame], coat, 2);
+  const svg = await draw(frame, coat);
   return fromHtml(svg, { fragment: true, space: "svg" })
     .children as ElementContent[];
 }
@@ -32,7 +49,9 @@ function cat(kind: Kind): ElementContent[] {
  * `<div class="callout callout-note">猫<div><b>NOTE</b>本文</div></div>`
  */
 export function rehypeAlerts() {
-  return (tree: Root) => {
+  return async (tree: Root, file: VFile) => {
+    // 猫を描くのは非同期なので、見つけたあとでまとめて描く
+    const cats: { span: Element; kind: Kind }[] = [];
     visit(tree, "element", (node: Element, index, parent) => {
       if (node.tagName !== "blockquote" || !parent || index === undefined)
         return;
@@ -51,17 +70,19 @@ export function rehypeAlerts() {
       const body = node.children.filter(
         (c) => !(c === first && first.children.length === 0),
       );
+      const span: Element = {
+        type: "element",
+        tagName: "span",
+        properties: { className: ["callout-cat"], ariaHidden: "true" },
+        children: [],
+      };
+      cats.push({ span, kind });
       parent.children[index] = {
         type: "element",
         tagName: "div",
         properties: { className: ["callout", `callout-${kind.toLowerCase()}`] },
         children: [
-          {
-            type: "element",
-            tagName: "span",
-            properties: { className: ["callout-cat"], ariaHidden: "true" },
-            children: cat(kind),
-          },
+          span,
           {
             type: "element",
             tagName: "div",
@@ -79,5 +100,8 @@ export function rehypeAlerts() {
         ],
       };
     });
+    for (const { span, kind } of cats) {
+      span.children = await cat(kind, file.data.cat);
+    }
   };
 }

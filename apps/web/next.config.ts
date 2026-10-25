@@ -12,6 +12,7 @@ const config: NextConfig = {
     "@portfolio/design",
     "@portfolio/pxcat",
     "@portfolio/content-wasm",
+    "@portfolio/markdown",
   ],
   // Mermaidの図をビルド時に描くChromiumの操作は、バンドルせずにそのまま読む
   serverExternalPackages: ["playwright-core"],
