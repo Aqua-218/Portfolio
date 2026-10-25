@@ -3,8 +3,9 @@
 // - ログインはいらない(いつも「dev」でログインしている)
 // - mainはディスクのcontent/。下書き(draft/)は apps/web/.dev/admin.json に置く
 // - 公開(PRのマージ)すると、下書きをディスクのcontent/に書く。チェックはすぐ通る
+// - Qiitaにも出さない。出した記事は apps/web/.dev/admin.json に置く
 // 管理画面が使うGitHub APIだけを、同じ形で返す。127.0.0.1でしか待たない
-import { createHash } from "node:crypto";
+import { createHash, randomBytes } from "node:crypto";
 import {
   mkdirSync,
   readdirSync,
@@ -26,10 +27,11 @@ function load() {
   try {
     return JSON.parse(readFileSync(storeFile, "utf8"));
   } catch {
-    return { drafts: {}, objects: {}, pulls: [], next: 1 };
+    return { drafts: {}, objects: {}, pulls: [], next: 1, qiita: {} };
   }
 }
 let store = load();
+store.qiita ??= {};
 function save() {
   mkdirSync(path.dirname(storeFile), { recursive: true });
   writeFileSync(storeFile, JSON.stringify(store, null, 2));
@@ -258,6 +260,52 @@ async function github(method, full, req) {
   return [404, { error: "開発モードでは、まだ使えません" }];
 }
 
+/** いまの日時。Qiitaが返す形(+09:00) */
+function now() {
+  const t = new Date(Date.now() + 9 * 3600_000).toISOString().slice(0, 19);
+  return `${t}+09:00`;
+}
+
+/** Qiita APIの代わり。pathは /api/v2/ から */
+async function qiita(method, full, req) {
+  const url = new URL(full, "http://dev");
+  const p = url.pathname;
+  let m;
+  if (method === "GET" && p === "/api/v2/authenticated_user/items") {
+    const page = Number(url.searchParams.get("page") ?? 1);
+    const per = Number(url.searchParams.get("per_page") ?? 20);
+    const items = Object.values(store.qiita).sort((a, b) =>
+      b.created_at.localeCompare(a.created_at),
+    );
+    return [200, items.slice((page - 1) * per, page * per)];
+  }
+  if ((m = /^\/api\/v2\/items\/([0-9a-f]{20})$/.exec(p))) {
+    const item = store.qiita[m[1]];
+    if (!item) return [404, { message: "Not found" }];
+    if (method === "GET") return [200, item];
+    if (method === "PATCH") {
+      Object.assign(item, await body(req), { updated_at: now() });
+      save();
+      return [200, item];
+    }
+  }
+  if (method === "POST" && p === "/api/v2/items") {
+    const id = randomBytes(10).toString("hex");
+    const at = now();
+    const item = {
+      ...(await body(req)),
+      id,
+      created_at: at,
+      updated_at: at,
+      url: `https://qiita.com/dev/items/${id}`,
+    };
+    store.qiita[id] = item;
+    save();
+    return [201, item];
+  }
+  return [403, { error: "その操作はできません" }];
+}
+
 createServer((req, res) => {
   const url = new URL(req.url ?? "/", "http://dev");
   const route = url.pathname.replace(/\/$/, "");
@@ -271,6 +319,14 @@ createServer((req, res) => {
       if (route === "/admin/auth/logout") return send(res, 200, { ok: true });
       if (route === "/admin/api") {
         const [status, data] = await github(
+          req.method ?? "GET",
+          url.searchParams.get("path") ?? "",
+          req,
+        );
+        return send(res, status, data);
+      }
+      if (route === "/admin/qiita") {
+        const [status, data] = await qiita(
           req.method ?? "GET",
           url.searchParams.get("path") ?? "",
           req,
