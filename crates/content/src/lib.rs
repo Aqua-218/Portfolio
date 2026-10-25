@@ -1,6 +1,7 @@
 //! `content/`のファイルを読んで検証する。
 
 pub mod affiliations;
+pub mod blog;
 pub mod cats;
 pub mod date;
 pub mod event_years;
