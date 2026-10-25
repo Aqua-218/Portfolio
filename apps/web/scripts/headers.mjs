@@ -87,6 +87,9 @@ ${ERRORS.map((code) => `ErrorDocument ${code} /errors/${code}/`).join("\n")}
 # HTTPSにする。Cloudflareを前に置いたときは、Cloudflareとの間がHTTPでも転送しない(X-Forwarded-Proto)
 <IfModule mod_rewrite.c>
   RewriteEngine On
+  # www.komineko.jp は komineko.jp へ(どちらでも開けるが、URLは1つにする)
+  RewriteCond %{HTTP_HOST} ^www\\.komineko\\.jp$ [NC]
+  RewriteRule ^ https://komineko.jp%{REQUEST_URI} [R=301,L]
   RewriteCond %{HTTPS} off
   RewriteCond %{HTTP:X-Forwarded-Proto} !^https$ [NC]
   RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
