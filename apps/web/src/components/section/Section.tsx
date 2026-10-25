@@ -17,6 +17,7 @@ export type SectionName =
   | "shelf"
   | "stack"
   | "license"
+  | "blog"
   | "admin"
   | "markdown";
 
