@@ -1,5 +1,9 @@
 import type { Site } from "@portfolio/content-types";
-import init, { check as checkWasm, initSync } from "../dist/content_wasm.js";
+import init, {
+  check as checkWasm,
+  check_file as checkFileWasm,
+  initSync,
+} from "../dist/content_wasm.js";
 
 /** 検証の結果。間違いがなければsiteに中身が入る */
 export interface Checked {
@@ -38,4 +42,30 @@ export async function check(
   return JSON.parse(
     checkWasm(paths, new Uint32Array(chunks.map((c) => c.length)), data),
   ) as Checked;
+}
+
+/** 1つのファイルの間違い */
+export interface FileProblem {
+  line: number | null;
+  message: string;
+  /** `content/events/x.md:3: date がありません`の形。ビルドと同じ文 */
+  text: string;
+}
+
+export interface FileChecked {
+  /** このファイルを1つだけで検証できたか。できないもの(猫の写真の説明など)は、PRのCIで確かめる */
+  supported: boolean;
+  problems: FileProblem[];
+}
+
+/**
+ * ファイル1つを、ビルドと同じ関数で検証する。`path`は`content/`からの相対パス。
+ * ファイルをまたいだ確かめはしない
+ */
+export async function checkFile(
+  path: string,
+  text: string,
+): Promise<FileChecked> {
+  await load();
+  return JSON.parse(checkFileWasm(path, text)) as FileChecked;
 }
