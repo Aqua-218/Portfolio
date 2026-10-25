@@ -1,6 +1,9 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { expect, test } from "@playwright/test";
 
+/** Wasmや大きなモジュールを初めて読み込むのを待つ時間。e2eを並べて走らせると、読み込みが遅くなる */
+const WASM = 15_000;
+
 test("管理画面は検索に載せない", async ({ page }) => {
   await page.goto("/admin/");
   await expect(page.getByRole("heading", { name: "Admin" })).toBeVisible();
@@ -323,9 +326,10 @@ tags: [Z1ゼミ]
     page,
   }) => {
     await page.getByRole("button", { name: "2026-08-10-seccamp.md" }).click();
+    // 最初の検証は、検証のWasmを読み込んでからなので時間がかかる
     await expect(
       page.getByText("ビルドと同じ検証で、間違いはありません。"),
-    ).toBeVisible();
+    ).toBeVisible({ timeout: WASM });
     await page.getByLabel("タイトル").fill("");
     await expect(page.getByText("間違いが 1 件あります。")).toBeVisible();
     // タイトルの欄の中に、理由が出る
@@ -341,7 +345,9 @@ tags: [Z1ゼミ]
   test("TOMLの間違いは、行番号つきで出す", async ({ page }) => {
     await page.getByRole("button", { name: "プロフィール" }).click();
     await page.getByLabel("中身").fill('name = "小峯 圭也"\nname = 2\n');
-    await expect(page.locator("main ul[role=alert]")).toContainText("行目");
+    await expect(page.locator("main ul[role=alert]")).toContainText("行目", {
+      timeout: WASM,
+    });
   });
 
   test("プレビューは本番と同じ見た目で、書き換えたものを出す", async ({
@@ -358,7 +364,10 @@ tags: [Z1ゼミ]
       .fill("> [!NOTE]\n> 猫は液体です。\n\n```rust\nfn main() {}\n```\n");
     await page.getByRole("button", { name: "プレビュー" }).click();
     const preview = page.getByRole("region", { name: "プレビュー" });
-    await expect(preview.locator("time")).toHaveText("8/10–15");
+    // Markdownの処理(Shikiなど)とドット猫のWasmは、プレビューを開いてから読み込む
+    await expect(preview.locator("time")).toHaveText("8/10–15", {
+      timeout: WASM,
+    });
     await expect(preview.getByText("セキュキャン")).toBeVisible();
     await expect(preview.getByText("@ 多摩 LINK FOREST")).toBeVisible();
     // アラートの猫(Wasm)とコードの色(Shiki)も本番と同じ
