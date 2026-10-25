@@ -31,3 +31,33 @@ globalStyle(".callout p", {
   margin: "0.15rem 0 0",
   fontSize: "0.9375rem",
 });
+
+/** リンクカード。Stackの見本と同じ見た目 */
+globalStyle(".lcard", {
+  display: "grid",
+  gap: "0.2rem",
+  margin: "0 0 1rem",
+  padding: "0.9rem 1rem",
+  border: `1px solid ${vars.color.line}`,
+  borderRadius: vars.radius.lg,
+  textDecoration: "none",
+  transition: "border-color 0.25s",
+});
+
+globalStyle(".lcard:hover", {
+  borderColor: vars.color.mike,
+});
+
+globalStyle(".lc-t", {
+  fontWeight: 700,
+});
+
+globalStyle(".lc-d", {
+  fontSize: "0.875rem",
+  color: vars.color.muted,
+});
+
+globalStyle(".lc-u", {
+  fontSize: "0.75rem",
+  color: vars.color.muted,
+});
