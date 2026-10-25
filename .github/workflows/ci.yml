@@ -5,6 +5,7 @@ on:
   push:
     branches: [main]
 
+# 既定はリポジトリを読むだけ。書き込みのいるジョブはない
 permissions:
   contents: read
 
@@ -17,6 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: jdx/mise-action@8418fedb1110381a0d3ba51a7a415d7c1b884550 # v5.2.2
         with:
           install_args: node pnpm rust github:wasm-bindgen/wasm-bindgen
@@ -44,6 +47,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: jdx/mise-action@8418fedb1110381a0d3ba51a7a415d7c1b884550 # v5.2.2
         with:
           install_args: node pnpm rust github:wasm-bindgen/wasm-bindgen
@@ -69,6 +74,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: jdx/mise-action@8418fedb1110381a0d3ba51a7a415d7c1b884550 # v5.2.2
         with:
           install_args: node pnpm rust github:wasm-bindgen/wasm-bindgen
@@ -94,10 +101,13 @@ jobs:
     runs-on: ubuntu-latest
     # 手元のpnpm vrtと同じイメージで撮り、フォントの描画をそろえる
     container:
-      image: mcr.microsoft.com/playwright:v1.64.1-noble
+      # 版(v1.64.1-noble)だけでなく中身のハッシュで固定する。手元のpnpm vrt(vrt/run.sh)と同じもの
+      image: mcr.microsoft.com/playwright:v1.64.1-noble@sha256:47b510dd9230bf0b9bfc9b20102241e577ea7a99334ab4c3ca19f19770e9b8ea
       options: --ipc=host
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: jdx/mise-action@8418fedb1110381a0d3ba51a7a415d7c1b884550 # v5.2.2
         with:
           install_args: node pnpm
@@ -128,6 +138,8 @@ jobs:
         working-directory: proofs
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: jdx/mise-action@8418fedb1110381a0d3ba51a7a415d7c1b884550 # v5.2.2
         with:
           install_args: github:leanprover/elan
@@ -152,6 +164,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       # CharonとAeneasは、ビルドに時間がかかるので版ごとに取っておく
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
@@ -165,6 +179,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: jdx/mise-action@8418fedb1110381a0d3ba51a7a415d7c1b884550 # v5.2.2
         with:
           install_args: java
@@ -176,3 +192,18 @@ jobs:
       - run: sh specs/tlc.sh
       # 変換したTLAがコミットされているものと同じか見る
       - run: git diff --exit-code specs
+
+  # ワークフローの穴(権限の広さ、資格情報の残し方、固定していないアクションなど)を調べる
+  workflows:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@8418fedb1110381a0d3ba51a7a415d7c1b884550 # v5.2.2
+        with:
+          install_args: github:zizmorcore/zizmor
+      # トークンを渡すと、知られた脆弱性のあるアクションや、なりすましのコミットも調べる
+      - run: zizmor --persona=pedantic --min-severity=low .github/workflows
+        env:
+          GH_TOKEN: ${{ github.token }}
