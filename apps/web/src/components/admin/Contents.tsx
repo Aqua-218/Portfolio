@@ -11,7 +11,12 @@ type State =
   | { kind: "ready"; paths: string[] };
 
 /** content/の一覧。種類ごとに分け、名前で絞り込める */
-export function Contents() {
+/** 文字のファイルだけ開ける。写真はアップロード(#85)で扱う */
+function editable(path: string): boolean {
+  return /\.(md|toml|svg)$/.test(path);
+}
+
+export function Contents({ onOpen }: { onOpen: (path: string) => void }) {
   const [state, setState] = useState<State>({ kind: "loading" });
   const [query, setQuery] = useState("");
 
@@ -69,7 +74,19 @@ export function Contents() {
           <ul className={s.list}>
             {g.items.map((item) => (
               <li key={item.path} title={item.path}>
-                {item.label}
+                {editable(item.path) ? (
+                  <button
+                    type="button"
+                    className={s.item}
+                    onClick={() => {
+                      onOpen(item.path);
+                    }}
+                  >
+                    {item.label}
+                  </button>
+                ) : (
+                  item.label
+                )}
               </li>
             ))}
           </ul>
