@@ -4,6 +4,7 @@ import type { Cats } from "./Cats";
 import type { Company } from "./Company";
 import type { Event } from "./Event";
 import type { License } from "./License";
+import type { Post } from "./Post";
 import type { Profile } from "./Profile";
 import type { ShelfWork } from "./ShelfWork";
 import type { Skills } from "./Skills";
@@ -25,4 +26,8 @@ export type Site = {
   shelf: Array<ShelfWork>;
   cats: Cats;
   licenses: Array<License>;
+  /**
+   * ブログの記事。ファイル名の順
+   */
+  blog: Array<Post>;
 };
