@@ -1,0 +1,62 @@
+name: Content cache
+# 管理画面から足したMermaidの図とリンクカード(content/.cache/)を、PRの中で作ってコミットする。
+# 管理画面の下書き(draft/)のブランチのPRだけ。使わなくなった図とOGPは消す(apps/web/scripts/cache.mjs)。
+# コミットのあとにいつものチェックが走るよう、GITHUB_TOKENではなくCONTENT_CACHE_TOKENで押す(docs/admin.md)
+on:
+  pull_request:
+    paths:
+      - "content/**"
+
+# 既定は何もできない。ジョブで読むだけを足す
+permissions: {}
+
+concurrency:
+  group: content-cache-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  cache:
+    # 同じリポジトリの、下書きのブランチだけ(フォークのPRには秘密を渡さない)
+    if: github.event.pull_request.head.repo.full_name == github.repository && startsWith(github.head_ref, 'draft/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.head_ref }}
+          persist-credentials: false
+      - uses: jdx/mise-action@8418fedb1110381a0d3ba51a7a415d7c1b884550 # v5.2.2
+        with:
+          install_args: node pnpm rust github:wasm-bindgen/wasm-bindgen
+      - id: pnpm-store
+        run: echo "path=$(pnpm store path)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-${{ runner.os }}-
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+      - run: pnpm install --frozen-lockfile
+      # 図はChromiumで描く。OGPはビルドの中で取りに行く
+      - run: pnpm --filter @portfolio/web exec playwright install --with-deps chromium
+      - run: pnpm build
+      # トークンを渡すのはここだけ。ビルドのステップには渡さない
+      - name: 変わっていればコミットする
+        env:
+          TOKEN: ${{ secrets.CONTENT_CACHE_TOKEN }}
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          git add content/.cache
+          if git diff --cached --quiet; then
+            echo "content/.cache/ は変わらない"
+            exit 0
+          fi
+          if [ -z "$TOKEN" ]; then
+            echo "::error::CONTENT_CACHE_TOKEN がありません(docs/admin.md)"
+            exit 1
+          fi
+          git -c user.name="github-actions[bot]" \
+            -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -m "chore(content): 図とリンクカードを作る"
+          git push "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${BRANCH}"
