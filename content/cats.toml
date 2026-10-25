@@ -13,6 +13,7 @@ events = "futari"
 shelf = "mike-face"
 stack = "kuro"
 license = "koneko"
+blog = "kaminari-01"
 
 # Catsのギャラリーにはこの順に並ぶ
 [[photo]]
