@@ -13,6 +13,7 @@ export type { Level } from "./Level";
 export type { License } from "./License";
 export type { LicenseGroup } from "./LicenseGroup";
 export type { Photo } from "./Photo";
+export type { Post } from "./Post";
 export type { Profile } from "./Profile";
 export type { ShelfKind } from "./ShelfKind";
 export type { ShelfWork } from "./ShelfWork";
