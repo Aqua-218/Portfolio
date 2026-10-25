@@ -149,6 +149,48 @@ fn ライセンスの間違い() {
 }
 
 #[test]
+fn ライセンスの原文を結びつける() {
+    let src = LICENSES.replace(
+        "icons = [\"lean\"]",
+        "icons = [\"lean\"]\ntext = \"apache-2\"",
+    );
+    let l = licenses::parse(&src).unwrap();
+    assert_eq!(l[0].text.as_deref(), Some("apache-2"));
+    assert_eq!(l[1].text, None);
+    // 原文のファイルがあればよい
+    let have = BTreeSet::from(["apache-2".to_owned()]);
+    assert!(licenses::check_texts(&src, &have).is_empty());
+    assert_problems(
+        &licenses::check_texts(&src, &BTreeSet::new()),
+        &[(Some(9), "content/licenses/apache-2.txt")],
+    );
+}
+
+#[test]
+fn ライセンスの原文のidとlicenseの名前() {
+    // URLやパスをずらす字・ドット・大文字は使えない
+    for id in ["../secret", "CC-BY-4.0", "a/b", ""] {
+        let bad = LICENSES.replace(
+            "icons = [\"lean\"]",
+            &format!("icons = [\"lean\"]\ntext = \"{id}\""),
+        );
+        assert_problems(
+            &licenses::parse(&bad).unwrap_err(),
+            &[(Some(9), "英小文字・数字・ハイフン")],
+        );
+    }
+    // 原文があるなら、リンクの名前(license)もいる
+    let no_name = LICENSES.replace(
+        "note = \"サイト内の写真は、すべて本人が用意した猫の写真です。\"",
+        "note = \"サイト内の写真は、すべて本人が用意した猫の写真です。\"\ntext = \"mit\"",
+    );
+    assert_problems(
+        &licenses::parse(&no_name).unwrap_err(),
+        &[(Some(14), "license も書いてください")],
+    );
+}
+
+#[test]
 fn localのアイコンはファイルとライセンスがいる() {
     let s = skills::parse(
         r#"
