@@ -17,6 +17,17 @@
 | Cross-Origin-Resource-Policy | `same-origin`                                      |
 | Permissions-Policy           | カメラ・マイク・位置情報・支払い・USBを使わない    |
 
+### いちばん上の.htaccessだけに書くもの
+
+- エラーのページ: 404は`/404.html`、400・401・403・408・410・429・500・502・503・504は`/errors/<番号>/`
+- HTTPSへ移す(301)。Cloudflareを前に置くので、`X-Forwarded-Proto: https`のときは移さない(Cloudflareとの間がHTTPでもループしない)
+- ディレクトリの最後の`/`もHTTPSのまま足す。Apacheに任せると`http://`で返す
+- ファイルの一覧は出さない(`Options -Indexes`)
+- 古いApacheが知らない種類(wasm・woff2・avif・webp)と、拡張子のないOGPの画像(`image/png`)
+- 文字のファイルは縮めて送る(gzip)
+
+本物のApache(Docker、`.htaccess`を読む設定)で`out/`を出して確かめる: `pnpm --filter @portfolio/web apache`(`apps/web/apache/`)。CIの`apache`のジョブでも走る。
+
 ### キャッシュ
 
 同じ`.htaccess`で`Cache-Control`もつける。
