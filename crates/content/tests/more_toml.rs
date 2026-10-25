@@ -190,6 +190,7 @@ events = "a"
 shelf = "b"
 stack = "c"
 license = "d"
+blog = "a"
 
 [[photo]]
 id = "a"
@@ -232,7 +233,7 @@ fn 写真のファイルが足りないか余っている() {
     assert_problems(
         &problems,
         &[
-            (Some(31), "d.jpg がありません"),
+            (Some(32), "d.jpg がありません"),
             (None, "cats.toml に載っていません"),
         ],
     );
