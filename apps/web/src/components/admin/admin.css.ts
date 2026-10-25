@@ -197,3 +197,26 @@ export const problems = style({
   fontSize: "0.875rem",
   color: vars.color.mike,
 });
+
+export const preview = style({
+  padding: "1.25rem",
+  border: `1px dashed ${vars.color.line}`,
+  borderRadius: vars.radius.lg,
+});
+
+export const tabs = style({
+  display: "flex",
+  gap: "0.5rem",
+});
+
+export const tab = style([
+  button,
+  {
+    selectors: {
+      '&[aria-pressed="true"]': {
+        background: vars.color.ink,
+        color: vars.color.paper,
+      },
+    },
+  },
+]);
