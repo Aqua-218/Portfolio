@@ -5,7 +5,11 @@ on:
     types: [opened, edited, synchronize, reopened]
 
 permissions:
-  pull-requests: read
+  pull-requests: read # PRのタイトルを読むだけ
+
+concurrency:
+  group: pr-title-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 jobs:
   pr-title:
