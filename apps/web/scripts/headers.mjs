@@ -2,7 +2,7 @@
 // Next.jsはページにインラインのスクリプトを書き出すので、ページごとにそのハッシュだけをCSPで許す。
 // .htaccessはページのディレクトリごとに置く(Apacheは近いディレクトリのものを使う)。
 import { createHash } from "node:crypto";
-import { readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 const out = new URL("../out/", import.meta.url).pathname;
@@ -76,9 +76,21 @@ function htaccess(policy, admin) {
   Header always set Cross-Origin-Opener-Policy "same-origin"
   Header always set Cross-Origin-Resource-Policy "same-origin"
   Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
-${admin ? '  Header always set Cache-Control "no-store"\n' : ""}</IfModule>
+  # ページは毎回、変わっていないか確かめる。管理画面は残さない
+  Header always set Cache-Control "${admin ? "no-store" : "no-cache"}"
+</IfModule>
 `;
 }
+
+/** 名前に中身のハッシュが入るファイルの置き場。中身が変われば名前も変わるので、1年持たせて確かめもしない */
+const IMMUTABLE = ["_next/static", "img/cats", "fonts"];
+
+const immutable = `# scripts/headers.mjsが書き出す。手で直さない
+# ここのファイルは名前に中身のハッシュが入る
+<IfModule mod_headers.c>
+  Header always set Cache-Control "public, max-age=31536000, immutable"
+</IfModule>
+`;
 
 /** HTMLのあるディレクトリ(_next/など、ページのないところは除く) */
 function pageDirs(dir) {
@@ -116,5 +128,9 @@ for (const { dir, htmls } of dirs) {
     admin,
   });
   writeFileSync(path.join(dir, ".htaccess"), htaccess(policy, admin));
+}
+for (const rel of IMMUTABLE) {
+  const dir = path.join(out, rel);
+  if (existsSync(dir)) writeFileSync(path.join(dir, ".htaccess"), immutable);
 }
 console.log(`${String(dirs.length)} 個のディレクトリに .htaccess を書き出した`);
