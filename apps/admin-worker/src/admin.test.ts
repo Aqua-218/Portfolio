@@ -18,6 +18,8 @@ import {
 const OWNER = 4242;
 const ORIGIN = "https://example.com";
 const REPO = "Aqua-218/Portfolio";
+/** Qiitaが受けつけるトークン(16進の40字) */
+const GOOD_QIITA = "0123456789abcdef0123456789abcdef01234567";
 
 /** 偽のKV。期限は見ない(Workerの側で時刻を見て切っている) */
 class FakeKV implements Store {
@@ -105,6 +107,12 @@ class World {
             }),
           );
         }
+        if (url === "https://qiita.com/api/v2/authenticated_user")
+          return Promise.resolve(
+            headers.authorization === `Bearer ${GOOD_QIITA}`
+              ? Response.json({ id: "neko" })
+              : Response.json({ message: "Unauthorized" }, { status: 401 }),
+          );
         if (url.endsWith("/user"))
           return Promise.resolve(
             Response.json({ id: this.userId, login: "neko" }),
@@ -160,6 +168,20 @@ class World {
   /** 同じサイトの画面から、Qiitaへの中継を呼ぶ */
   qiitaApi(method: string, path: string, body?: string) {
     return this.send(`/admin/qiita?path=${encodeURIComponent(path)}`, {
+      method,
+      ...(body === undefined ? {} : { body }),
+      headers: {
+        "x-admin": "1",
+        ...(method === "GET"
+          ? { "sec-fetch-site": "same-origin" }
+          : { origin: ORIGIN }),
+      },
+    });
+  }
+
+  /** 同じサイトの画面から、設定を呼ぶ */
+  setting(method: string, name = "", body?: string) {
+    return this.send(`/admin/settings${name ? `?name=${name}` : ""}`, {
       method,
       ...(body === undefined ? {} : { body }),
       headers: {
@@ -687,5 +709,96 @@ describe("Qiitaへの中継", () => {
     const r = await w.qiitaApi("GET", `/api/v2/items/${ID}`);
     expect(r.status).toBe(503);
     expect(w.to("qiita.com")).toEqual([]);
+  });
+});
+
+/** 設定の返事 */
+interface Settings {
+  settings: { name: string; source: string | null }[];
+  changes: unknown[];
+}
+const settingsOf = (r: Response) => r.json<Settings>();
+
+describe("設定", () => {
+  const put = (value: string) =>
+    w.setting("PUT", "qiita", JSON.stringify({ value }));
+
+  it("入れたQiitaのトークンは、暗号化してKVに置き、どの返事にも出さない", async () => {
+    await w.login();
+    const r = await put(GOOD_QIITA);
+    expect(r.status).toBe(200);
+    const text = await r.text();
+    expect(text).not.toContain(GOOD_QIITA);
+    expect((JSON.parse(text) as Settings).settings[0]).toMatchObject({
+      name: "qiita",
+      source: "admin",
+      last4: "4567",
+      by: "neko",
+    });
+    const stored = w.kv.data.get("setting:qiita") ?? "";
+    expect(stored).not.toBe("");
+    expect(stored).not.toContain(GOOD_QIITA);
+    expect(await (await w.setting("GET")).text()).not.toContain(GOOD_QIITA);
+  });
+
+  it("入れたトークンで中継する。消すと wrangler secret のものに戻る", async () => {
+    await w.login();
+    await put(GOOD_QIITA);
+    await w.qiitaApi("GET", "/api/v2/items/0123456789abcdef0123");
+    expect(w.to("qiita.com/api/v2/items").at(-1)?.headers.authorization).toBe(
+      `Bearer ${GOOD_QIITA}`,
+    );
+    const r = await w.setting("DELETE", "qiita");
+    expect((await settingsOf(r)).settings[0]?.source).toBe("secret");
+    await w.qiitaApi("GET", "/api/v2/items/0123456789abcdef0123");
+    expect(w.to("qiita.com/api/v2/items").at(-1)?.headers.authorization).toBe(
+      "Bearer qiita_secret_token",
+    );
+  });
+
+  it("Qiitaが受けつけないトークンや、形の違うものは入れない", async () => {
+    await w.login();
+    expect((await put("f".repeat(40))).status).toBe(422);
+    expect((await put("short")).status).toBe(422);
+    expect((await w.setting("PUT", "qiita", "not json")).status).toBe(422);
+    expect(w.kv.data.has("setting:qiita")).toBe(false);
+  });
+
+  it("知らない設定・ログインしていない・ほかのサイトからは断る", async () => {
+    expect((await put(GOOD_QIITA)).status).toBe(401);
+    await w.login();
+    expect(
+      (await w.setting("PUT", "github", JSON.stringify({ value: "x" }))).status,
+    ).toBe(404);
+    expect((await w.setting("PUT", "__proto__", "{}")).status).toBe(404);
+    const r = await w.send("/admin/settings?name=qiita", {
+      method: "PUT",
+      body: JSON.stringify({ value: GOOD_QIITA }),
+      headers: { "x-admin": "1", origin: "https://evil.example" },
+    });
+    expect(r.status).toBe(403);
+    expect(w.kv.data.has("setting:qiita")).toBe(false);
+  });
+
+  it("ほかの鍵で暗号化したものや、別の場所の値は使わない", async () => {
+    await w.login();
+    await put(GOOD_QIITA);
+    // セッションの暗号文を設定の場所に置いても、設定としては読まない
+    const session = w.kv.keys("session:")[0] ?? "";
+    w.kv.data.set("setting:qiita", w.kv.data.get(session) ?? "");
+    const r = await w.setting("GET");
+    expect((await settingsOf(r)).settings[0]?.source).toBe("secret");
+  });
+
+  it("変えたことを、値を入れずに記録する", async () => {
+    await w.login();
+    await put(GOOD_QIITA);
+    w.now += 60;
+    await w.setting("DELETE", "qiita");
+    const { changes } = await settingsOf(await w.setting("GET"));
+    expect(changes).toEqual([
+      { name: "qiita", action: "delete", at: w.now, by: "neko" },
+      { name: "qiita", action: "set", at: w.now - 60, by: "neko" },
+    ]);
   });
 });
