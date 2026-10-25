@@ -50,7 +50,17 @@ function frameOrigins(html) {
   ].map(([, origin = ""]) => origin);
 }
 
-/** ページのCSP。管理画面だけ、ログインのフォームがGitHubへ移る */
+/**
+ * Qiitaの記事の画像の置き場。管理画面のプレビューで、取り込んだ(まだビルドしていない)記事の画像を出すため。
+ * サイトのページでは、ビルドしたHTMLの画像から出どころを集める
+ */
+export const QIITA_IMAGES = [
+  "https://qiita-image-store.s3.amazonaws.com",
+  "https://qiita-image-store.s3.ap-northeast-1.amazonaws.com",
+  "https://qiita-user-contents.imgix.net",
+];
+
+/** ページのCSP。管理画面だけ、ログインのフォームがGitHubへ移り、Qiitaの画像を出せる */
 export function csp({ hashes, styles, images, frames = [], admin }) {
   return [
     "default-src 'none'",
@@ -59,7 +69,7 @@ export function csp({ hashes, styles, images, frames = [], admin }) {
     // 見た目はCSSのファイル。Mermaidの図の<style>はハッシュで、要素のstyle属性(ドット猫の大きさなど)はインラインで許す
     `style-src 'self' ${[...new Set(styles)].join(" ")}`.trim(),
     "style-src-attr 'unsafe-inline'",
-    `img-src 'self' data: ${[...new Set(images)].sort().join(" ")}`.trim(),
+    `img-src 'self' data: ${[...new Set([...images, ...(admin ? QIITA_IMAGES : [])])].sort().join(" ")}`.trim(),
     "font-src 'self'",
     // 通信は自分のサイト(次のページの読み込みと、管理画面のWorker)だけ
     "connect-src 'self'",
