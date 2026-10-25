@@ -676,3 +676,170 @@ tags: [Z1ゼミ]
     await expect(page.getByRole("button", { name: "kuro.jpg" })).toHaveCount(0);
   });
 });
+
+test.describe("写真を足す", () => {
+  const repo = "/repos/Aqua-218/Portfolio";
+  const TOML = '[[photo]]\nid = "kuro"\nalt = "黒猫"\ncoats = ["kuro"]\n';
+
+  /** content/cats/の写真のSOIのすぐあとに、位置情報(GPS)を書いたEXIFを差し込む */
+  function withGps(): Buffer {
+    const jpeg = readFileSync(
+      new URL("../../../content/cats/futari.jpg", import.meta.url),
+    );
+    const body = Buffer.concat([
+      Buffer.from("Exif\0\0MM\0*", "latin1"),
+      Buffer.from("GPSLatitude 36.5551N GPSLongitude 139.8828E", "latin1"),
+    ]);
+    const head = Buffer.from([0xff, 0xe1, 0, 0]);
+    head.writeUInt16BE(body.length + 2, 2);
+    return Buffer.concat([jpeg.subarray(0, 2), head, body, jpeg.subarray(2)]);
+  }
+
+  /** JPEGの中の、メタデータの種類(SOSまでを見る) */
+  function metadata(jpeg: Buffer): string[] {
+    const found: string[] = [];
+    let i = 2;
+    while (i + 4 <= jpeg.length && jpeg[i] === 0xff) {
+      const marker = jpeg[i + 1] ?? 0;
+      if (marker === 0xda) break;
+      const len = jpeg.readUInt16BE(i + 2);
+      const body = jpeg.subarray(i + 4, i + 2 + len).toString("latin1");
+      if (marker === 0xe1) found.push(body.slice(0, 4));
+      if (marker === 0xed) found.push("IPTC");
+      i += 2 + len;
+    }
+    return found;
+  }
+
+  test("位置情報を消してから、写真とcats.tomlを1つのコミットで下書きに入れる", async ({
+    page,
+  }) => {
+    const calls: { method: string; path: string; body: unknown }[] = [];
+    await page.route("**/admin/auth/me", (r) =>
+      r.fulfill({ status: 200, json: { login: "neko" } }),
+    );
+    await page.route("**/admin/api?*", (r) => {
+      const req = r.request();
+      const path = new URL(req.url()).searchParams.get("path") ?? "";
+      const body: unknown = req.postData() ? req.postDataJSON() : null;
+      calls.push({ method: req.method(), path, body });
+      if (path.includes("/git/matching-refs/")) return r.fulfill({ json: [] });
+      if (path.includes("/git/trees/main"))
+        return r.fulfill({
+          json: { tree: [{ path: "content/cats/kuro.jpg", type: "blob" }] },
+        });
+      if (path.endsWith("/git/ref/heads/main"))
+        return r.fulfill({ json: { object: { sha: "m1" } } });
+      if (path.endsWith("/git/commits/m1"))
+        return r.fulfill({ json: { tree: { sha: "t1" } } });
+      if (path.includes("cats.toml?ref=draft/cats/tama.jpg"))
+        return r.fulfill({
+          json: { content: Buffer.from(TOML).toString("base64"), sha: "x" },
+        });
+      if (req.method() === "POST" && path.endsWith("/git/refs"))
+        return r.fulfill({ status: 201, json: {} });
+      if (req.method() === "POST" && path.endsWith("/git/blobs"))
+        return r.fulfill({
+          status: 201,
+          json: { sha: `blob${String(calls.length)}` },
+        });
+      if (req.method() === "POST" && path.endsWith("/git/trees"))
+        return r.fulfill({ status: 201, json: { sha: "t2" } });
+      if (req.method() === "POST" && path.endsWith("/git/commits"))
+        return r.fulfill({ status: 201, json: { sha: "c2" } });
+      if (req.method() === "PATCH") return r.fulfill({ json: {} });
+      return r.fulfill({ status: 404 });
+    });
+    await page.goto("/admin/");
+    await page.getByText("写真を足す").click();
+
+    const gps = withGps();
+    expect(metadata(gps)).toContain("Exif");
+    await page.getByLabel("写真を選ぶ").setInputFiles({
+      name: "IMG_0001.jpg",
+      mimeType: "image/jpeg",
+      buffer: gps,
+    });
+    await expect(page.getByRole("img", { name: "足す写真" })).toBeVisible({
+      timeout: WASM,
+    });
+
+    // もうある名前は使えない
+    await page.getByLabel(/^ファイル名/).fill("kuro");
+    await expect(
+      page.getByText("同じ名前の写真がもうあります。").first(),
+    ).toBeVisible();
+    await page.getByLabel(/^ファイル名/).fill("tama");
+    await page.getByLabel(/^説明/).fill('寝ている"たま"');
+    await page.getByLabel("三毛").check();
+    await page.getByRole("button", { name: "下書きに保存" }).click();
+    await expect(page.getByRole("status")).toHaveText(
+      "写真「tama」を下書きに保存しました。まだ公開していません。",
+    );
+
+    // コミットする写真には、メタデータも位置情報の文字も残っていない
+    const blobs = calls.filter((c) => c.path.endsWith("/git/blobs"));
+    const image = blobs.find(
+      (c) => (c.body as { encoding: string }).encoding === "base64",
+    );
+    const sent = Buffer.from(
+      (image?.body as { content: string }).content,
+      "base64",
+    );
+    expect([...sent.subarray(0, 2)]).toEqual([0xff, 0xd8]);
+    expect(metadata(sent)).toEqual([]);
+    expect(sent.includes(Buffer.from("GPS"))).toBe(false);
+
+    const toml = blobs.find(
+      (c) => (c.body as { encoding: string }).encoding === "utf-8",
+    );
+    expect((toml?.body as { content: string }).content).toBe(
+      `${TOML}\n[[photo]]\nid = "tama"\nalt = "寝ている\\"たま\\""\ncoats = ["mike"]\n`,
+    );
+
+    // 写真とcats.tomlを1つのコミットにして、下書きのブランチを進める
+    const tree = calls.find((c) => c.path.endsWith("/git/trees"));
+    expect(tree?.body).toMatchObject({
+      base_tree: "t1",
+      tree: [
+        { path: "content/cats/tama.jpg", mode: "100644", type: "blob" },
+        { path: "content/cats.toml", mode: "100644", type: "blob" },
+      ],
+    });
+    expect(calls).toContainEqual({
+      method: "POST",
+      path: `${repo}/git/commits`,
+      body: {
+        message: "chore(content): 写真「tama」の下書き",
+        tree: "t2",
+        parents: ["m1"],
+      },
+    });
+    expect(calls).toContainEqual({
+      method: "PATCH",
+      path: `${repo}/git/refs/heads/draft/cats/tama.jpg`,
+      body: { sha: "c2" },
+    });
+  });
+
+  test("読めない写真は、そう出す", async ({ page }) => {
+    await page.route("**/admin/auth/me", (r) =>
+      r.fulfill({ status: 200, json: { login: "neko" } }),
+    );
+    await page.route("**/admin/api?*", (r) =>
+      r.fulfill({
+        json: r.request().url().includes("matching-refs") ? [] : { tree: [] },
+      }),
+    );
+    await page.goto("/admin/");
+    await page.getByText("写真を足す").click();
+    await page.getByLabel("写真を選ぶ").setInputFiles({
+      name: "a.jpg",
+      mimeType: "image/jpeg",
+      buffer: Buffer.from("not a photo"),
+    });
+    await expect(page.locator("details").getByRole("alert")).toHaveText(
+      "この写真は読めませんでした。JPEGかPNGにしてください。",
+    );
+  });
+});
