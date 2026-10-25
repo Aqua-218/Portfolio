@@ -60,9 +60,38 @@ export function Contents({ onOpen }: { onOpen: (path: string) => void }) {
       .map((p) => /^content\/cats\/(.+)\.jpg$/.exec(p)?.[1])
       .filter((id) => id !== undefined),
   );
+  /** mainにまだない、足した写真の下書き */
+  const newPhotos = [...state.drafts]
+    .filter((p) => p.startsWith("content/cats/") && p.endsWith(".jpg"))
+    .filter((p) => !state.paths.includes(p))
+    .sort();
   return (
     <section className={s.contents} aria-label="content/ の一覧">
-      <Upload ids={photoIds} />
+      <Upload ids={photoIds} onOpen={onOpen} />
+      {newPhotos.length > 0 && (
+        <div>
+          <h3 className={s.groupTitle}>
+            足した写真の下書き
+            <span className={s.count}>{newPhotos.length}</span>
+          </h3>
+          <ul className={s.list}>
+            {newPhotos.map((p) => (
+              <li key={p} title={p}>
+                <button
+                  type="button"
+                  className={s.item}
+                  onClick={() => {
+                    onOpen(p);
+                  }}
+                >
+                  {p.replace(/^content\/cats\//, "")}
+                </button>
+                <span className={s.draft}>下書き</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       <input
         className={s.search}
         type="search"
