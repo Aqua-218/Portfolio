@@ -344,6 +344,40 @@ tags: [Z1ゼミ]
     await expect(page.locator("main ul[role=alert]")).toContainText("行目");
   });
 
+  test("プレビューは本番と同じ見た目で、書き換えたものを出す", async ({
+    page,
+  }) => {
+    const errors: string[] = [];
+    page.on("pageerror", (e) => {
+      errors.push(e.message);
+    });
+    await page.getByRole("button", { name: "2026-08-10-seccamp.md" }).click();
+    await page.getByLabel("タイトル").fill("セキュキャン");
+    await page
+      .getByLabel("本文(Markdown)")
+      .fill("> [!NOTE]\n> 猫は液体です。\n\n```rust\nfn main() {}\n```\n");
+    await page.getByRole("button", { name: "プレビュー" }).click();
+    const preview = page.getByRole("region", { name: "プレビュー" });
+    await expect(preview.locator("time")).toHaveText("8/10–15");
+    await expect(preview.getByText("セキュキャン")).toBeVisible();
+    await expect(preview.getByText("@ 多摩 LINK FOREST")).toBeVisible();
+    // アラートの猫(Wasm)とコードの色(Shiki)も本番と同じ
+    await expect(preview.locator(".callout svg.px-svg")).toBeAttached();
+    await expect(preview.locator("pre.shiki")).toBeVisible();
+    // 編集に戻ると、書いたものが残っている
+    await page.getByRole("button", { name: "編集" }).click();
+    await expect(page.getByLabel("タイトル")).toHaveValue("セキュキャン");
+    expect(errors).toEqual([]);
+  });
+
+  test("TOMLにはプレビューがない", async ({ page }) => {
+    await page.getByRole("button", { name: "プロフィール" }).click();
+    await expect(page.getByLabel("中身")).toBeVisible();
+    await expect(page.getByRole("button", { name: "プレビュー" })).toHaveCount(
+      0,
+    );
+  });
+
   test("写真は開けない(アップロードで扱う)", async ({ page }) => {
     await expect(page.getByText("kuro.jpg")).toBeVisible();
     await expect(page.getByRole("button", { name: "kuro.jpg" })).toHaveCount(0);
