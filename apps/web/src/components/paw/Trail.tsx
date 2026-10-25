@@ -1,7 +1,8 @@
+import type { CSSProperties } from "react";
 import * as s from "./paw.css";
 
 /** 文字列から決まる0以上1未満の数の列。同じ種からは、いつも同じ列が出る */
-function random(seed: string): () => number {
+export function random(seed: string): () => number {
   let h = 2166136261;
   for (const ch of seed) h = Math.imul(h ^ (ch.codePointAt(0) ?? 0), 16777619);
   return () => {
@@ -40,6 +41,40 @@ function walk(seed: string, angle: number, steps: number, wobble: number) {
   return prints;
 }
 
+/** 足跡の歩き方と置く場所。ページごとに違って見えるよう、種から決める */
+export interface TrailPlan {
+  angle: number;
+  steps: number;
+  wobble: number;
+  /** 置く場所のずれ(rem) */
+  x: number;
+  y: number;
+}
+
+/** 種から歩き方と置く場所を決める。`angle`は向きの範囲[最小, 最大](度)、`x`・`y`はずれの範囲(rem) */
+export function plan(
+  seed: string,
+  range: {
+    angle: [number, number];
+    steps: [number, number];
+    wobble: [number, number];
+    x: [number, number];
+    y: [number, number];
+  },
+): TrailPlan {
+  // 足跡そのものの形(walk)とは別の列にする
+  const rand = random(`plan:${seed}`);
+  const pick = ([lo, hi]: [number, number]) => lo + rand() * (hi - lo);
+  const round = (n: number) => Math.round(n * 10) / 10;
+  return {
+    angle: Math.round(pick(range.angle)),
+    steps: Math.round(pick(range.steps)),
+    wobble: Math.round(pick(range.wobble)),
+    x: round(pick(range.x)),
+    y: round(pick(range.y)),
+  };
+}
+
 interface TrailProps {
   /** 足跡の形を決める種。ページごとに変えると、ページごとに違う形になる */
   seed: string;
@@ -49,6 +84,7 @@ interface TrailProps {
   /** 1歩ごとに向きが揺れる幅(度) */
   wobble?: number;
   className?: string;
+  style?: CSSProperties;
 }
 
 /** 猫が歩いていったような足跡。種が同じなら、いつも同じ形になる。 */
@@ -58,6 +94,7 @@ export function Trail({
   steps,
   wobble = 16,
   className,
+  style,
 }: TrailProps) {
   const prints = walk(seed, angle, steps, wobble);
   const xs = prints.map((p) => p.x);
@@ -76,6 +113,7 @@ export function Trail({
       height={Math.round(height)}
       aria-hidden="true"
       focusable="false"
+      {...(style ? { style } : {})}
     >
       {prints.map((p, i) => (
         <g

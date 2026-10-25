@@ -39,3 +39,36 @@ test("スマホの幅では写真の下の足跡を出さず、はみ出さな�
   );
   expect(overflow).toBe(false);
 });
+
+/** 足跡の置き場所と向き。見出しの下とフッターのそれぞれで、ずれ(margin)と最初の1歩の向き */
+async function placement(page: Page): Promise<string[]> {
+  return trails(page).evaluateAll((svgs) =>
+    svgs.map((svg) => {
+      const first = svg.querySelector("g")?.getAttribute("transform") ?? "";
+      const rotate = /rotate\(([-\d.]+)\)/.exec(first)?.[1] ?? "";
+      return `${svg.style.margin}|${svg.style.marginLeft}|${svg.style.marginRight}|${rotate}|${String(svg.querySelectorAll("g").length)}`;
+    }),
+  );
+}
+
+test("足跡の向き・歩数・置く場所が、ページごとに違う(フッターも)", async ({
+  page,
+}) => {
+  const pages = [
+    "/about/",
+    "/skills/",
+    "/work/",
+    "/events/",
+    "/cats/",
+    "/stack/",
+  ];
+  const seen: string[][] = [];
+  for (const path of pages) {
+    await page.goto(path);
+    const [section = "", footer = ""] = await placement(page);
+    seen.push([section, footer]);
+  }
+  // 見出しの下も、フッターも、ページの数だけ違うものがある
+  expect(new Set(seen.map(([sec]) => sec)).size).toBe(pages.length);
+  expect(new Set(seen.map(([, foot]) => foot)).size).toBe(pages.length);
+});
