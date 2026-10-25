@@ -8,7 +8,11 @@ const withVanillaExtract = createVanillaExtractPlugin({
 const config: NextConfig = {
   output: "export",
   trailingSlash: true,
-  transpilePackages: ["@portfolio/design", "@portfolio/pxcat"],
+  transpilePackages: [
+    "@portfolio/design",
+    "@portfolio/pxcat",
+    "@portfolio/content-wasm",
+  ],
   // Mermaidの図をビルド時に描くChromiumの操作は、バンドルせずにそのまま読む
   serverExternalPackages: ["playwright-core"],
 };

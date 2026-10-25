@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { beforeAll, describe, expect, it } from "vitest";
-import { check, load } from "./index";
+import { check, checkFile, load } from "./index";
 
 // テストはpackages/content-wasmで走る
 const root = path.join(process.cwd(), "../../content");
@@ -49,5 +49,24 @@ describe("check", () => {
     expect(checked.problems[0]).toMatch(
       /^content\/events\/2026-08-10-seccamp\.md:\d+: /,
     );
+  });
+});
+
+describe("checkFile", () => {
+  it("ファイル1つの間違いを、ビルドと同じ文で出す", async () => {
+    const checked = await checkFile(
+      "events/2026-08-10-seccamp.md",
+      "---\ntitle: a\ndate: 2026-02-30\nvenue: b\n---\n\nほんぶん\n",
+    );
+    expect(checked.supported).toBe(true);
+    expect(checked.problems).toHaveLength(1);
+    expect(checked.problems[0]?.line).toBe(3);
+    expect(checked.problems[0]?.text).toMatch(
+      /^content\/events\/2026-08-10-seccamp\.md:3: date /,
+    );
+  });
+
+  it("一つだけでは確かめられないものは、そう返す", async () => {
+    expect((await checkFile("cats.toml", "")).supported).toBe(false);
   });
 });

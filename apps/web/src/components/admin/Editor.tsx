@@ -1,9 +1,11 @@
 "use client";
 
+import { checkFile, type FileProblem } from "@portfolio/content-wasm";
 import { useEffect, useState } from "react";
 import * as s from "./admin.css";
 import { type EventDoc, parse, serialize } from "./frontmatter";
 import { readFile } from "./github";
+import { byField, type Field } from "./validate";
 
 type State =
   | { kind: "loading" }
@@ -56,6 +58,30 @@ export function Editor({ path, onBack }: { path: string; onBack: () => void }) {
     (state.kind === "event" || state.kind === "text") &&
     text !== state.original;
 
+  /** ビルドと同じ検証の結果。nullは、このファイルは1つだけでは確かめられないとき */
+  const [problems, setProblems] = useState<FileProblem[] | null>([]);
+  useEffect(() => {
+    if (text === null) return;
+    let alive = true;
+    // 打つたびに走らせないよう、少し待つ
+    const timer = setTimeout(() => {
+      void checkFile(path.replace(/^content\//, ""), text).then((checked) => {
+        if (alive) setProblems(checked.supported ? checked.problems : null);
+      });
+    }, 250);
+    return () => {
+      alive = false;
+      clearTimeout(timer);
+    };
+  }, [path, text]);
+  const fieldProblems = byField(problems ?? []);
+  const hint = (field: Field) =>
+    fieldProblems.get(field)?.map((m) => (
+      <span key={m} className={s.fieldError} role="alert">
+        {m}
+      </span>
+    ));
+
   const back = () => {
     if (dirty && !confirm("保存していない変更があります。一覧へ戻りますか？"))
       return;
@@ -83,6 +109,16 @@ export function Editor({ path, onBack }: { path: string; onBack: () => void }) {
         {dirty && <span className={s.dirty}>変更あり</span>}
       </div>
 
+      {text !== null && (
+        <p className={s.note} aria-live="polite">
+          {problems === null
+            ? "このファイルは、保存したあとに CI で確かめます。"
+            : problems.length === 0
+              ? "ビルドと同じ検証で、間違いはありません。"
+              : `間違いが ${String(problems.length)} 件あります。`}
+        </p>
+      )}
+
       {state.kind === "loading" && <p className={s.note}>読んでいます…</p>}
       {state.kind === "error" && (
         <p className={s.error} role="alert">
@@ -101,6 +137,7 @@ export function Editor({ path, onBack }: { path: string; onBack: () => void }) {
                 setMeta("title", e.target.value);
               }}
             />
+            {hint("title")}
           </label>
           <div className={s.pair}>
             <label className={s.field}>
@@ -113,6 +150,7 @@ export function Editor({ path, onBack }: { path: string; onBack: () => void }) {
                   setMeta("date", e.target.value);
                 }}
               />
+              {hint("date")}
             </label>
             <label className={s.field}>
               最終日(1日だけなら空)
@@ -124,6 +162,7 @@ export function Editor({ path, onBack }: { path: string; onBack: () => void }) {
                   setMeta("end", e.target.value);
                 }}
               />
+              {hint("end")}
             </label>
           </div>
           <label className={s.field}>
@@ -135,6 +174,7 @@ export function Editor({ path, onBack }: { path: string; onBack: () => void }) {
                 setMeta("venue", e.target.value);
               }}
             />
+            {hint("venue")}
           </label>
           <label className={s.field}>
             タグ(「受賞」「LT」など。1つまで)
@@ -151,6 +191,7 @@ export function Editor({ path, onBack }: { path: string; onBack: () => void }) {
                 );
               }}
             />
+            {hint("tags")}
           </label>
           <label className={s.field}>
             本文(Markdown)
@@ -167,26 +208,39 @@ export function Editor({ path, onBack }: { path: string; onBack: () => void }) {
                 );
               }}
             />
+            {hint("body")}
           </label>
         </div>
       )}
 
       {state.kind === "text" && (
-        <label className={s.field}>
-          中身
-          <textarea
-            className={`${s.textarea} ${s.code}`}
-            rows={24}
-            spellCheck={false}
-            value={state.text}
-            onChange={(e) => {
-              const value = e.target.value;
-              setState((st) =>
-                st.kind === "text" ? { ...st, text: value } : st,
-              );
-            }}
-          />
-        </label>
+        <>
+          <label className={s.field}>
+            中身
+            <textarea
+              className={`${s.textarea} ${s.code}`}
+              rows={24}
+              spellCheck={false}
+              value={state.text}
+              onChange={(e) => {
+                const value = e.target.value;
+                setState((st) =>
+                  st.kind === "text" ? { ...st, text: value } : st,
+                );
+              }}
+            />
+          </label>
+          {problems !== null && problems.length > 0 && (
+            <ul className={s.problems} role="alert">
+              {problems.map((p) => (
+                <li key={p.text}>
+                  {p.line === null ? "" : `${String(p.line)}行目: `}
+                  {p.message}
+                </li>
+              ))}
+            </ul>
+          )}
+        </>
       )}
     </section>
   );
