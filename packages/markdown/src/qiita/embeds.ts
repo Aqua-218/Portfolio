@@ -7,7 +7,7 @@
  * - スクリプトのもの(X・CodePen・SpeakerDeck・Docswell・asciinema): Qiitaが許すものだけ、iframeにする
  * iframeの属性(sandboxなど)は、書かれたものを使わず、ここで決めたものだけにする
  */
-import type { Element, ElementContent, Root } from "hast";
+import type { Element, Root } from "hast";
 import { SKIP, visit } from "unist-util-visit";
 
 /** iframeで埋め込んでよい出どころ(qiita-markdownのFilterIframeと同じ) */
@@ -58,7 +58,12 @@ const hasClass = (node: Element, name: string) => {
 };
 
 function number(value: unknown): number | undefined {
-  const n = Number.parseFloat(String(value ?? ""));
+  const n =
+    typeof value === "number"
+      ? value
+      : typeof value === "string"
+        ? Number.parseFloat(value)
+        : Number.NaN;
   return Number.isFinite(n) && n > 0 ? n : undefined;
 }
 
@@ -224,7 +229,7 @@ export function rehypeQiitaEmbeds() {
         embed = fromCodePen(node);
       }
       if (embed) {
-        parent.children[index] = frame(embed) as ElementContent;
+        parent.children[index] = frame(embed);
         return SKIP;
       }
       if (known) {
