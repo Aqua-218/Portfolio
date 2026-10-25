@@ -49,7 +49,7 @@ PHPを使わない理由: 2026-10-21に、PHP本体に認証なしで遠隔か�
 1. GitHubの Settings → Developer settings → GitHub Apps → New GitHub App
 2. 次のとおりにする
    - Homepage URL: サイトのURL
-   - Callback URL: `https://<ドメイン>/admin/auth/callback`
+   - Callback URL: `https://komineko.jp/admin/auth/callback`
    - 「Expire user authorization tokens」: オン(トークンは8時間で切れ、リフレッシュトークンで取り直す)
    - 「Request user authorization (OAuth) during installation」: オフ
    - Webhook: オフ
@@ -61,7 +61,7 @@ PHPを使わない理由: 2026-10-21に、PHP本体に認証なしで遠隔か�
 ### Cloudflare
 
 1. ドメインをCloudflareのDNSに乗せ、ロリポップをオリジンにする(プロキシをオン)
-2. `apps/admin-worker/wrangler.toml`の`routes`・`ORIGIN`をそのドメインにする
+2. `apps/admin-worker/wrangler.toml`の`routes`・`ORIGIN`は`komineko.jp`にしてある
 3. KVを作り、idを`wrangler.toml`に書く: `pnpm dlx wrangler kv namespace create ADMIN_KV`
 4. `GITHUB_CLIENT_ID`と`OWNER_ID`(`https://api.github.com/users/Aqua-218`のid)を`wrangler.toml`に書く
 5. 秘密の値を入れる。リポジトリには書かない

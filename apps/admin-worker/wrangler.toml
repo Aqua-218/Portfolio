@@ -5,10 +5,9 @@ compatibility_date = "2026-10-01"
 # Node互換(nodejs_compat)は入れない。2026年にnode:zlibでworkerdのバグが見つかったため、使わないものは入れない
 
 # サイトのドメインのうち、ここだけWorkerに回す。ほかはロリポップの静的なファイルを出す
-# ドメインが決まったら(#94)差し替える
 routes = [
-  { pattern = "example.com/admin/auth/*", zone_name = "example.com" },
-  { pattern = "example.com/admin/api", zone_name = "example.com" },
+  { pattern = "komineko.jp/admin/auth/*", zone_name = "komineko.jp" },
+  { pattern = "komineko.jp/admin/api", zone_name = "komineko.jp" },
 ]
 
 # セッション・端末の記憶・試行回数。中身は暗号化して入れる
@@ -22,7 +21,7 @@ GITHUB_CLIENT_ID = "ここにGitHub AppのClient ID"
 # 管理画面に入れるGitHubのユーザーのid(数字)。https://api.github.com/users/Aqua-218 のid
 OWNER_ID = "219285495"
 REPO = "Aqua-218/Portfolio"
-ORIGIN = "https://example.com"
+ORIGIN = "https://komineko.jp"
 
 # 秘密の値はここに書かず、`wrangler secret put`で入れる
 # GITHUB_CLIENT_SECRET: GitHub AppのClient secret

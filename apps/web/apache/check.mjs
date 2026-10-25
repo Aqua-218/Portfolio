@@ -1,6 +1,7 @@
 // out/を出しているApacheに聞いて、.htaccess(scripts/headers.mjs)が思ったとおりに効いているか確かめる。apache/run.shから走らせる。
 import assert from "node:assert/strict";
 import { readdirSync } from "node:fs";
+import { request } from "node:http";
 import { test } from "node:test";
 
 const base = process.env.APACHE ?? "http://127.0.0.1:4180";
@@ -101,4 +102,25 @@ test("文字のファイルは縮めて送る", async () => {
     "accept-encoding": "gzip",
   });
   assert.equal(res.headers.get("content-encoding"), "gzip");
+});
+
+test("www.komineko.jpはkomineko.jpへ移す", async () => {
+  // fetchはHostを変えられないので、httpで聞く
+  const res = await new Promise((resolve, reject) => {
+    const u = new URL(base);
+    request(
+      {
+        host: u.hostname,
+        port: u.port,
+        path: "/about/?x=1",
+        headers: { ...https, host: "www.komineko.jp" },
+      },
+      resolve,
+    )
+      .on("error", reject)
+      .end();
+  });
+  res.resume();
+  assert.equal(res.statusCode, 301);
+  assert.equal(res.headers.location, "https://komineko.jp/about/?x=1");
 });

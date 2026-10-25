@@ -3,4 +3,5 @@
 Contact: https://github.com/Aqua-218/Portfolio/security/advisories/new
 Expires: 2027-10-25T00:00:00.000Z
 Preferred-Languages: ja, en
+Canonical: https://komineko.jp/.well-known/security.txt
 Policy: https://github.com/Aqua-218/Portfolio/security/policy
