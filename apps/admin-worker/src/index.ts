@@ -1,6 +1,6 @@
 import { Admin, importKey } from "./admin";
 
-/** Worker の設定。秘密の値(GITHUB_CLIENT_SECRET・KEY)は wrangler secret で入れる */
+/** Worker の設定。秘密の値(GITHUB_CLIENT_SECRET・KEY・QIITA_TOKEN)は wrangler secret で入れる */
 interface Env {
   ADMIN_KV: KVNamespace;
   GITHUB_CLIENT_ID: string;
@@ -9,6 +9,8 @@ interface Env {
   REPO: string;
   ORIGIN: string;
   KEY: string;
+  /** Qiitaのトークン。wrangler secretで入れる。なくてもよい */
+  QIITA_TOKEN?: string;
 }
 
 export default {
@@ -21,6 +23,7 @@ export default {
         repo: env.REPO,
         origin: env.ORIGIN,
         key: await importKey(env.KEY),
+        ...(env.QIITA_TOKEN ? { qiitaToken: env.QIITA_TOKEN } : {}),
       },
       store: env.ADMIN_KV,
       fetch: (input, init) => fetch(input, init),
