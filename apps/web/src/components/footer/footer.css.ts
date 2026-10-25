@@ -36,7 +36,7 @@ export const smPage = style({
   textDecoration: "none",
   selectors: {
     '&[aria-current="page"]': {
-      color: vars.color.mike,
+      color: vars.color.mikeText,
     },
     "&:hover": {
       textDecoration: "underline",
@@ -82,7 +82,7 @@ export const footLink = style({
   textUnderlineOffset: "3px",
   selectors: {
     '&:hover, &[aria-current="page"]': {
-      color: vars.color.mike,
+      color: vars.color.mikeText,
     },
   },
 });
