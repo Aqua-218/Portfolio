@@ -10,6 +10,8 @@ packages/content-wasm/dist/
 # Playwright
 apps/web/test-results/
 apps/web/playwright-report/
+# scripts/lighthouse.mjsが書き出す
+apps/web/.lighthouse/
 # content-checkが書き出す
 apps/web/.content/
 # imgpipeが書き出す

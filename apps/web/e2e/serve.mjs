@@ -1,7 +1,9 @@
 // out/を配信する小さな静的サーバー。e2eテストで使う。
 import { createReadStream, readFileSync, statSync } from "node:fs";
 import { createServer } from "node:http";
+import { createSecureServer } from "node:http2";
 import { dirname, extname, join, normalize } from "node:path";
+import { brotliCompressSync, gzipSync } from "node:zlib";
 
 const root = new URL("../out/", import.meta.url).pathname;
 const port = Number(process.env.PORT ?? 4173);
@@ -53,20 +55,72 @@ function htaccessHeaders(file) {
   return headers;
 }
 
-createServer((req, res) => {
+/** 文字のファイルは、本番(Cloudflare・ロリポップ)と同じく縮めて送る。Lighthouseで本番に近い大きさを測るため */
+const compressible = new Set([".html", ".js", ".css", ".svg", ".txt", ".wasm"]);
+
+/** 縮めたものは覚えておく。毎回brotliで縮めると、e2eを並べて走らせたときに遅くなる */
+const compressed = new Map();
+
+function compress(file, encoding) {
+  const key = `${encoding}:${file}`;
+  let body = compressed.get(key);
+  if (!body) {
+    const raw = readFileSync(file);
+    body = encoding === "br" ? brotliCompressSync(raw) : gzipSync(raw);
+    compressed.set(key, body);
+  }
+  return body;
+}
+
+function send(req, res, status, file, headers) {
+  const accept = String(req.headers["accept-encoding"] ?? "");
+  const encoding = !compressible.has(extname(file))
+    ? undefined
+    : /\bbr\b/.test(accept)
+      ? "br"
+      : /\bgzip\b/.test(accept)
+        ? "gzip"
+        : undefined;
+  res.writeHead(status, {
+    ...headers,
+    vary: "accept-encoding",
+    ...(encoding ? { "content-encoding": encoding } : {}),
+  });
+  if (encoding) res.end(compress(file, encoding));
+  else createReadStream(file).pipe(res);
+}
+
+/**
+ * TLS_KEYとTLS_CERTがあれば、本番(Cloudflare)と同じくHTTPSのHTTP/2で出す。Lighthouseで使う。
+ * HTTP/1.1だと、ファイルごとに接続を取り合うものとして見積もられ、本番よりずっと遅く出る
+ */
+function serve(handler) {
+  const { TLS_KEY, TLS_CERT } = process.env;
+  return TLS_KEY && TLS_CERT
+    ? createSecureServer(
+        {
+          allowHTTP1: true,
+          key: readFileSync(TLS_KEY),
+          cert: readFileSync(TLS_CERT),
+        },
+        handler,
+      )
+    : createServer(handler);
+}
+
+serve((req, res) => {
   const { pathname } = new URL(req.url ?? "/", "http://localhost");
   const file = resolve(pathname);
   if (!file) {
-    res.writeHead(404, {
-      ...htaccessHeaders(join(root, "404.html")),
+    const page = join(root, "404.html");
+    send(req, res, 404, page, {
+      ...htaccessHeaders(page),
       "content-type": types[".html"],
     });
-    createReadStream(join(root, "404.html")).pipe(res);
     return;
   }
-  res.writeHead(200, {
+  send(req, res, 200, file, {
     ...htaccessHeaders(file),
     "content-type": types[extname(file)] ?? "application/octet-stream",
   });
-  createReadStream(file).pipe(res);
 }).listen(port);

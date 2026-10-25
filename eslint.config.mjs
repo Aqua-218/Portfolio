@@ -12,6 +12,8 @@ export default defineConfig([
     "target/",
     "packages/pxcat/dist/",
     "packages/content-wasm/dist/",
+    // Lakeが取ってきたLeanのパッケージ
+    "proofs/.lake/",
   ]),
   js.configs.recommended,
   tseslint.configs.strictTypeChecked,
