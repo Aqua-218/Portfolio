@@ -12,6 +12,8 @@ apps/web/test-results/
 apps/web/playwright-report/
 # scripts/lighthouse.mjsが書き出す
 apps/web/.lighthouse/
+# ビルドで使った図とOGP(apps/web/scripts/cache.mjs)
+content/.cache/.used
 # content-checkが書き出す
 apps/web/.content/
 # imgpipeが書き出す

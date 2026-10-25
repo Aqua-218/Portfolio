@@ -63,3 +63,17 @@ PHPを使わない理由: 2026-10-21に、PHP本体に認証なしで遠隔か�
 6. デプロイ: `pnpm dlx wrangler deploy`(`apps/admin-worker`で)
 
 鍵(`KEY`)を変えると、いまのセッションと覚えた端末はすべて使えなくなる。漏れた疑いがあるときは、鍵とClient secretの両方を作り直す。
+
+### 図とリンクカードを作るトークン
+
+管理画面からMermaidの図やリンクカードを足すと、下書きのPRでActions(`.github/workflows/content-cache.yml`)が図を描き、OGPを取って、`content/.cache/`をそのPRにコミットする。使わなくなった図とOGPは消す。
+
+GitHub Actionsの`GITHUB_TOKEN`で押したコミットでは、ほかのワークフロー(必須のチェック)が走らない。そのため、押すのにだけ使うトークンを用意する。
+
+1. GitHubの Settings → Developer settings → Fine-grained personal access tokens → Generate new token
+   - Repository access: Only select repositories → `Aqua-218/Portfolio`
+   - Repository permissions: Contents は Read and write。ほかはNo access
+   - 期限: 1年まで。切れる前に作り直す
+2. リポジトリの Settings → Secrets and variables → Actions に、`CONTENT_CACHE_TOKEN`として入れる
+
+このトークンを渡すのは、下書き(`draft/`)のブランチのPRで、コミットするステップだけ。ビルドのステップやフォークのPRには渡さない。

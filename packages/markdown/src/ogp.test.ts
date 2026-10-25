@@ -80,6 +80,36 @@ describe("リンクカード", () => {
     expect(calls).toBe(1);
   });
 
+  it("べつのプロセスが保存したものを消さずに、合わせて保存する", async () => {
+    const file = cacheFile();
+    const fetcher: Fetcher = (url) =>
+      Promise.resolve({ title: url, description: "" });
+    // 2つのプロセスが、それぞれ空のキャッシュから読み始めたとき
+    const a = new OgpCache(file, fetcher);
+    const b = new OgpCache(file, fetcher);
+    await a.get("https://a.example/");
+    await b.get("https://b.example/");
+    const saved = JSON.parse(readFileSync(file, "utf8")) as Record<
+      string,
+      unknown
+    >;
+    expect(Object.keys(saved)).toEqual([
+      "https://a.example/",
+      "https://b.example/",
+    ]);
+  });
+
+  it("usedを渡すと、使ったURLを書き足す。キャッシュにあっても書く", async () => {
+    const file = cacheFile();
+    const used = path.join(path.dirname(file), ".used");
+    const ogp = new OgpCache(file, SIMPLE, used);
+    await ogp.get("https://simpleicons.org/");
+    await ogp.get("https://simpleicons.org/");
+    expect(readFileSync(used, "utf8")).toBe(
+      "ogp https://simpleicons.org/\nogp https://simpleicons.org/\n",
+    );
+  });
+
   it("画像があれば、リファラーなしで読む画像をつける", async () => {
     const ogp = new OgpCache(cacheFile(), () =>
       Promise.resolve({

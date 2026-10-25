@@ -1,5 +1,10 @@
 import { createHash } from "node:crypto";
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import {
+  appendFileSync,
+  mkdirSync,
+  readFileSync,
+  writeFileSync,
+} from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { type MermaidSource, themeVariables, toVars } from "./diagrams";
@@ -49,16 +54,19 @@ export const drawWithChromium: Drawer = async (source, id) => {
 
 /**
  * 描いた図のキャッシュ。図の中身のハッシュをファイル名にして、SVGを保存する。
- * 保存したものはコミットするので、CIのビルドではChromiumがなくても図が出る。
+ * 保存したものはコミットするので、次のビルドでは描き直さない。
+ * usedを渡すと、使った図のハッシュをそのファイルに書き足していく(使わなくなった図を消すのに使う。apps/web/scripts/cache.mjs)
  */
 export class MermaidCache implements MermaidSource {
   constructor(
     private readonly dir: string,
     private readonly drawer: Drawer = drawWithChromium,
+    private readonly used?: string,
   ) {}
 
   async get(source: string): Promise<string> {
     const hash = createHash("sha256").update(source).digest("hex").slice(0, 16);
+    if (this.used) appendFileSync(this.used, `mermaid ${hash}\n`);
     const file = path.join(this.dir, `${hash}.svg`);
     try {
       return readFileSync(file, "utf8");

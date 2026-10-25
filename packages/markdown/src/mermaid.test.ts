@@ -1,4 +1,4 @@
-import { mkdtempSync, readdirSync } from "node:fs";
+import { mkdtempSync, readdirSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
@@ -54,6 +54,17 @@ describe("Mermaid", () => {
     await render(md, { mermaid: new MermaidCache(dir, counting) });
     expect(calls).toBe(1);
     expect(readdirSync(dir)).toHaveLength(1);
+  });
+
+  it("usedを渡すと、使った図のハッシュを書き足す", async () => {
+    const dir = mkdtempSync(path.join(tmpdir(), "mm-"));
+    const used = path.join(dir, ".used");
+    const md = "```mermaid\nflowchart LR\n  A --> B\n```";
+    await render(md, { mermaid: new MermaidCache(dir, svg, used) });
+    const [file = ""] = readdirSync(dir).filter((f) => f.endsWith(".svg"));
+    expect(readFileSync(used, "utf8")).toBe(
+      `mermaid ${file.replace(/\.svg$/, "")}\n`,
+    );
   });
 
   it("キャッシュを渡さなければコードのまま", async () => {

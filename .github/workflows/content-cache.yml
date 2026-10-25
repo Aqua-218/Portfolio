@@ -1,0 +1,102 @@
+name: Content cache
+# 管理画面から足したMermaidの図とリンクカード(content/.cache/)を、PRの中で作ってコミットする。
+# 管理画面の下書き(draft/)のブランチのPRだけ。使わなくなった図とOGPは消す(apps/web/scripts/cache.mjs)。
+# コミットのあとにいつものチェックが走るよう、GITHUB_TOKENではなくCONTENT_CACHE_TOKENで押す(docs/admin.md)。
+# PRのコードを動かすジョブ(build)と、トークンを使うジョブ(push)を分ける
+on:
+  pull_request:
+    paths:
+      - "content/**"
+
+# 既定は何もできない。ジョブで読むだけを足す
+permissions: {}
+
+concurrency:
+  group: content-cache-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  # サイトをビルドして、図とOGPを作る。PRのコードを動かすので、トークンは渡さない
+  build:
+    # 同じリポジトリの、下書きのブランチだけ(フォークのPRには秘密を渡さない)
+    if: github.event.pull_request.head.repo.full_name == github.repository && startsWith(github.head_ref, 'draft/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.head_ref }}
+          persist-credentials: false
+      - uses: jdx/mise-action@8418fedb1110381a0d3ba51a7a415d7c1b884550 # v5.2.2
+        with:
+          install_args: node pnpm rust github:wasm-bindgen/wasm-bindgen
+      - id: pnpm-store
+        run: echo "path=$(pnpm store path)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-${{ runner.os }}-
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+      - run: pnpm install --frozen-lockfile
+      # 図はChromiumで描く。OGPはビルドの中で取りに行く。使わなくなったものは消える
+      - run: pnpm --filter @portfolio/web exec playwright install --with-deps chromium
+      - run: pnpm build
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: content-cache
+          path: content/.cache/
+          include-hidden-files: false
+          retention-days: 1
+
+  # 作ったものをコミットして押す。トークンを使うので、PRのコードは動かさない(git だけ)
+  push:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.head_ref }}
+          persist-credentials: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: content-cache
+          path: ${{ runner.temp }}/content-cache
+      # 写すのは、名前がハッシュの図と、ogp.jsonだけ
+      - name: 図とOGPを写す
+        env:
+          FROM: ${{ runner.temp }}/content-cache
+        run: |
+          mkdir -p content/.cache/mermaid
+          rm -f content/.cache/mermaid/*.svg
+          for f in "$FROM"/mermaid/*.svg; do
+            [ -e "$f" ] || continue
+            name=$(basename "$f")
+            if ! printf '%s' "$name" | grep -Eq '^[0-9a-f]{16}\.svg$'; then
+              echo "::error::思っていない名前の図: $name"
+              exit 1
+            fi
+            cp "$f" "content/.cache/mermaid/$name"
+          done
+          if [ -f "$FROM/ogp.json" ]; then cp "$FROM/ogp.json" content/.cache/ogp.json; fi
+      - name: 変わっていればコミットする
+        env:
+          TOKEN: ${{ secrets.CONTENT_CACHE_TOKEN }}
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          git add -A content/.cache
+          if git diff --cached --quiet; then
+            echo "content/.cache/ は変わらない"
+            exit 0
+          fi
+          if [ -z "$TOKEN" ]; then
+            echo "::error::CONTENT_CACHE_TOKEN がありません(docs/admin.md)"
+            exit 1
+          fi
+          git -c user.name="github-actions[bot]" \
+            -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -m "chore(content): 図とリンクカードを作る"
+          git push "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${BRANCH}"
