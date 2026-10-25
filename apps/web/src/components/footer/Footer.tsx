@@ -81,6 +81,11 @@ const SITEMAP = [
     label: "Cats",
     items: [{ href: "/cats/", label: "ギャラリー" }],
   },
+  {
+    href: "/blog/",
+    label: "Blog",
+    items: [{ href: "/blog/", label: "記事" }],
+  },
 ] as const;
 
 function current(pathname: string, href: string): "page" | undefined {

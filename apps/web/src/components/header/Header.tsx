@@ -16,6 +16,7 @@ const PAGES = [
   { href: "/shelf/", label: "Shelf" },
   { href: "/stack/", label: "Stack" },
   { href: "/cats/", label: "Cats" },
+  { href: "/blog/", label: "Blog" },
 ] as const;
 
 export function Header() {

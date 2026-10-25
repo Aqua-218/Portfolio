@@ -28,3 +28,8 @@ const mermaid = new MermaidCache(
 export function markdown(source: string): Promise<string> {
   return render(source, { ogp, mermaid });
 }
+
+/** ブログの記事(Qiitaと同じ記法)をHTMLにする */
+export function qiitaMarkdown(source: string): Promise<string> {
+  return render(source, { ogp, mermaid, flavor: "qiita" });
+}

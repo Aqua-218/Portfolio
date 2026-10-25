@@ -12,7 +12,7 @@ import lighthouse from "lighthouse";
 
 const PORT = 4173;
 const BASE = `https://localhost:${String(PORT)}`;
-const PAGES = ["/", "/about/", "/events/", "/cats/", "/stack/"];
+const PAGES = ["/", "/about/", "/events/", "/cats/", "/stack/", "/blog/"];
 // ゆれを減らすため、3回測って真ん中を使う
 const RUNS = 3;
 const out = new URL("../.lighthouse/", import.meta.url).pathname;

@@ -517,3 +517,16 @@ export function rehypeQiitaCode() {
     });
   };
 }
+
+// ---- チェックリスト(Checkbox) ----
+
+/** チェックリストの箱に、読み上げ用の名前をつける(Qiitaと同じく、押せない箱) */
+export function rehypeQiitaTasks() {
+  return (tree: Root) => {
+    visit(tree, "element", (node: Element) => {
+      if (node.tagName !== "input" || node.properties.type !== "checkbox")
+        return;
+      node.properties.ariaLabel = node.properties.checked ? "済み" : "まだ";
+    });
+  };
+}

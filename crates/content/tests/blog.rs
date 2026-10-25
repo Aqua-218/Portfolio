@@ -127,3 +127,9 @@ fn 知らない項目と空の本文を断る() {
     let empty = parse("a", "---\ntitle: t\ntags: [Rust]\n---\n\n").unwrap_err();
     assert!(messages(&empty).iter().any(|m| m.contains("本文が空")));
 }
+
+#[test]
+fn 見本のページの名前は使えない() {
+    let err = parse("sample", NEW).unwrap_err();
+    assert!(messages(&err).iter().any(|m| m.contains("/blog/sample/")));
+}

@@ -172,6 +172,8 @@ globalStyle(`${md} blockquote`, {
 /** ブログの記事の埋め込み(YouTube・Xなど)。高さか縦横の比は、要素のstyleで決まる */
 globalStyle(".embed", {
   width: "100%",
+  // 読み込むまでと、読めなかったときに枠がわかるように
+  background: vars.color.tatami,
   maxWidth: "100%",
   margin: "0 0 1rem",
   borderRadius: vars.radius.md,
@@ -189,3 +191,90 @@ globalStyle(".embed > iframe", {
 globalStyle(".embed-tweet", {
   maxWidth: "550px",
 });
+
+/** 読み上げだけに出すもの(脚注の見出しなど) */
+globalStyle(".sr-only", {
+  position: "absolute",
+  width: 1,
+  height: 1,
+  overflow: "hidden",
+  clipPath: "inset(50%)",
+  whiteSpace: "nowrap",
+});
+
+/** ブログの記事(Qiitaの記法)の見出し1。Qiitaでは本文に#から書く */
+globalStyle(`${md} h1`, {
+  margin: "2.75rem 0 1.1rem",
+  fontSize: "1.375rem",
+  fontWeight: 800,
+});
+
+globalStyle(`${md} :is(h1, h4, h5, h6) a`, { textDecoration: "none" });
+
+/** 見出しの頭の、その見出しへのリンク。見出しにさわると「#」が出る */
+globalStyle(".heading-anchor", {
+  display: "inline-block",
+  width: "1.1em",
+  marginLeft: "-1.1em",
+  color: vars.color.mike,
+  opacity: 0,
+  textDecoration: "none",
+});
+
+globalStyle(".heading-anchor::before", { content: '"#"' });
+
+globalStyle(
+  ":is(h1, h2, h3, h4, h5, h6):hover > .heading-anchor, .heading-anchor:focus-visible",
+  { opacity: 1 },
+);
+
+/** コードの枠(ファイル名つき) */
+globalStyle("figure.code-frame", { margin: "0 0 1rem" });
+
+globalStyle("figure.code-frame > pre", { margin: 0 });
+
+globalStyle("figcaption.code-lang", {
+  display: "inline-block",
+  padding: "0.3rem 0.75rem",
+  background: vars.color.ink,
+  color: vars.color.paper,
+  borderRadius: `${vars.radius.md} ${vars.radius.md} 0 0`,
+  fontFamily: vars.font.mono,
+  fontSize: "0.75rem",
+});
+
+globalStyle("figcaption.code-lang + pre", {
+  borderTopLeftRadius: 0,
+});
+
+/** インラインのコードの色の見本 */
+globalStyle(".inline-code-color", {
+  display: "inline-block",
+  width: "0.75em",
+  height: "0.75em",
+  marginLeft: "0.35em",
+  verticalAlign: "-0.05em",
+  borderRadius: vars.radius.sm,
+  border: `1px solid ${vars.color.line}`,
+});
+
+/** 絵文字とメンション */
+globalStyle(".emoji", { fontStyle: "normal" });
+
+globalStyle(".user-mention", {
+  fontWeight: 700,
+  textDecoration: "none",
+});
+
+/** 脚注 */
+globalStyle(`${md} section.footnotes`, {
+  marginTop: "2.5rem",
+  paddingTop: "1rem",
+  borderTop: `1px solid ${vars.color.line}`,
+  fontSize: "0.8125rem",
+});
+
+/** 折りたたみ */
+globalStyle(`${md} details`, { margin: "0 0 1rem" });
+
+globalStyle(`${md} summary`, { cursor: "pointer", fontWeight: 700 });

@@ -7,3 +7,5 @@ CHANGELOG.md
 proofs/lake-manifest.json
 # Qiitaの互換テストの見本。正解(本物のqiita-markdown)と同じ文字でなければならない
 packages/markdown/src/qiita/fixtures/
+# ブログの記法の見本(Qiitaの書き方のまま)
+content/samples/qiita.md

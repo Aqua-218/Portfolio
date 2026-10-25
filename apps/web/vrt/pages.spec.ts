@@ -16,6 +16,9 @@ const PAGES = [
   { name: "cats", path: "/cats/" },
   { name: "404", path: "/nai/" },
   { name: "markdown", path: "/markdown/" },
+  { name: "blog", path: "/blog/" },
+  // ブログの記事の見た目は、記法の見本で見る
+  { name: "post", path: "/blog/sample/" },
   ...Object.keys(ERRORS).map((code) => ({
     name: code,
     path: `/errors/${code}/`,
@@ -26,6 +29,11 @@ for (const { name, path } of PAGES) {
   test(name, async ({ page }) => {
     // Homeの時計が毎回同じ時刻を出すよう、時計を止めておく
     await page.clock.setFixedTime(new Date("2026-10-24T12:34:56+09:00"));
+    // 埋め込み(YouTube・X)の中身は外のサイトなので読まない。枠は塗りつぶして撮る
+    await page.route(
+      (url) => /(^|\.)(youtube\.com|twitter\.com)$/.test(url.hostname),
+      (route) => route.abort(),
+    );
     await page.goto(path);
     // フォントとドット猫が出そろってから撮る
     await page.evaluate(() => document.fonts.ready);
@@ -45,6 +53,9 @@ for (const { name, path } of PAGES) {
     await page.evaluate(() =>
       Promise.all([...document.images].map((im) => im.decode())),
     );
-    await expect(page).toHaveScreenshot(`${name}.png`, { fullPage: true });
+    await expect(page).toHaveScreenshot(`${name}.png`, {
+      fullPage: true,
+      mask: [page.locator(".embed")],
+    });
   });
 }

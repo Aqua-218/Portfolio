@@ -9,7 +9,7 @@ use toml::Spanned;
 use ts_rs::TS;
 
 /// 見出しの横に写真を置くページ。
-pub const SECTIONS: [&str; 8] = [
+pub const SECTIONS: [&str; 9] = [
     "about",
     "skills",
     "work",
@@ -18,6 +18,7 @@ pub const SECTIONS: [&str; 8] = [
     "shelf",
     "stack",
     "license",
+    "blog",
 ];
 
 const COATS: [&str; 3] = ["kuro", "kiji", "mike"];

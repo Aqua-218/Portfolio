@@ -1,5 +1,13 @@
 import rehypeShikiFromHighlighter from "@shikijs/rehype/core";
-import { createCssVariablesTheme, createHighlighter } from "shiki";
+import type { Element, Root } from "hast";
+import {
+  type BundledLanguage,
+  bundledLanguages,
+  bundledLanguagesInfo,
+  createCssVariablesTheme,
+  createHighlighter,
+} from "shiki";
+import { visit } from "unist-util-visit";
 import tla from "./grammars/tla.json" with { type: "json" };
 
 /**
@@ -52,3 +60,36 @@ export function getHighlighter() {
 }
 
 export { rehypeShikiFromHighlighter };
+
+/**
+ * 記事で使っている言語を、Shikiの持っているものから読み込む(ブログの記事用)。
+ * サイトのページは決まった言語(langs)だけだが、Qiitaの記事はどの言語でも書けるため。
+ * Shikiが知らない言語は読み込まず、色なしで出す
+ */
+export function rehypeLoadLanguages(ready: ReturnType<typeof getHighlighter>) {
+  return async (tree: Root) => {
+    const wanted = new Set<string>();
+    visit(tree, "element", (node: Element) => {
+      if (node.tagName !== "code") return;
+      const cls = node.properties.className;
+      if (!Array.isArray(cls)) return;
+      for (const c of cls) {
+        const lang =
+          typeof c === "string" ? /^language-(.+)$/.exec(c)?.[1] : undefined;
+        if (lang) wanted.add(lang.toLowerCase());
+      }
+    });
+    if (wanted.size === 0) return;
+    const h = await ready;
+    const loaded = new Set(h.getLoadedLanguages());
+    for (const lang of wanted) {
+      if (loaded.has(lang)) continue;
+      // 名前か別名(rb・pyなど)から、Shikiの言語を探す
+      const id = bundledLanguagesInfo.find(
+        (l) => l.id === lang || l.aliases?.includes(lang),
+      )?.id;
+      if (id === undefined || !(id in bundledLanguages)) continue;
+      await h.loadLanguage(id as BundledLanguage);
+    }
+  };
+}

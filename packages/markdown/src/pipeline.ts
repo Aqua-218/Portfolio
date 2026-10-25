@@ -1,4 +1,5 @@
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import { toText } from "hast-util-to-text";
 import rehypeKatex from "rehype-katex";
 import rehypeRaw from "rehype-raw";
 import rehypeSanitize from "rehype-sanitize";
@@ -13,7 +14,11 @@ import { unified } from "unified";
 import { type CatDrawer, rehypeAlerts } from "./alerts";
 import { type OgpSource, rehypeLinkCards } from "./cards";
 import { type MermaidSource, rehypeMermaid } from "./diagrams";
-import { getHighlighter, rehypeShikiFromHighlighter } from "./highlight";
+import {
+  getHighlighter,
+  rehypeLoadLanguages,
+  rehypeShikiFromHighlighter,
+} from "./highlight";
 import { customBlocks } from "./qiita/blocks";
 import { rehypeQiitaEmbeds } from "./qiita/embeds";
 import { remarkQiitaCode } from "./qiita/code";
@@ -27,6 +32,7 @@ import {
   rehypeQiitaMath,
   rehypeQiitaMentions,
   rehypeQiitaNotes,
+  rehypeQiitaTasks,
 } from "./qiita/rehype";
 import { qiitaSchema, rehypeQiitaStyle } from "./qiita/sanitize";
 
@@ -96,6 +102,7 @@ async function qiitaProcessor() {
       .use(rehypeQiitaMentions)
       .use(rehypeQiitaLinks)
       .use(rehypeQiitaCodeColor)
+      .use(rehypeQiitaTasks)
       .use(rehypeQiitaInlineMath)
       .use(rehypeQiitaMath)
       .use(rehypeLinkCards)
@@ -103,9 +110,22 @@ async function qiitaProcessor() {
       .use(rehypeAlerts, { blockquotes: false })
       .use(rehypeMermaid)
       .use(rehypeQiitaCode)
+      // Qiitaの記事はどの言語でも書けるので、使っている言語をその場で読み込む
+      .use(rehypeLoadLanguages, getHighlighter())
       .use(rehypeShikiFromHighlighter, highlighter, {
         theme: "cat",
         fallbackLanguage: "text",
+        // 差分(diffとdiff_ruby)は、足した行と消した行に色をつける
+        transformers: [
+          {
+            line(node) {
+              if (this.options.lang !== "diff") return;
+              const first = toText(node)[0];
+              if (first === "+") this.addClassToHast(node, "diff-add");
+              if (first === "-") this.addClassToHast(node, "diff-del");
+            },
+          },
+        ],
       })
       .use(rehypeStringify)
   );
