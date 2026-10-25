@@ -19,7 +19,8 @@
 
 ### いちばん上の.htaccessだけに書くもの
 
-- エラーのページ: 404は`/404.html`、400・401・403・408・410・429・500・502・503・504は`/errors/<番号>/`
+- エラーのページ: 404は`/404.html`、400・401・403・405・408・410・429・500・502・503・504は`/errors/<番号>/`
+- GETとHEADのほかのメソッド(POST・DELETEなど)は405にし、`Allow: GET, HEAD`をつける
 - HTTPSへ移す(301)。Cloudflareを前に置くので、`X-Forwarded-Proto: https`のときは移さない(Cloudflareとの間がHTTPでもループしない)
 - ディレクトリの最後の`/`もHTTPSのまま足す。Apacheに任せると`http://`で返す
 - ファイルの一覧は出さない(`Options -Indexes`)
