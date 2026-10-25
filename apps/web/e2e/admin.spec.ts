@@ -1120,3 +1120,91 @@ ignorePublish: false
     );
   });
 });
+
+test.describe("設定", () => {
+  const TOKEN = "0123456789abcdef0123456789abcdef01234567";
+  const info = (source: "admin" | "secret" | null) => ({
+    settings: [
+      {
+        name: "qiita",
+        label: "Qiitaのトークン",
+        source,
+        last4: source === null ? null : source === "admin" ? "4567" : "beef",
+        at: source === "admin" ? 1_800_000_000 : null,
+        by: source === "admin" ? "neko" : null,
+      },
+    ],
+    changes:
+      source === "admin"
+        ? [{ name: "qiita", action: "set", at: 1_800_000_000, by: "neko" }]
+        : [],
+  });
+
+  test.beforeEach(async ({ page }) => {
+    await page.route("**/admin/auth/me", (r) =>
+      r.fulfill({ status: 200, json: { login: "neko" } }),
+    );
+    await page.route("**/admin/api?*", (r) => {
+      const path = new URL(r.request().url()).searchParams.get("path") ?? "";
+      if (path.includes("/git/matching-refs/")) return r.fulfill({ json: [] });
+      return r.fulfill({ json: { tree: [] } });
+    });
+    await page.goto("/admin/");
+  });
+
+  test("Qiitaのトークンを入れ替える。値は送るだけで、画面には最後の4字しか出さない", async ({
+    page,
+  }) => {
+    const sent: { method: string; body: unknown }[] = [];
+    await page.route("**/admin/settings*", (r) => {
+      const req = r.request();
+      sent.push({
+        method: req.method(),
+        body: req.postData() ? req.postDataJSON() : null,
+      });
+      return r.fulfill({
+        json: info(req.method() === "PUT" ? "admin" : "secret"),
+      });
+    });
+    await page.getByRole("button", { name: "設定" }).click();
+    const region = page.getByRole("region", { name: "設定" });
+    await expect(
+      region.getByText("wrangler secret のもの(…beef)"),
+    ).toBeVisible();
+    const input = region.getByLabel(/^新しい値/);
+    await expect(input).toHaveAttribute("type", "password");
+    await input.fill(TOKEN);
+    await region.getByRole("button", { name: "入れ替える" }).click();
+    await expect(region.getByText("入れ替えました。")).toBeVisible();
+    await expect(region.getByText(/管理画面で入れたもの\(…4567/)).toBeVisible();
+    await expect(input).toHaveValue("");
+    expect(sent.at(-1)).toEqual({ method: "PUT", body: { value: TOKEN } });
+    await expect(page.locator("body")).not.toContainText(TOKEN);
+    await expect(region.getByText("Qiitaのトークンを入れ替えた")).toBeVisible();
+    // Actionsのものは、GitHubの画面へ案内するだけ
+    await expect(
+      region.getByRole("link", { name: "GitHubでActionsのsecretsを開く" }),
+    ).toHaveAttribute(
+      "href",
+      "https://github.com/Aqua-218/Portfolio/settings/secrets/actions",
+    );
+  });
+
+  test("Qiitaが受けつけなければ、理由を出す", async ({ page }) => {
+    await page.route("**/admin/settings*", (r) =>
+      r.request().method() === "PUT"
+        ? r.fulfill({
+            status: 422,
+            json: { error: "Qiitaがこのトークンを受けつけません" },
+          })
+        : r.fulfill({ json: info(null) }),
+    );
+    await page.getByRole("button", { name: "設定" }).click();
+    await expect(page.getByText("入っていません")).toBeVisible();
+    await page.getByLabel(/^新しい値/).fill("f".repeat(40));
+    await page.getByRole("button", { name: "入れ替える" }).click();
+    await expect(
+      page.getByRole("region", { name: "設定" }).getByRole("alert"),
+    ).toHaveText("Qiitaがこのトークンを受けつけません。");
+  });
+});

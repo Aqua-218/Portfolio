@@ -41,7 +41,8 @@ PHPを使わない理由: 2026-10-21に、PHP本体に認証なしで遠隔か�
   - mainはディスクの`content/`。下書きは`apps/web/.dev/admin.json`に置く(コミットしない)
   - 「マージして公開する」と、下書きをディスクの`content/`に書く。チェックはすぐ通る
   - 「Qiitaに出す」は本物のQiitaには送らない。出した記事は`apps/web/.dev/admin.json`に置く
-- `pnpm dev`が、Next.jsの開発サーバーとこの相手をいっしょに立てる(`scripts/dev.mjs`)。管理画面のログインと中継(`/admin/auth/*`・`/admin/api`・`/admin/qiita`)だけを、開発サーバーの設定(`next.config.ts`)でこの相手に回す
+  - 「設定」は入れたふりだけをする(値は残さず、最後の4字だけ覚える)
+- `pnpm dev`が、Next.jsの開発サーバーとこの相手をいっしょに立てる(`scripts/dev.mjs`)。管理画面のログインと中継(`/admin/auth/*`・`/admin/api`・`/admin/qiita`・`/admin/settings`)だけを、開発サーバーの設定(`next.config.ts`)でこの相手に回す
 
 Workerには手を入れていない。ログインを飛ばす道は、手元の開発サーバーにしかない。
 
@@ -60,7 +61,16 @@ Workerには手を入れていない。ログインを飛ばす道は、手元�
 | ログアウトしたのに使える     | ログアウトでGitHubのトークン・セッション・端末の記憶を取り消す                                                                                                                                                                             |
 | 公開を壊される               | mainには直接コミットしない。PRを作り、必須チェック(証明・検査・VRTを含む)が通ってからマージする。mainはルールセットで守り(PR必須・例外なし)、Workerも`draft/`にしか書かせない                                                              |
 
-Qiitaへの中継(`/admin/qiita`)も、GitHubへの中継と同じく、このサイトの画面からの呼び出しで、持ち主がログインしているときだけ通す。通すのは自分の記事を読む・投稿する・更新することだけ(消す・ほかの人の記事・設定は通さない)で、送る項目も記事のもの(タイトル・本文・タグ・限定公開・スライド・organization)だけ。Qiitaのトークンは Worker の秘密にだけ置く。
+Qiitaへの中継(`/admin/qiita`)も、GitHubへの中継と同じく、このサイトの画面からの呼び出しで、持ち主がログインしているときだけ通す。通すのは自分の記事を読む・投稿する・更新することだけ(消す・ほかの人の記事・設定は通さない)で、送る項目も記事のもの(タイトル・本文・タグ・限定公開・スライド・organization)だけ。Qiitaのトークンは Worker の秘密(または下の「設定」で入れたもの)にだけ置く。
+
+設定(`/admin/settings`)も、同じく持ち主がこのサイトの画面から呼んだときだけ通す。
+
+- 入れられるのは、Workerが使うもの(いまはQiitaのトークン)だけ。知らない名前は断る
+- 値は鍵(`KEY`)でAES-GCMにしてKVに置く。中に設定の名前も入れ、別の場所の暗号文(セッションなど)を持ってきても設定としては使わない
+- 入れた値は、どの返事にも入れない。返すのは「どこから来たか(管理画面・wrangler secret)」「最後の4字」「入れた日時と人」だけ
+- 入れる前に形(16進の40字)を見て、Qiitaに自分を問い合わせ、受けつけられなければ入れない
+- 入れ替え・消去は、値を入れずに記録する(新しい20件)
+- Actionsのsecretsは管理画面からは変えない。GitHub Appにsecretsの権限を足すと、管理画面を乗っ取られたときにCIの秘密まで書き換えられるため。設定の画面からGitHubの画面へ案内するだけ
 
 前提: GitHubのアカウントで2段階認証を有効にしておく。管理画面の安全はここに乗っている。
 
@@ -89,10 +99,10 @@ Qiitaへの中継(`/admin/qiita`)も、GitHubへの中継と同じく、この�
 5. 秘密の値を入れる。リポジトリには書かない
    - `pnpm dlx wrangler secret put GITHUB_CLIENT_SECRET`
    - `openssl rand -base64 32 | pnpm dlx wrangler secret put KEY`
-   - `pnpm dlx wrangler secret put QIITA_TOKEN`(管理画面からQiitaに出す・取り込むとき。Qiitaの個人用アクセストークン、`read_qiita`・`write_qiita`。なくてもよい)
+   - `pnpm dlx wrangler secret put QIITA_TOKEN`(管理画面からQiitaに出す・取り込むとき。Qiitaの個人用アクセストークン、`read_qiita`・`write_qiita`。なくてもよい。あとから管理画面の「設定」でも入れ替えられ、そちらが先に使われる)
 6. デプロイ: `pnpm dlx wrangler deploy`(`apps/admin-worker`で)
 
-鍵(`KEY`)を変えると、いまのセッションと覚えた端末はすべて使えなくなる。漏れた疑いがあるときは、鍵とClient secretの両方を作り直す。
+鍵(`KEY`)を変えると、いまのセッションと覚えた端末、管理画面で入れた設定はすべて使えなくなる(設定は入れ直す)。漏れた疑いがあるときは、鍵とClient secretの両方を作り直す。
 
 ### 図とリンクカードを作るトークン
 

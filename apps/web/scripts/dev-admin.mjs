@@ -4,6 +4,7 @@
 // - mainはディスクのcontent/。下書き(draft/)は apps/web/.dev/admin.json に置く
 // - 公開(PRのマージ)すると、下書きをディスクのcontent/に書く。チェックはすぐ通る
 // - Qiitaにも出さない。出した記事は apps/web/.dev/admin.json に置く
+// - 設定は入れたふりだけをする(値は残さず、最後の4字だけ覚える)
 // 管理画面が使うGitHub APIだけを、同じ形で返す。127.0.0.1でしか待たない
 import { createHash, randomBytes } from "node:crypto";
 import {
@@ -317,6 +318,42 @@ createServer((req, res) => {
         return res.end();
       }
       if (route === "/admin/auth/logout") return send(res, 200, { ok: true });
+      if (route === "/admin/settings") {
+        store.settings ??= { qiita: null };
+        store.changes ??= [];
+        const name = url.searchParams.get("name") ?? "";
+        const at = Math.floor(Date.now() / 1000);
+        if (req.method !== "GET") {
+          if (name !== "qiita") return send(res, 404, {});
+          if (req.method === "PUT") {
+            const { value } = await body(req);
+            if (!/^[0-9a-f]{40}$/.test(String(value)))
+              return send(res, 422, { error: "形が違います" });
+            store.settings.qiita = { last4: value.slice(-4), at };
+          } else store.settings.qiita = null;
+          store.changes.unshift({
+            name,
+            action: req.method === "PUT" ? "set" : "delete",
+            at,
+            by: "dev",
+          });
+          save();
+        }
+        const q = store.settings.qiita;
+        return send(res, 200, {
+          settings: [
+            {
+              name: "qiita",
+              label: "Qiitaのトークン",
+              source: q ? "admin" : null,
+              last4: q?.last4 ?? null,
+              at: q?.at ?? null,
+              by: q ? "dev" : null,
+            },
+          ],
+          changes: store.changes,
+        });
+      }
       if (route === "/admin/api") {
         const [status, data] = await github(
           req.method ?? "GET",

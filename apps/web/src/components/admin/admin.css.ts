@@ -184,6 +184,19 @@ export const option = style({
   fontSize: "0.875rem",
 });
 
+export const settings = style({
+  listStyle: "none",
+  margin: 0,
+  padding: 0,
+  display: "grid",
+  gap: "1.25rem",
+});
+
+export const setting = style({
+  display: "grid",
+  gap: "0.5rem",
+});
+
 export const field = style({
   display: "grid",
   gap: "0.35rem",

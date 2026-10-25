@@ -317,6 +317,41 @@ export function qiitaWritable(method: string, body: string): boolean {
   );
 }
 
+/** 管理画面から入れ替えられる設定。Workerの中で使うものだけ(ActionsのsecretsはGitHubで入れる) */
+export const SETTINGS = {
+  qiita: {
+    label: "Qiitaのトークン",
+    /** Qiitaの個人用アクセストークンは16進の40字 */
+    format: /^[0-9a-f]{40}$/,
+  },
+} as const;
+
+export type SettingName = keyof typeof SETTINGS;
+
+const isSetting = (name: string): name is SettingName =>
+  Object.hasOwn(SETTINGS, name);
+
+/** KVに置く設定。Worker の鍵で暗号化する。nameも中に入れ、ほかの場所の値と取り替えられても使わない */
+interface Setting {
+  name: SettingName;
+  value: string;
+  /** 入れた日時(秒) */
+  at: number;
+  /** 入れた人 */
+  by: string;
+}
+
+/** 設定を変えた記録。値は入れない */
+interface Change {
+  name: SettingName;
+  action: "set" | "delete";
+  at: number;
+  by: string;
+}
+
+/** 記録を残す数 */
+const CHANGES = 20;
+
 /**
  * このサイトの画面からの呼び出しか。独自ヘッダー X-Admin(別のサイトからはつけられない)があり、
  * Origin がこのサイトか、Origin がないとき(同じサイトへの GET)は Sec-Fetch-Site が same-origin
@@ -365,6 +400,8 @@ export class Admin {
         return this.api(req, url.searchParams.get("path") ?? "");
       case "/admin/qiita":
         return this.qiita(req, url.searchParams.get("path") ?? "");
+      case "/admin/settings":
+        return this.settings(req, url.searchParams.get("name") ?? "");
       default:
         return json(404, { error: "見つかりません" });
     }
@@ -734,7 +771,7 @@ export class Admin {
       (await this.session(req, set)) ?? (await this.resume(req, set));
     if (session === null)
       return json(401, { error: "ログインしていません" }, set);
-    const token = this.d.config.qiitaToken;
+    const token = await this.qiitaToken();
     if (!token) return json(503, { error: "Qiitaのトークンがありません" }, set);
     const res = await this.d.fetch(`https://qiita.com${path}`, {
       method: req.method,
@@ -750,6 +787,132 @@ export class Admin {
     });
     for (const c of set) headers.append("Set-Cookie", c);
     return new Response(await res.text(), { status: res.status, headers });
+  }
+
+  /** Qiitaのトークン。管理画面から入れたものがあればそれ、なければ wrangler secret のもの */
+  private async qiitaToken(): Promise<string | undefined> {
+    return (await this.loadSetting("qiita"))?.value ?? this.secrets().qiita;
+  }
+
+  // ---- 設定 ----
+
+  private async loadSetting(name: SettingName): Promise<Setting | null> {
+    const sealed = await this.d.store.get(`setting:${name}`);
+    const plain =
+      sealed === null ? null : await decrypt(this.d.config.key, sealed);
+    if (plain === null) return null;
+    // 中の名前が違えば、別の場所の暗号文。使わない
+    const s = JSON.parse(plain) as { name?: unknown };
+    return s.name === name ? (s as Setting) : null;
+  }
+
+  private async changes(): Promise<Change[]> {
+    const raw = await this.d.store.get("settings:changes");
+    return raw === null ? [] : (JSON.parse(raw) as Change[]);
+  }
+
+  private async record(change: Change): Promise<void> {
+    const list = [change, ...(await this.changes())].slice(0, CHANGES);
+    await this.d.store.put("settings:changes", JSON.stringify(list));
+  }
+
+  /** いまの設定の様子。値そのものは返さない(最後の4字だけ) */
+  private async describe(): Promise<unknown> {
+    const items = await Promise.all(
+      (Object.keys(SETTINGS) as SettingName[]).map(async (name) => {
+        const stored = await this.loadSetting(name);
+        const secret = this.secrets()[name];
+        const value = stored?.value ?? secret;
+        return {
+          name,
+          label: SETTINGS[name].label,
+          source: stored ? "admin" : secret ? "secret" : null,
+          last4: value === undefined ? null : value.slice(-4),
+          at: stored?.at ?? null,
+          by: stored?.by ?? null,
+        };
+      }),
+    );
+    return { settings: items, changes: await this.changes() };
+  }
+
+  /** wrangler secret で入れたもの。管理画面で入れたものがなければ、これを使う */
+  private secrets(): Record<SettingName, string | undefined> {
+    return { qiita: this.d.config.qiitaToken };
+  }
+
+  /** 入れようとした値が効くか */
+  private works(name: SettingName, value: string): Promise<boolean> {
+    const check: Record<SettingName, (v: string) => Promise<boolean>> = {
+      qiita: (v) => this.qiitaWorks(v),
+    };
+    return check[name](value);
+  }
+
+  /** 入れようとしたQiitaのトークンが効くか。Qiitaに自分を聞いてみる */
+  private async qiitaWorks(token: string): Promise<boolean> {
+    const res = await this.d.fetch(
+      "https://qiita.com/api/v2/authenticated_user",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "User-Agent": "portfolio-admin",
+        },
+      },
+    );
+    return res.ok;
+  }
+
+  /**
+   * 設定を見る(GET)・入れる(PUT)・消す(DELETE)。持ち主だけ・同じサイトの画面からだけ。
+   * 入れた値は、どの返事にも入れない
+   */
+  private async settings(req: Request, name: string): Promise<Response> {
+    if (!sameSite(req, this.d.config.origin))
+      return json(403, { error: "別のサイトからは操作できません" });
+    if (!["GET", "PUT", "DELETE"].includes(req.method))
+      return json(405, { error: "GET・PUT・DELETE で呼んでください" });
+    if (req.method !== "GET" && !isSetting(name))
+      return json(404, { error: "その設定はありません" });
+    // 長すぎる中身は読まない
+    const body = req.method === "PUT" ? (await req.text()).slice(0, 1024) : "";
+    const set: string[] = [];
+    const session =
+      (await this.session(req, set)) ?? (await this.resume(req, set));
+    if (session === null)
+      return json(401, { error: "ログインしていません" }, set);
+    if (req.method === "GET") return json(200, await this.describe(), set);
+    const key = name as SettingName;
+    const now = this.d.now();
+
+    if (req.method === "DELETE") {
+      await this.d.store.delete(`setting:${key}`);
+      await this.record({
+        name: key,
+        action: "delete",
+        at: now,
+        by: session.user,
+      });
+      return json(200, await this.describe(), set);
+    }
+
+    let value: unknown;
+    try {
+      value = (JSON.parse(body) as { value?: unknown }).value;
+    } catch {
+      value = undefined;
+    }
+    if (typeof value !== "string" || !SETTINGS[key].format.test(value))
+      return json(422, { error: "形が違います" }, set);
+    if (!(await this.works(key, value)))
+      return json(422, { error: "Qiitaがこのトークンを受けつけません" }, set);
+    const setting: Setting = { name: key, value, at: now, by: session.user };
+    await this.d.store.put(
+      `setting:${key}`,
+      await encrypt(this.d.config.key, JSON.stringify(setting)),
+    );
+    await this.record({ name: key, action: "set", at: now, by: session.user });
+    return json(200, await this.describe(), set);
   }
 
   private github(
