@@ -24,7 +24,7 @@ export const button = style({
   fontSize: "0.9375rem",
   fontWeight: 700,
   cursor: "pointer",
-  ":hover": { borderColor: vars.color.mike, color: vars.color.mike },
+  ":hover": { borderColor: vars.color.mike, color: vars.color.mikeText },
 });
 
 export const remember = style({
@@ -122,7 +122,7 @@ export const dirty = style({
   padding: "0.15rem 0.5rem",
   borderRadius: vars.radius.md,
   background: vars.color.tatami,
-  color: vars.color.mike,
+  color: vars.color.mikeText,
   fontFamily: vars.font.jp,
   fontSize: "0.75rem",
   fontWeight: 700,
@@ -239,11 +239,11 @@ export const item = style({
   font: "inherit",
   textAlign: "left",
   cursor: "pointer",
-  ":hover": { color: vars.color.mike },
+  ":hover": { color: vars.color.mikeText },
 });
 
 export const fieldError = style({
-  color: vars.color.mike,
+  color: vars.color.mikeText,
   fontSize: "0.8125rem",
   fontWeight: 700,
 });
@@ -253,7 +253,7 @@ export const problems = style({
   paddingLeft: "1.2em",
   fontFamily: vars.font.jp,
   fontSize: "0.875rem",
-  color: vars.color.mike,
+  color: vars.color.mikeText,
 });
 
 export const preview = style({
@@ -314,7 +314,7 @@ export const diff = style({
 export const diffAdd = style({ color: vars.color.leaf, fontWeight: 700 });
 
 export const diffRemove = style({
-  color: vars.color.mike,
+  color: vars.color.mikeText,
   textDecoration: "line-through",
 });
 
@@ -340,7 +340,7 @@ globalStyle(`${checks} li`, {
 
 export const checkState = style({ color: vars.color.muted });
 
-export const checkFailed = style({ color: vars.color.mike, fontWeight: 700 });
+export const checkFailed = style({ color: vars.color.mikeText, fontWeight: 700 });
 /** 写真を足す */
 export const upload = style({
   display: "grid",
