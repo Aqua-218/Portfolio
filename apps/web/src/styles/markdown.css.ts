@@ -24,7 +24,7 @@ globalStyle(".callout b", {
   fontFamily: vars.font.sans,
   fontSize: "0.75rem",
   letterSpacing: "0.04em",
-  color: vars.color.mike,
+  color: vars.color.mikeText,
 });
 
 globalStyle(".callout p", {
@@ -216,7 +216,7 @@ globalStyle(".heading-anchor", {
   display: "inline-block",
   width: "1.1em",
   marginLeft: "-1.1em",
-  color: vars.color.mike,
+  color: vars.color.mikeText,
   opacity: 0,
   textDecoration: "none",
 });
