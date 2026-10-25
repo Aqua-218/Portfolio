@@ -4,9 +4,12 @@ on:
   push:
     branches: [main]
 
-permissions:
-  contents: write
-  pull-requests: write
+# GITHUB_TOKENは使わない(PRとリリースはRELEASE_PLEASE_TOKENで作る)ので、権限は何も渡さない
+permissions: {}
+
+concurrency:
+  group: release-please
+  cancel-in-progress: false
 
 jobs:
   release-please:
