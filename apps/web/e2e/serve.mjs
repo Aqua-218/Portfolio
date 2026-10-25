@@ -2,6 +2,7 @@
 import { createReadStream, readFileSync, statSync } from "node:fs";
 import { createServer } from "node:http";
 import { dirname, extname, join, normalize } from "node:path";
+import { createBrotliCompress, createGzip } from "node:zlib";
 
 const root = new URL("../out/", import.meta.url).pathname;
 const port = Number(process.env.PORT ?? 4173);
@@ -53,20 +54,42 @@ function htaccessHeaders(file) {
   return headers;
 }
 
+/** 文字のファイルは、本番(Cloudflare・ロリポップ)と同じく縮めて送る。Lighthouseで本番に近い大きさを測るため */
+const compressible = new Set([".html", ".js", ".css", ".svg", ".txt", ".wasm"]);
+
+function send(req, res, status, file, headers) {
+  const accept = String(req.headers["accept-encoding"] ?? "");
+  const encoding = !compressible.has(extname(file))
+    ? undefined
+    : /\bbr\b/.test(accept)
+      ? "br"
+      : /\bgzip\b/.test(accept)
+        ? "gzip"
+        : undefined;
+  res.writeHead(status, {
+    ...headers,
+    vary: "accept-encoding",
+    ...(encoding ? { "content-encoding": encoding } : {}),
+  });
+  const body = createReadStream(file);
+  if (encoding === "br") body.pipe(createBrotliCompress()).pipe(res);
+  else if (encoding === "gzip") body.pipe(createGzip()).pipe(res);
+  else body.pipe(res);
+}
+
 createServer((req, res) => {
   const { pathname } = new URL(req.url ?? "/", "http://localhost");
   const file = resolve(pathname);
   if (!file) {
-    res.writeHead(404, {
-      ...htaccessHeaders(join(root, "404.html")),
+    const page = join(root, "404.html");
+    send(req, res, 404, page, {
+      ...htaccessHeaders(page),
       "content-type": types[".html"],
     });
-    createReadStream(join(root, "404.html")).pipe(res);
     return;
   }
-  res.writeHead(200, {
+  send(req, res, 200, file, {
     ...htaccessHeaders(file),
     "content-type": types[extname(file)] ?? "application/octet-stream",
   });
-  createReadStream(file).pipe(res);
 }).listen(port);
