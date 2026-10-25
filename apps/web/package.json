@@ -17,6 +17,7 @@
     "@fontsource/geist": "5.3.0",
     "@fontsource/line-seed-jp": "5.3.2",
     "@portfolio/content-types": "workspace:*",
+    "@portfolio/content-wasm": "workspace:*",
     "@portfolio/design": "workspace:*",
     "@portfolio/markdown": "workspace:*",
     "@portfolio/pxcat": "workspace:*",
