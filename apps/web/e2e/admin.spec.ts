@@ -921,3 +921,202 @@ test.describe("写真を足す", () => {
     );
   });
 });
+
+test.describe("ブログ", () => {
+  const ID = "0123456789abcdef0123";
+  const POST = `---
+title: Rustで猫を描く
+tags:
+  - Rust
+private: false
+updated_at: ''
+id: null
+organization_url_name: null
+slide: false
+ignorePublish: false
+---
+:::note info
+猫は液体です。
+:::
+`;
+  const b64 = (t: string) => Buffer.from(t, "utf8").toString("base64");
+  /** 下書きのブランチに書いたもの */
+  let saved: string[];
+  /** Qiitaへの中継に来たもの */
+  let qiita: { method: string; path: string; body: unknown }[];
+
+  test.beforeEach(async ({ page }) => {
+    saved = [];
+    qiita = [];
+    await page.route("**/admin/auth/me", (r) =>
+      r.fulfill({ status: 200, json: { login: "neko" } }),
+    );
+    await page.route("**/admin/api?*", (r) => {
+      const req = r.request();
+      const path = new URL(req.url()).searchParams.get("path") ?? "";
+      if (path.includes("/git/matching-refs/")) return r.fulfill({ json: [] });
+      if (path.includes("/git/trees/"))
+        return r.fulfill({
+          json: { tree: [{ path: "content/blog/cat.md", type: "blob" }] },
+        });
+      if (path.endsWith("/blog/cat.md?ref=main"))
+        return r.fulfill({ json: { content: b64(POST), sha: "a1" } });
+      if (path.endsWith("/git/ref/heads/main"))
+        return r.fulfill({ json: { object: { sha: "m1" } } });
+      if (req.method() === "POST" && path.endsWith("/git/refs"))
+        return r.fulfill({ status: 201, json: {} });
+      if (req.method() === "PUT") {
+        const { content } = req.postDataJSON() as { content: string };
+        saved.push(Buffer.from(content, "base64").toString("utf8"));
+        return r.fulfill({ json: {} });
+      }
+      return r.fulfill({ status: 404 });
+    });
+    await page.goto("/admin/");
+  });
+
+  /** Qiitaの代わり。itemsは自分の記事 */
+  async function fakeQiita(
+    page: Page,
+    items: { id: string; title: string; body: string; updated_at: string }[],
+  ) {
+    await page.route("**/admin/qiita?*", (r) => {
+      const req = r.request();
+      const path = new URL(req.url()).searchParams.get("path") ?? "";
+      const body: unknown = req.postData() ? req.postDataJSON() : null;
+      qiita.push({ method: req.method(), path, body });
+      const full = (i: (typeof items)[number]) => ({
+        ...i,
+        private: false,
+        tags: [{ name: "Rust" }],
+        url: `https://qiita.com/neko/items/${i.id}`,
+      });
+      if (path.startsWith("/api/v2/authenticated_user/items"))
+        return r.fulfill({ json: items.map(full) });
+      if (req.method() === "POST")
+        return r.fulfill({
+          status: 201,
+          json: full({
+            id: ID,
+            title: "Rustで猫を描く",
+            body: "",
+            updated_at: "2026-10-25T10:00:00+09:00",
+          }),
+        });
+      const found = items.find((i) => path.endsWith(i.id));
+      return found
+        ? r.fulfill({ json: full(found) })
+        : r.fulfill({ status: 404, json: {} });
+    });
+  }
+
+  test("記事の項目がフォームに、本文がMarkdownで入る。プレビューはQiitaの記法で、本番の記事と同じ見た目", async ({
+    page,
+  }) => {
+    await page.getByRole("button", { name: "cat.md" }).click();
+    await expect(page.getByLabel("タイトル")).toHaveValue("Rustで猫を描く");
+    await expect(page.getByLabel(/^タグ/)).toHaveValue("Rust");
+    await expect(page.getByLabel("Qiitaには出さない")).not.toBeChecked();
+    await expect(page.getByLabel(/^本文/)).toHaveValue(
+      ":::note info\n猫は液体です。\n:::\n",
+    );
+    await expect(page.getByText("変更あり")).toHaveCount(0);
+    await page.getByRole("button", { name: "プレビュー" }).click();
+    const preview = page.getByRole("region", { name: "プレビュー" });
+    await expect(
+      preview.getByRole("heading", { level: 1, name: "Rustで猫を描く" }),
+    ).toBeVisible({ timeout: WASM });
+    // Qiitaの注意書き(:::note)が、サイトの注意書きになる
+    await expect(preview.locator('[data-note="info"]')).toContainText(
+      "猫は液体です。",
+    );
+  });
+
+  test("新しい記事は、ファイル名を決めて空の記事から書く", async ({ page }) => {
+    const name = page.getByLabel(/^新しい記事のファイル名/);
+    await name.fill("cat");
+    await expect(
+      page.getByText("その名前の記事はもうあります。"),
+    ).toBeVisible();
+    await name.fill("new-cat");
+    await page.getByRole("button", { name: "新しい記事を書く" }).click();
+    const editor = page.getByRole("region", {
+      name: "content/blog/new-cat.md の編集",
+    });
+    await expect(editor.getByLabel("タイトル")).toHaveValue("");
+    await expect(editor.getByText("変更あり")).toBeVisible();
+    await editor.getByLabel("タイトル").fill("新しい猫");
+    await editor.getByLabel(/^タグ/).fill("Cat");
+    await editor.getByLabel(/^本文/).fill("にゃー\n");
+    await editor.getByRole("button", { name: "下書きに保存" }).click();
+    await expect(editor.getByText("下書きに保存しました。")).toBeVisible();
+    expect(saved[0]).toContain("title: 新しい猫\ntags:\n  - Cat\n");
+  });
+
+  test("「Qiitaに出す」で投稿し、もらったidと日時を下書きに書き戻す", async ({
+    page,
+  }) => {
+    await fakeQiita(page, []);
+    await page.getByRole("button", { name: "cat.md" }).click();
+    await page.getByRole("button", { name: "Qiitaに出す" }).click();
+    // 押しただけでは出さない。Qiitaの様子を見てから、もう一度確かめる
+    await expect(
+      page.getByText("Qiitaに新しく投稿します(公開)。"),
+    ).toBeVisible();
+    expect(qiita.map((c) => c.method)).toEqual(["GET"]);
+    await page.getByRole("button", { name: "投稿する" }).click();
+    await expect(
+      page.getByText("idと日時を下書きに書き戻しました。", { exact: false }),
+    ).toBeVisible();
+    const sent = qiita.find((c) => c.method === "POST");
+    expect(sent?.path).toBe("/api/v2/items");
+    expect(sent?.body).toEqual({
+      title: "Rustで猫を描く",
+      body: ":::note info\n猫は液体です。\n:::\n",
+      tags: [{ name: "Rust", versions: [] }],
+      private: false,
+      slide: false,
+    });
+    expect(saved).toHaveLength(1);
+    expect(saved[0]).toContain(
+      `updated_at: '2026-10-25T10:00:00+09:00'\nid: ${ID}\n`,
+    );
+    await expect(
+      page.getByRole("link", { name: "Qiitaで見る" }),
+    ).toHaveAttribute("href", `https://qiita.com/neko/items/${ID}`);
+  });
+
+  test("Qiitaのほうが新しく直されていれば、聞いてから上書きする", async ({
+    page,
+  }) => {
+    await fakeQiita(page, [
+      {
+        id: "fedcba9876543210fedc",
+        title: "Rustで猫を描く",
+        body: "Qiitaで直した",
+        updated_at: "2026-10-20T10:00:00+09:00",
+      },
+    ]);
+    await page.getByRole("button", { name: "cat.md" }).click();
+    await page.getByRole("button", { name: "Qiitaに出す" }).click();
+    await expect(
+      page.getByText("同じタイトルの記事がもうQiitaにあります", {
+        exact: false,
+      }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "やめる" }).click();
+    expect(qiita.filter((c) => c.method !== "GET")).toEqual([]);
+    expect(saved).toEqual([]);
+  });
+
+  test("保存していない変更があれば、Qiitaには出さない", async ({ page }) => {
+    await page.getByRole("button", { name: "cat.md" }).click();
+    await page.getByLabel("タイトル").fill("書きかけ");
+    await expect(
+      page.getByText("Qiitaに出すには、先に下書きに保存してください。"),
+    ).toBeVisible();
+    await expect(page.getByRole("button", { name: "Qiitaに出す" })).toHaveCount(
+      0,
+    );
+  });
+});
