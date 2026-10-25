@@ -79,3 +79,31 @@ e2e(`e2e/csp.spec.ts`)で、全部のページをCSPの下で開き、違反や�
 - アクションはコミットのハッシュで固定し、`persist-credentials: false`で認証情報を残さない。ワークフローの権限は既定で読むだけ
 - 直った版のない脆弱性を連れてくる道具は入れない。たとえばLighthouse CI(`@lhci/cli`)は、古いLighthouseに固定されていて`extract-zip`などを連れてくるので、Lighthouseを直接呼ぶ形にした(#224)
 - 出て間もない版は避ける。Renovateは3日待つ。手で入れるときも、しばらく使われた版にする
+
+## ロリポップへの公開
+
+`.github/workflows/deploy.yml`が、書き出したサイトをロリポップの`~/web/komineko/`へrsyncで送る。
+
+| いつ                           | 何を出すか                                                                                                 |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| リリース                       | そのタグでビルドしたもの。ReleaseにZip(`komineko-<タグ>.zip`)もつける                                      |
+| `content/`だけが変わったマージ | コードは最新のリリースのまま、`content/`だけmainのものでビルドしたもの(リリースしていないコードは出さない) |
+| 手で動かす                     | 最新のリリースを送り直す                                                                                   |
+
+- 入り方: デプロイ専用のed25519の鍵。サーバーの`~/.ssh/authorized_keys`に`restrict`(転送や端末を使わせない)をつけて登録した。パスワードはActionsに置かない
+- サーバーの鍵は`known_hosts`として控え、鍵が違うサーバーにはつながない(`StrictHostKeyChecking=yes`)。ロリポップの鍵はRSA `SHA256:1Rt0rvYV+xZGCMAzm6BKjqAIPWXYYDX0bYK5CikAvCE`
+- 接続情報はEnvironment `production`のシークレットにだけ置く。`production`は`main`ブランチと`v*`のタグからしか使えない
+
+  | シークレット          | 中身                                       |
+  | --------------------- | ------------------------------------------ |
+  | `LOLIPOP_SSH_KEY`     | 秘密鍵                                     |
+  | `LOLIPOP_KNOWN_HOSTS` | サーバーの鍵(`ssh-keyscan -p 2222 -t rsa`) |
+  | `LOLIPOP_HOST`        | `ssh.lolipop.jp`                           |
+  | `LOLIPOP_USER`        | アカウント                                 |
+  | `LOLIPOP_PORT`        | `2222`                                     |
+  | `LOLIPOP_PATH`        | `/home/users/…/web/komineko/`              |
+
+- ビルドするジョブには秘密を渡さず、キャッシュも使わない。送るジョブはコードを動かさず、rsyncだけ
+- 中身の変わったファイルだけ送り(`--checksum`)、なくなったファイルは消す。`.well-known/`(無料SSLの更新に使う)は消さない。送り先が`~/web/`の下のフォルダでなければ止まる
+- 権限はディレクトリ705・ファイル604(ロリポップのおすすめ)
+- 鍵を替えるときは、新しい鍵を`authorized_keys`に足して`LOLIPOP_SSH_KEY`を差し替え、古い行を消す

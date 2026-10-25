@@ -1,0 +1,176 @@
+name: Deploy
+# サイトをビルドして、ロリポップ(~/web/komineko/)へ差分だけ送る。
+# - リリースのとき: そのタグでビルドし、Zipを Release につけてから送る
+# - content/ だけが変わったマージ: リリースを待たずに送る。コードは最新のリリースのまま、content/ だけ main のものにする
+#   (まだリリースしていないコードを出さないため)
+# - 手で動かすとき(workflow_dispatch): 最新のリリースをそのまま送り直す
+# ビルドするジョブには秘密を渡さない。送るジョブはコードを動かさない(rsyncだけ)。
+# 接続情報は Environment production のシークレットにだけ置く(main と v* のタグからしか使えない。docs/security.md)
+on:
+  release:
+    types: [published]
+  push:
+    branches: [main]
+    paths:
+      - "content/**"
+  workflow_dispatch:
+
+# 既定は何もできない。ジョブで要るものだけを足す
+permissions: {}
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  # 何を出すかを決める。push のときは、変わったのが content/ だけのときだけ出す
+  plan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      go: ${{ steps.plan.outputs.go }}
+      tag: ${{ steps.plan.outputs.tag }}
+      content: ${{ steps.plan.outputs.content }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - id: plan
+        env:
+          EVENT: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          if [ "$EVENT" = release ]; then
+            echo "go=true" >> "$GITHUB_OUTPUT"
+            echo "tag=$RELEASE_TAG" >> "$GITHUB_OUTPUT"
+            echo "content=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          tag=$(git describe --tags --abbrev=0 --match 'v*' HEAD)
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          if [ "$EVENT" = workflow_dispatch ]; then
+            echo "go=true" >> "$GITHUB_OUTPUT"
+            echo "content=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # content/ のほかも変わったマージは、次のリリースで出す
+          others=$(git diff --name-only "$BEFORE" "$GITHUB_SHA" -- . ':(exclude)content' | head -5)
+          if [ -n "$others" ]; then
+            echo "content/ のほかも変わっているので、次のリリースで出す:"
+            echo "$others"
+            echo "go=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "go=true" >> "$GITHUB_OUTPUT"
+          fi
+          echo "content=true" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: plan
+    if: needs.plan.outputs.go == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # content/ だけを出すときは main(記事の日付をgitの履歴から読むため)、ほかはリリースのタグ
+          ref: ${{ needs.plan.outputs.content == 'true' && github.sha || needs.plan.outputs.tag }}
+          persist-credentials: false
+          fetch-depth: 0
+      # content/ のほかを、最新のリリースのときに戻す。リリースのあとに足したファイルは消す
+      - if: needs.plan.outputs.content == 'true'
+        env:
+          TAG: ${{ needs.plan.outputs.tag }}
+        run: |
+          git diff --name-only --diff-filter=A -z "$TAG" HEAD -- . ':(exclude)content' | xargs -0 -r rm -f
+          git restore --source="$TAG" --worktree -- . ':(exclude)content'
+          echo "コードは $TAG、content/ は $(git rev-parse --short HEAD)"
+      # 公開するものを作るので、キャッシュは使わない(汚されたキャッシュから入り込まれないように)
+      - uses: jdx/mise-action@8418fedb1110381a0d3ba51a7a415d7c1b884550 # v5.2.2
+        with:
+          install_args: node pnpm rust github:wasm-bindgen/wasm-bindgen
+          cache: false
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @portfolio/web exec playwright install --with-deps chromium
+      - run: pnpm build
+      # 管理画面のトークンが、書き出したサイトに入っていないか見る
+      - run: sh scripts/check-tokens.sh apps/web/out
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: site
+          path: apps/web/out/
+          # .htaccess(守りのヘッダー・キャッシュ・転送)も送る
+          include-hidden-files: true
+          retention-days: 3
+
+  # Releaseに、書き出したサイトのZipをつける。コードは動かさない
+  attach:
+    needs: [plan, build]
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Releaseにファイルをつける
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: site
+          path: site
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.plan.outputs.tag }}
+        run: |
+          (cd site && zip -qr -X "../komineko-$TAG.zip" .)
+          gh release upload "$TAG" "komineko-$TAG.zip" --clobber --repo "$GITHUB_REPOSITORY"
+
+  # ロリポップへ送る。コードは動かさず、rsyncだけ
+  upload:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+    permissions: {}
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: site
+          path: site
+      - name: ロリポップへ送る
+        env:
+          SSH_KEY: ${{ secrets.LOLIPOP_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.LOLIPOP_KNOWN_HOSTS }}
+          HOST: ${{ secrets.LOLIPOP_HOST }}
+          USER_NAME: ${{ secrets.LOLIPOP_USER }}
+          PORT: ${{ secrets.LOLIPOP_PORT }}
+          DEST: ${{ secrets.LOLIPOP_PATH }}
+        run: |
+          for v in SSH_KEY KNOWN_HOSTS HOST USER_NAME PORT DEST; do
+            if [ -z "$(printenv "$v")" ]; then
+              echo "::error::Environment production のシークレットが足りない: $v(docs/security.md)"
+              exit 1
+            fi
+          done
+          # --delete で消すので、送り先は ~/web/ の下のサイトのフォルダだけにする
+          case "$DEST" in
+            /home/users/*/web/?*/) ;;
+            *)
+              echo "::error::LOLIPOP_PATH は /home/users/…/web/<フォルダ>/ の形にする"
+              exit 1
+              ;;
+          esac
+          # 消し忘れても残らないよう、ランナーの一時フォルダに置く
+          dir="$RUNNER_TEMP/ssh"
+          install -d -m 700 "$dir"
+          (umask 077 && printf '%s\n' "$SSH_KEY" > "$dir/key" && printf '%s\n' "$KNOWN_HOSTS" > "$dir/known_hosts")
+          # 知らないサーバー(鍵が違う)にはつながない。パスワードでは入らない
+          ssh="ssh -i $dir/key -p $PORT -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$dir/known_hosts"
+          # 中身が変わったファイルだけ送り、消えたファイルは消す。
+          # .well-known/ はロリポップの無料SSLの更新に使うので、消さない
+          rsync -rlz --checksum --delete --delay-updates \
+            --filter='P .well-known/' \
+            --perms --chmod=D705,F604 \
+            --itemize-changes \
+            -e "$ssh" \
+            site/ "$USER_NAME@$HOST:$DEST"
+          rm -rf "$dir"
