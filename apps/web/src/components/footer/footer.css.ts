@@ -3,7 +3,7 @@ import { vars } from "@/styles/theme.css";
 
 export const sitemap = style({
   display: "grid",
-  gridTemplateColumns: "repeat(9, minmax(0, 1fr))",
+  gridTemplateColumns: "repeat(10, minmax(0, 1fr))",
   gap: "1.5rem",
   paddingBlock: "1.75rem 2.25rem",
   borderTop: `2px solid ${vars.color.ink}`,
