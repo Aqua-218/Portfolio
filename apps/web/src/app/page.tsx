@@ -5,6 +5,7 @@ import { Clock } from "@/components/home/Clock";
 import { Goodnight } from "@/components/home/Goodnight";
 import * as h from "@/components/home/home.css";
 import { Mosaic } from "@/components/mosaic/Mosaic";
+import { Playground } from "@/components/play/Playground";
 import { Photo } from "@/components/photo/Photo";
 import { Lead, Section } from "@/components/section/Section";
 import { groupHeading } from "@/components/section/section.css";
@@ -34,6 +35,7 @@ export default function Home() {
           </div>
           <Clock location={profile.location} timezone={profile.timezone} />
         </div>
+        <Playground seed="home" count={5} pixel={4} className={h.play} />
       </section>
 
       <Section

@@ -28,16 +28,18 @@ structure coat.Rgb where
   b : Std.U8
 
 /-- [pxcat_core::coat::Coat]
-    Source: 'crates/pxcat-core/src/coat.rs', lines 23:0-30:1
+    Source: 'crates/pxcat-core/src/coat.rs', lines 23:0-34:1
     Visibility: public -/
 @[discriminant isize]
 inductive coat.Coat where
 | Kuro : coat.Coat
 | Kiji : coat.Coat
 | Mike : coat.Coat
+| Chatora : coat.Coat
+| Shiro : coat.Coat
 
 /-- [pxcat_core::coat::Patch]
-    Source: 'crates/pxcat-core/src/coat.rs', lines 34:0-41:1
+    Source: 'crates/pxcat-core/src/coat.rs', lines 38:0-45:1
     Visibility: public -/
 @[discriminant isize]
 inductive coat.Patch where
@@ -59,7 +61,7 @@ inductive sprite.Cell where
 | Closed : sprite.Cell
 
 /-- [pxcat_core::frames::FrameName]
-    Source: 'crates/pxcat-core/src/frames.rs', lines 7:0-17:1
+    Source: 'crates/pxcat-core/src/frames.rs', lines 8:0-26:1
     Visibility: public -/
 @[discriminant isize]
 inductive frames.FrameName where
@@ -72,6 +74,14 @@ inductive frames.FrameName where
 | TailB : frames.FrameName
 | Peek : frames.FrameName
 | PeekBlink : frames.FrameName
+| GroomA : frames.FrameName
+| GroomB : frames.FrameName
+| Loaf : frames.FrameName
+| Stretch : frames.FrameName
+| RollA : frames.FrameName
+| RollB : frames.FrameName
+| PounceA : frames.FrameName
+| PounceB : frames.FrameName
 
 /-- [pxcat_core::sprite::Frame]
     Source: 'crates/pxcat-core/src/sprite.rs', lines 48:0-52:1

@@ -42,7 +42,10 @@ export function PxCat({
       if (!alive || !el) return;
       el.innerHTML = svg;
       if (motion === undefined || reducedMotion()) return;
-      const index = motion === "blink" ? nextBlinker() : 0;
+      // 瞬き・毛づくろい・へそ天・飛びつくは、猫ごとに時をずらす
+      const index = ["blink", "groom", "roll", "pounce"].includes(motion)
+        ? nextBlinker()
+        : 0;
       unsubscribe = subscribe((n) => {
         showFrame(el, frameIndex(motion, n, index));
       });

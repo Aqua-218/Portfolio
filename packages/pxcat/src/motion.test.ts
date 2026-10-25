@@ -30,6 +30,21 @@ describe("frameIndex", () => {
     expect(seq[37]).toBe("1");
   });
 
+  it("毛づくろいは3回ごと、へそ天は4回ごとにコマを入れ替える", () => {
+    expect(frames("groom", 12)).toBe("000111000111");
+    expect(frames("roll", 16)).toBe("0000111100001111");
+  });
+
+  it("飛びつく猫は長く構えて、少しだけ飛ぶ", () => {
+    const seq = frames("pounce", 52);
+    expect(seq).toBe(`${"0".repeat(21)}11111${"0".repeat(21)}11111`);
+  });
+
+  it("毛づくろい・へそ天・飛びつくも、猫ごとにずれる", () => {
+    for (const m of ["groom", "roll", "pounce"] as const)
+      expect(frames(m, 26, 0), m).not.toBe(frames(m, 26, 1));
+  });
+
   it("瞬きは猫ごとにずれる", () => {
     const first = frames("blink", 37, 0).indexOf("1");
     const second = frames("blink", 37, 1).indexOf("1");

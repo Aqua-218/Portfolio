@@ -157,6 +157,8 @@ def coat.Coat.Insts.CoreFmtDebug.fmt
   | coat.Coat.Kuro => core.fmt.Formatter.write_str f (toStr "Kuro")
   | coat.Coat.Kiji => core.fmt.Formatter.write_str f (toStr "Kiji")
   | coat.Coat.Mike => core.fmt.Formatter.write_str f (toStr "Mike")
+  | coat.Coat.Chatora => core.fmt.Formatter.write_str f (toStr "Chatora")
+  | coat.Coat.Shiro => core.fmt.Formatter.write_str f (toStr "Shiro")
 
 /-- Trait implementation: [pxcat_core::coat::{impl core::fmt::Debug for pxcat_core::coat::Coat}]
     Source: 'crates/pxcat-core/src/coat.rs', lines 22:22-22:27 -/
@@ -199,28 +201,28 @@ impl_def coat.Coat.Insts.CoreCmpEq : core.cmp.Eq coat.Coat := {
 }
 
 /-- [pxcat_core::coat::{impl core::clone::Clone for pxcat_core::coat::Patch}::clone]:
-    Source: 'crates/pxcat-core/src/coat.rs', lines 33:9-33:14
+    Source: 'crates/pxcat-core/src/coat.rs', lines 37:9-37:14
     Visibility: public -/
 def coat.Patch.Insts.CoreCloneClone.clone
   (self : coat.Patch) : Result coat.Patch := do
   ok self
 
 /-- Trait implementation: [pxcat_core::coat::{impl core::clone::Clone for pxcat_core::coat::Patch}]
-    Source: 'crates/pxcat-core/src/coat.rs', lines 33:9-33:14 -/
+    Source: 'crates/pxcat-core/src/coat.rs', lines 37:9-37:14 -/
 @[reducible]
 def coat.Patch.Insts.CoreCloneClone : core.clone.Clone coat.Patch := {
   clone := coat.Patch.Insts.CoreCloneClone.clone
 }
 
 /-- Trait implementation: [pxcat_core::coat::{impl core::marker::Copy for pxcat_core::coat::Patch}]
-    Source: 'crates/pxcat-core/src/coat.rs', lines 33:16-33:20 -/
+    Source: 'crates/pxcat-core/src/coat.rs', lines 37:16-37:20 -/
 @[reducible]
 def coat.Patch.Insts.CoreMarkerCopy : core.marker.Copy coat.Patch := {
   cloneInst := coat.Patch.Insts.CoreCloneClone
 }
 
 /-- [pxcat_core::coat::{impl core::fmt::Debug for pxcat_core::coat::Patch}::fmt]:
-    Source: 'crates/pxcat-core/src/coat.rs', lines 33:22-33:27
+    Source: 'crates/pxcat-core/src/coat.rs', lines 37:22-37:27
     Visibility: public -/
 def coat.Patch.Insts.CoreFmtDebug.fmt
   (self : coat.Patch) (f : core.fmt.Formatter) :
@@ -232,21 +234,21 @@ def coat.Patch.Insts.CoreFmtDebug.fmt
   | coat.Patch.Black => core.fmt.Formatter.write_str f (toStr "Black")
 
 /-- Trait implementation: [pxcat_core::coat::{impl core::fmt::Debug for pxcat_core::coat::Patch}]
-    Source: 'crates/pxcat-core/src/coat.rs', lines 33:22-33:27 -/
+    Source: 'crates/pxcat-core/src/coat.rs', lines 37:22-37:27 -/
 @[reducible]
 def coat.Patch.Insts.CoreFmtDebug : core.fmt.Debug coat.Patch := {
   fmt := coat.Patch.Insts.CoreFmtDebug.fmt
 }
 
 /-- Trait implementation: [pxcat_core::coat::{impl core::marker::StructuralPartialEq for pxcat_core::coat::Patch}]
-    Source: 'crates/pxcat-core/src/coat.rs', lines 33:29-33:38 -/
+    Source: 'crates/pxcat-core/src/coat.rs', lines 37:29-37:38 -/
 @[reducible]
 def coat.Patch.Insts.CoreMarkerStructuralPartialEq :
   core.marker.StructuralPartialEq coat.Patch := {
 }
 
 /-- [pxcat_core::coat::{impl core::cmp::PartialEq<pxcat_core::coat::Patch> for pxcat_core::coat::Patch}::eq]:
-    Source: 'crates/pxcat-core/src/coat.rs', lines 33:29-33:38
+    Source: 'crates/pxcat-core/src/coat.rs', lines 37:29-37:38
     Visibility: public -/
 def coat.Patch.Insts.CoreCmpPartialEqPatch.eq
   (self : coat.Patch) (other : coat.Patch) : Result Bool := do
@@ -255,7 +257,7 @@ def coat.Patch.Insts.CoreCmpPartialEqPatch.eq
   ok (self1 = other1)
 
 /-- Trait implementation: [pxcat_core::coat::{impl core::cmp::PartialEq<pxcat_core::coat::Patch> for pxcat_core::coat::Patch}]
-    Source: 'crates/pxcat-core/src/coat.rs', lines 33:29-33:38 -/
+    Source: 'crates/pxcat-core/src/coat.rs', lines 37:29-37:38 -/
 @[reducible]
 def coat.Patch.Insts.CoreCmpPartialEqPatch : core.cmp.PartialEq coat.Patch
   coat.Patch := {
@@ -263,7 +265,7 @@ def coat.Patch.Insts.CoreCmpPartialEqPatch : core.cmp.PartialEq coat.Patch
 }
 
 /-- Trait implementation: [pxcat_core::coat::{impl core::cmp::Eq for pxcat_core::coat::Patch}]
-    Source: 'crates/pxcat-core/src/coat.rs', lines 33:40-33:42 -/
+    Source: 'crates/pxcat-core/src/coat.rs', lines 37:40-37:42 -/
 @[reducible]
 impl_def coat.Patch.Insts.CoreCmpEq : core.cmp.Eq coat.Patch := {
   partialEqInst := coat.Patch.Insts.CoreCmpPartialEqPatch
@@ -272,7 +274,7 @@ impl_def coat.Patch.Insts.CoreCmpEq : core.cmp.Eq coat.Patch := {
 }
 
 /-- [pxcat_core::coat::mike_patch]:
-    Source: 'crates/pxcat-core/src/coat.rs', lines 49:0-60:1
+    Source: 'crates/pxcat-core/src/coat.rs', lines 53:0-64:1
     Visibility: public -/
 def coat.mike_patch (x : Std.Usize) (y : Std.Usize) : Result coat.Patch := do
   let i ← x + 1#usize
@@ -293,7 +295,7 @@ def coat.mike_patch (x : Std.Usize) (y : Std.Usize) : Result coat.Patch := do
        else ok coat.Patch.White
 
 /-- [pxcat_core::coat::paint]:
-    Source: 'crates/pxcat-core/src/coat.rs', lines 66:0-100:1
+    Source: 'crates/pxcat-core/src/coat.rs', lines 70:0-123:1
     Visibility: public -/
 def coat.paint
   (fur : coat.Coat) (cell : sprite.Cell) (x : Std.Usize) (y : Std.Usize) :
@@ -352,16 +354,46 @@ def coat.paint
                           ok (some r)
     | sprite.Cell.Closed => let r ← coat.rgb 3813418#u32
                             ok (some r)
+  | coat.Coat.Chatora =>
+    match cell with
+    | sprite.Cell.Empty => ok none
+    | sprite.Cell.Fur => let r ← coat.rgb 14191173#u32
+                         ok (some r)
+    | sprite.Cell.Stripe => let r ← coat.rgb 11034410#u32
+                            ok (some r)
+    | sprite.Cell.White => let r ← coat.rgb 16183268#u32
+                           ok (some r)
+    | sprite.Cell.Eye => let r ← coat.rgb 10268746#u32
+                         ok (some r)
+    | sprite.Cell.Nose => let r ← coat.rgb 14916236#u32
+                          ok (some r)
+    | sprite.Cell.Closed => let r ← coat.rgb 7028511#u32
+                            ok (some r)
+  | coat.Coat.Shiro =>
+    match cell with
+    | sprite.Cell.Empty => ok none
+    | sprite.Cell.Fur => let r ← coat.rgb 16052714#u32
+                         ok (some r)
+    | sprite.Cell.Stripe => let r ← coat.rgb 14867922#u32
+                            ok (some r)
+    | sprite.Cell.White => let r ← coat.rgb 14275784#u32
+                           ok (some r)
+    | sprite.Cell.Eye => let r ← coat.rgb 7316438#u32
+                         ok (some r)
+    | sprite.Cell.Nose => let r ← coat.rgb 15508901#u32
+                          ok (some r)
+    | sprite.Cell.Closed => let r ← coat.rgb 9077624#u32
+                            ok (some r)
 
 /-- [pxcat_core::frames::{impl core::clone::Clone for pxcat_core::frames::FrameName}::clone]:
-    Source: 'crates/pxcat-core/src/frames.rs', lines 6:9-6:14
+    Source: 'crates/pxcat-core/src/frames.rs', lines 7:9-7:14
     Visibility: public -/
 def frames.FrameName.Insts.CoreCloneClone.clone
   (self : frames.FrameName) : Result frames.FrameName := do
   ok self
 
 /-- Trait implementation: [pxcat_core::frames::{impl core::clone::Clone for pxcat_core::frames::FrameName}]
-    Source: 'crates/pxcat-core/src/frames.rs', lines 6:9-6:14 -/
+    Source: 'crates/pxcat-core/src/frames.rs', lines 7:9-7:14 -/
 @[reducible]
 def frames.FrameName.Insts.CoreCloneClone : core.clone.Clone frames.FrameName
   := {
@@ -369,7 +401,7 @@ def frames.FrameName.Insts.CoreCloneClone : core.clone.Clone frames.FrameName
 }
 
 /-- Trait implementation: [pxcat_core::frames::{impl core::marker::Copy for pxcat_core::frames::FrameName}]
-    Source: 'crates/pxcat-core/src/frames.rs', lines 6:16-6:20 -/
+    Source: 'crates/pxcat-core/src/frames.rs', lines 7:16-7:20 -/
 @[reducible]
 def frames.FrameName.Insts.CoreMarkerCopy : core.marker.Copy frames.FrameName
   := {
@@ -377,7 +409,7 @@ def frames.FrameName.Insts.CoreMarkerCopy : core.marker.Copy frames.FrameName
 }
 
 /-- [pxcat_core::frames::{impl core::fmt::Debug for pxcat_core::frames::FrameName}::fmt]:
-    Source: 'crates/pxcat-core/src/frames.rs', lines 6:22-6:27
+    Source: 'crates/pxcat-core/src/frames.rs', lines 7:22-7:27
     Visibility: public -/
 def frames.FrameName.Insts.CoreFmtDebug.fmt
   (self : frames.FrameName) (f : core.fmt.Formatter) :
@@ -394,23 +426,34 @@ def frames.FrameName.Insts.CoreFmtDebug.fmt
   | frames.FrameName.Peek => core.fmt.Formatter.write_str f (toStr "Peek")
   | frames.FrameName.PeekBlink =>
     core.fmt.Formatter.write_str f (toStr "PeekBlink")
+  | frames.FrameName.GroomA => core.fmt.Formatter.write_str f (toStr "GroomA")
+  | frames.FrameName.GroomB => core.fmt.Formatter.write_str f (toStr "GroomB")
+  | frames.FrameName.Loaf => core.fmt.Formatter.write_str f (toStr "Loaf")
+  | frames.FrameName.Stretch =>
+    core.fmt.Formatter.write_str f (toStr "Stretch")
+  | frames.FrameName.RollA => core.fmt.Formatter.write_str f (toStr "RollA")
+  | frames.FrameName.RollB => core.fmt.Formatter.write_str f (toStr "RollB")
+  | frames.FrameName.PounceA =>
+    core.fmt.Formatter.write_str f (toStr "PounceA")
+  | frames.FrameName.PounceB =>
+    core.fmt.Formatter.write_str f (toStr "PounceB")
 
 /-- Trait implementation: [pxcat_core::frames::{impl core::fmt::Debug for pxcat_core::frames::FrameName}]
-    Source: 'crates/pxcat-core/src/frames.rs', lines 6:22-6:27 -/
+    Source: 'crates/pxcat-core/src/frames.rs', lines 7:22-7:27 -/
 @[reducible]
 def frames.FrameName.Insts.CoreFmtDebug : core.fmt.Debug frames.FrameName := {
   fmt := frames.FrameName.Insts.CoreFmtDebug.fmt
 }
 
 /-- Trait implementation: [pxcat_core::frames::{impl core::marker::StructuralPartialEq for pxcat_core::frames::FrameName}]
-    Source: 'crates/pxcat-core/src/frames.rs', lines 6:29-6:38 -/
+    Source: 'crates/pxcat-core/src/frames.rs', lines 7:29-7:38 -/
 @[reducible]
 def frames.FrameName.Insts.CoreMarkerStructuralPartialEq :
   core.marker.StructuralPartialEq frames.FrameName := {
 }
 
 /-- [pxcat_core::frames::{impl core::cmp::PartialEq<pxcat_core::frames::FrameName> for pxcat_core::frames::FrameName}::eq]:
-    Source: 'crates/pxcat-core/src/frames.rs', lines 6:29-6:38
+    Source: 'crates/pxcat-core/src/frames.rs', lines 7:29-7:38
     Visibility: public -/
 def frames.FrameName.Insts.CoreCmpPartialEqFrameName.eq
   (self : frames.FrameName) (other : frames.FrameName) : Result Bool := do
@@ -419,7 +462,7 @@ def frames.FrameName.Insts.CoreCmpPartialEqFrameName.eq
   ok (self1 = other1)
 
 /-- Trait implementation: [pxcat_core::frames::{impl core::cmp::PartialEq<pxcat_core::frames::FrameName> for pxcat_core::frames::FrameName}]
-    Source: 'crates/pxcat-core/src/frames.rs', lines 6:29-6:38 -/
+    Source: 'crates/pxcat-core/src/frames.rs', lines 7:29-7:38 -/
 @[reducible]
 def frames.FrameName.Insts.CoreCmpPartialEqFrameName : core.cmp.PartialEq
   frames.FrameName frames.FrameName := {
@@ -427,7 +470,7 @@ def frames.FrameName.Insts.CoreCmpPartialEqFrameName : core.cmp.PartialEq
 }
 
 /-- Trait implementation: [pxcat_core::frames::{impl core::cmp::Eq for pxcat_core::frames::FrameName}]
-    Source: 'crates/pxcat-core/src/frames.rs', lines 6:40-6:42 -/
+    Source: 'crates/pxcat-core/src/frames.rs', lines 7:40-7:42 -/
 @[reducible]
 impl_def frames.FrameName.Insts.CoreCmpEq : core.cmp.Eq frames.FrameName := {
   partialEqInst := frames.FrameName.Insts.CoreCmpPartialEqFrameName
@@ -436,14 +479,17 @@ impl_def frames.FrameName.Insts.CoreCmpEq : core.cmp.Eq frames.FrameName := {
 }
 
 /-- [pxcat_core::frames::ALL]
-    Source: 'crates/pxcat-core/src/frames.rs', lines 20:0-30:2
+    Source: 'crates/pxcat-core/src/frames.rs', lines 29:0-47:2
     Visibility: public -/
 @[global_simps, irreducible]
-def frames.ALL : Array frames.FrameName 9#usize :=
-  Array.make 9#usize [
+def frames.ALL : Array frames.FrameName 17#usize :=
+  Array.make 17#usize [
     frames.FrameName.RunA, frames.FrameName.RunB, frames.FrameName.Sleep,
     frames.FrameName.SitA, frames.FrameName.SitB, frames.FrameName.TailA,
-    frames.FrameName.TailB, frames.FrameName.Peek, frames.FrameName.PeekBlink
+    frames.FrameName.TailB, frames.FrameName.Peek, frames.FrameName.PeekBlink,
+    frames.FrameName.GroomA, frames.FrameName.GroomB, frames.FrameName.Loaf,
+    frames.FrameName.Stretch, frames.FrameName.RollA, frames.FrameName.RollB,
+    frames.FrameName.PounceA, frames.FrameName.PounceB
     ]
 
 /-- [pxcat_core::sprite::{pxcat_core::sprite::Cell}::from_byte]:
@@ -474,7 +520,7 @@ def sprite.Cell.Insts.CoreCloneClone : core.clone.Clone sprite.Cell := {
 }
 
 /-- [pxcat_core::frames::build]: loop body 1:
-    Source: 'crates/pxcat-core/src/frames.rs', lines 40:8-43:9 -/
+    Source: 'crates/pxcat-core/src/frames.rs', lines 57:8-60:9 -/
 @[rust_loop_body]
 def frames.build_loop0_loop0.body
   (rows : Array (Array Std.U8 20#usize) 12#usize) (width : Std.Usize)
@@ -496,7 +542,7 @@ def frames.build_loop0_loop0.body
   else ok (done cells)
 
 /-- [pxcat_core::frames::build]: loop 1:
-    Source: 'crates/pxcat-core/src/frames.rs', lines 40:8-43:9 -/
+    Source: 'crates/pxcat-core/src/frames.rs', lines 57:8-60:9 -/
 @[rust_loop]
 def frames.build_loop0_loop0
   (rows : Array (Array Std.U8 20#usize) 12#usize) (width : Std.Usize)
@@ -509,7 +555,7 @@ def frames.build_loop0_loop0
     (cells, x)
 
 /-- [pxcat_core::frames::build]: loop body 0:
-    Source: 'crates/pxcat-core/src/frames.rs', lines 38:4-45:5 -/
+    Source: 'crates/pxcat-core/src/frames.rs', lines 55:4-62:5 -/
 @[rust_loop_body]
 def frames.build_loop0.body
   (rows : Array (Array Std.U8 20#usize) 12#usize) (width : Std.Usize)
@@ -526,7 +572,7 @@ def frames.build_loop0.body
   else ok (done cells)
 
 /-- [pxcat_core::frames::build]: loop 0:
-    Source: 'crates/pxcat-core/src/frames.rs', lines 38:4-45:5 -/
+    Source: 'crates/pxcat-core/src/frames.rs', lines 55:4-62:5 -/
 @[rust_loop]
 def frames.build_loop0
   (rows : Array (Array Std.U8 20#usize) 12#usize) (width : Std.Usize)
@@ -539,7 +585,7 @@ def frames.build_loop0
     (cells, y)
 
 /-- [pxcat_core::frames::build]:
-    Source: 'crates/pxcat-core/src/frames.rs', lines 35:0-51:1 -/
+    Source: 'crates/pxcat-core/src/frames.rs', lines 52:0-68:1 -/
 def frames.build
   (rows : Array (Array Std.U8 20#usize) 12#usize) (width : Std.Usize)
   (height : Std.Usize) :
@@ -550,8 +596,452 @@ def frames.build
   let cells1 ← frames.build_loop0 rows width height cells 0#usize
   ok { width, height, cells := cells1 }
 
+/-- [pxcat_core::frames::POUNCE_B]
+    Source: 'crates/pxcat-core/src/frames.rs', lines 351:0-364:2 -/
+@[global_simps, irreducible]
+def frames.POUNCE_B : Array (Array Std.U8 20#usize) 12#usize :=
+  Array.make 12#usize [
+    Array.make 20#usize [
+      35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 35#u8, 46#u8, 46#u8, 35#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 35#u8, 35#u8, 35#u8, 35#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 35#u8, 35#u8, 101#u8, 35#u8, 35#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8,
+      35#u8, 35#u8, 35#u8, 35#u8, 46#u8, 35#u8, 35#u8, 35#u8, 35#u8, 112#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 35#u8, 35#u8, 115#u8, 35#u8, 35#u8, 115#u8, 35#u8, 35#u8,
+      115#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8,
+      35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 119#u8, 119#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      35#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 119#u8, 119#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 119#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ]
+    ]
+
+/-- [pxcat_core::frames::POUNCE_A]
+    Source: 'crates/pxcat-core/src/frames.rs', lines 335:0-348:2 -/
+@[global_simps, irreducible]
+def frames.POUNCE_A : Array (Array Std.U8 20#usize) 12#usize :=
+  Array.make 12#usize [
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 35#u8, 46#u8, 46#u8, 35#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 35#u8, 35#u8, 35#u8, 35#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 35#u8, 35#u8, 101#u8, 35#u8, 35#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 35#u8, 46#u8, 46#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8,
+      35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 112#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 35#u8, 46#u8, 35#u8, 35#u8, 115#u8, 35#u8, 35#u8, 115#u8, 35#u8,
+      35#u8, 115#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      35#u8, 46#u8, 46#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8,
+      35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 119#u8, 119#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 35#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 35#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 35#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 35#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ]
+    ]
+
+/-- [pxcat_core::frames::ROLL_B]
+    Source: 'crates/pxcat-core/src/frames.rs', lines 319:0-332:2 -/
+@[global_simps, irreducible]
+def frames.ROLL_B : Array (Array Std.U8 20#usize) 12#usize :=
+  Array.make 12#usize [
+    Array.make 20#usize [
+      46#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 35#u8, 46#u8, 35#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 35#u8, 46#u8, 46#u8, 35#u8, 46#u8, 46#u8, 46#u8, 35#u8,
+      46#u8, 46#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8,
+      35#u8, 35#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 35#u8, 35#u8, 35#u8, 35#u8, 119#u8, 119#u8, 119#u8, 119#u8,
+      119#u8, 119#u8, 35#u8, 35#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8
+      ],
+    Array.make 20#usize [
+      35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 119#u8, 119#u8, 119#u8, 119#u8,
+      119#u8, 119#u8, 35#u8, 35#u8, 35#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8,
+      35#u8, 35#u8, 35#u8, 35#u8, 101#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8,
+      35#u8, 35#u8, 35#u8, 112#u8, 35#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 35#u8, 46#u8, 46#u8, 35#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ]
+    ]
+
+/-- [pxcat_core::frames::ROLL_A]
+    Source: 'crates/pxcat-core/src/frames.rs', lines 303:0-316:2 -/
+@[global_simps, irreducible]
+def frames.ROLL_A : Array (Array Std.U8 20#usize) 12#usize :=
+  Array.make 12#usize [
+    Array.make 20#usize [
+      46#u8, 46#u8, 35#u8, 46#u8, 46#u8, 35#u8, 46#u8, 46#u8, 35#u8, 46#u8,
+      46#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 35#u8, 46#u8, 46#u8, 35#u8, 46#u8, 46#u8, 35#u8, 46#u8,
+      46#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8,
+      35#u8, 35#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 35#u8, 35#u8, 35#u8, 35#u8, 119#u8, 119#u8, 119#u8, 119#u8,
+      119#u8, 119#u8, 35#u8, 35#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8
+      ],
+    Array.make 20#usize [
+      35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 119#u8, 119#u8, 119#u8, 119#u8,
+      119#u8, 119#u8, 35#u8, 35#u8, 35#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8,
+      35#u8, 35#u8, 35#u8, 35#u8, 101#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8,
+      35#u8, 35#u8, 35#u8, 112#u8, 35#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 35#u8, 46#u8, 46#u8, 35#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ]
+    ]
+
+/-- [pxcat_core::frames::STRETCH]
+    Source: 'crates/pxcat-core/src/frames.rs', lines 287:0-300:2 -/
+@[global_simps, irreducible]
+def frames.STRETCH : Array (Array Std.U8 20#usize) 12#usize :=
+  Array.make 12#usize [
+    Array.make 20#usize [
+      35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 35#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 115#u8, 35#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8,
+      115#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 35#u8, 35#u8, 35#u8, 46#u8, 46#u8, 46#u8, 35#u8, 35#u8,
+      35#u8, 35#u8, 35#u8, 35#u8, 115#u8, 35#u8, 35#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 35#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 35#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 35#u8, 35#u8, 101#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 35#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 119#u8, 119#u8, 46#u8, 112#u8, 35#u8, 35#u8, 35#u8, 35#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 119#u8, 119#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 119#u8,
+      119#u8, 119#u8, 119#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ]
+    ]
+
+/-- [pxcat_core::frames::LOAF]
+    Source: 'crates/pxcat-core/src/frames.rs', lines 271:0-284:2 -/
+@[global_simps, irreducible]
+def frames.LOAF : Array (Array Std.U8 20#usize) 12#usize :=
+  Array.make 12#usize [
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 35#u8, 46#u8, 46#u8, 35#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 35#u8, 35#u8, 35#u8, 35#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 35#u8, 35#u8, 101#u8, 35#u8, 101#u8, 35#u8, 35#u8, 35#u8,
+      35#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 35#u8, 35#u8, 35#u8, 112#u8, 35#u8, 35#u8, 35#u8, 35#u8,
+      35#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8,
+      35#u8, 35#u8, 115#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      35#u8, 115#u8, 115#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8,
+      35#u8, 35#u8, 115#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 35#u8, 119#u8, 119#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8,
+      35#u8, 115#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ]
+    ]
+
+/-- [pxcat_core::frames::GROOM_B]
+    Source: 'crates/pxcat-core/src/frames.rs', lines 255:0-268:2 -/
+@[global_simps, irreducible]
+def frames.GROOM_B : Array (Array Std.U8 20#usize) 12#usize :=
+  Array.make 12#usize [
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8,
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 35#u8, 46#u8,
+      46#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 35#u8, 35#u8,
+      35#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 35#u8, 35#u8, 35#u8,
+      107#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 35#u8, 35#u8, 35#u8,
+      35#u8, 119#u8, 112#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 35#u8, 35#u8,
+      35#u8, 119#u8, 119#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 35#u8, 35#u8, 35#u8,
+      35#u8, 46#u8, 119#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 35#u8, 35#u8, 35#u8, 35#u8,
+      35#u8, 119#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 35#u8, 35#u8, 35#u8, 115#u8, 35#u8,
+      35#u8, 119#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 35#u8, 35#u8, 35#u8, 35#u8, 46#u8, 35#u8,
+      46#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      35#u8, 46#u8, 46#u8, 46#u8, 35#u8, 35#u8, 35#u8, 35#u8, 46#u8, 35#u8,
+      46#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 46#u8, 119#u8,
+      46#u8, 119#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ]
+    ]
+
+/-- [pxcat_core::frames::GROOM_A]
+    Source: 'crates/pxcat-core/src/frames.rs', lines 239:0-252:2 -/
+@[global_simps, irreducible]
+def frames.GROOM_A : Array (Array Std.U8 20#usize) 12#usize :=
+  Array.make 12#usize [
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 35#u8, 46#u8,
+      46#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 35#u8, 35#u8,
+      35#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 35#u8, 35#u8, 35#u8,
+      107#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 35#u8, 35#u8, 35#u8,
+      35#u8, 35#u8, 112#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 35#u8, 35#u8,
+      35#u8, 119#u8, 119#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 35#u8, 35#u8, 35#u8,
+      35#u8, 46#u8, 119#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 35#u8, 35#u8, 35#u8, 35#u8,
+      35#u8, 46#u8, 119#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8,
+      35#u8, 119#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 35#u8, 35#u8, 35#u8, 115#u8, 35#u8,
+      35#u8, 119#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 46#u8, 46#u8, 46#u8, 35#u8, 35#u8, 35#u8, 35#u8, 46#u8, 35#u8,
+      46#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      35#u8, 46#u8, 46#u8, 46#u8, 35#u8, 35#u8, 35#u8, 35#u8, 46#u8, 35#u8,
+      46#u8, 35#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ],
+    Array.make 20#usize [
+      46#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 35#u8, 46#u8, 119#u8,
+      46#u8, 119#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8, 46#u8
+      ]
+    ]
+
 /-- [pxcat_core::frames::PEEK_BLINK]
-    Source: 'crates/pxcat-core/src/frames.rs', lines 198:0-211:2 -/
+    Source: 'crates/pxcat-core/src/frames.rs', lines 223:0-236:2 -/
 @[global_simps, irreducible]
 def frames.PEEK_BLINK : Array (Array Std.U8 20#usize) 12#usize :=
   Array.make 12#usize [
@@ -606,7 +1096,7 @@ def frames.PEEK_BLINK : Array (Array Std.U8 20#usize) 12#usize :=
     ]
 
 /-- [pxcat_core::frames::PEEK]
-    Source: 'crates/pxcat-core/src/frames.rs', lines 182:0-195:2 -/
+    Source: 'crates/pxcat-core/src/frames.rs', lines 207:0-220:2 -/
 @[global_simps, irreducible]
 def frames.PEEK : Array (Array Std.U8 20#usize) 12#usize :=
   Array.make 12#usize [
@@ -661,7 +1151,7 @@ def frames.PEEK : Array (Array Std.U8 20#usize) 12#usize :=
     ]
 
 /-- [pxcat_core::frames::TAIL_B]
-    Source: 'crates/pxcat-core/src/frames.rs', lines 166:0-179:2 -/
+    Source: 'crates/pxcat-core/src/frames.rs', lines 191:0-204:2 -/
 @[global_simps, irreducible]
 def frames.TAIL_B : Array (Array Std.U8 20#usize) 12#usize :=
   Array.make 12#usize [
@@ -716,7 +1206,7 @@ def frames.TAIL_B : Array (Array Std.U8 20#usize) 12#usize :=
     ]
 
 /-- [pxcat_core::frames::TAIL_A]
-    Source: 'crates/pxcat-core/src/frames.rs', lines 150:0-163:2 -/
+    Source: 'crates/pxcat-core/src/frames.rs', lines 175:0-188:2 -/
 @[global_simps, irreducible]
 def frames.TAIL_A : Array (Array Std.U8 20#usize) 12#usize :=
   Array.make 12#usize [
@@ -771,7 +1261,7 @@ def frames.TAIL_A : Array (Array Std.U8 20#usize) 12#usize :=
     ]
 
 /-- [pxcat_core::frames::SIT_B]
-    Source: 'crates/pxcat-core/src/frames.rs', lines 134:0-147:2 -/
+    Source: 'crates/pxcat-core/src/frames.rs', lines 159:0-172:2 -/
 @[global_simps, irreducible]
 def frames.SIT_B : Array (Array Std.U8 20#usize) 12#usize :=
   Array.make 12#usize [
@@ -826,7 +1316,7 @@ def frames.SIT_B : Array (Array Std.U8 20#usize) 12#usize :=
     ]
 
 /-- [pxcat_core::frames::SIT_A]
-    Source: 'crates/pxcat-core/src/frames.rs', lines 118:0-131:2 -/
+    Source: 'crates/pxcat-core/src/frames.rs', lines 143:0-156:2 -/
 @[global_simps, irreducible]
 def frames.SIT_A : Array (Array Std.U8 20#usize) 12#usize :=
   Array.make 12#usize [
@@ -881,7 +1371,7 @@ def frames.SIT_A : Array (Array Std.U8 20#usize) 12#usize :=
     ]
 
 /-- [pxcat_core::frames::SLEEP]
-    Source: 'crates/pxcat-core/src/frames.rs', lines 102:0-115:2 -/
+    Source: 'crates/pxcat-core/src/frames.rs', lines 127:0-140:2 -/
 @[global_simps, irreducible]
 def frames.SLEEP : Array (Array Std.U8 20#usize) 12#usize :=
   Array.make 12#usize [
@@ -936,7 +1426,7 @@ def frames.SLEEP : Array (Array Std.U8 20#usize) 12#usize :=
     ]
 
 /-- [pxcat_core::frames::RUN_B]
-    Source: 'crates/pxcat-core/src/frames.rs', lines 86:0-99:2 -/
+    Source: 'crates/pxcat-core/src/frames.rs', lines 111:0-124:2 -/
 @[global_simps, irreducible]
 def frames.RUN_B : Array (Array Std.U8 20#usize) 12#usize :=
   Array.make 12#usize [
@@ -991,7 +1481,7 @@ def frames.RUN_B : Array (Array Std.U8 20#usize) 12#usize :=
     ]
 
 /-- [pxcat_core::frames::RUN_A]
-    Source: 'crates/pxcat-core/src/frames.rs', lines 70:0-83:2 -/
+    Source: 'crates/pxcat-core/src/frames.rs', lines 95:0-108:2 -/
 @[global_simps, irreducible]
 def frames.RUN_A : Array (Array Std.U8 20#usize) 12#usize :=
   Array.make 12#usize [
@@ -1046,7 +1536,7 @@ def frames.RUN_A : Array (Array Std.U8 20#usize) 12#usize :=
     ]
 
 /-- [pxcat_core::frames::frame]:
-    Source: 'crates/pxcat-core/src/frames.rs', lines 55:0-67:1
+    Source: 'crates/pxcat-core/src/frames.rs', lines 72:0-92:1
     Visibility: public -/
 def frames.frame («name» : frames.FrameName) : Result sprite.Frame := do
   match «name» with
@@ -1060,6 +1550,14 @@ def frames.frame («name» : frames.FrameName) : Result sprite.Frame := do
   | frames.FrameName.Peek => frames.build frames.PEEK 7#usize 6#usize
   | frames.FrameName.PeekBlink =>
     frames.build frames.PEEK_BLINK 7#usize 6#usize
+  | frames.FrameName.GroomA => frames.build frames.GROOM_A 14#usize 12#usize
+  | frames.FrameName.GroomB => frames.build frames.GROOM_B 14#usize 12#usize
+  | frames.FrameName.Loaf => frames.build frames.LOAF 13#usize 7#usize
+  | frames.FrameName.Stretch => frames.build frames.STRETCH 20#usize 10#usize
+  | frames.FrameName.RollA => frames.build frames.ROLL_A 20#usize 8#usize
+  | frames.FrameName.RollB => frames.build frames.ROLL_B 20#usize 8#usize
+  | frames.FrameName.PounceA => frames.build frames.POUNCE_A 20#usize 8#usize
+  | frames.FrameName.PounceB => frames.build frames.POUNCE_B 20#usize 8#usize
 
 /-- [pxcat_core::sprite::MAX_W]
     Source: 'crates/pxcat-core/src/sprite.rs', lines 6:0-6:28

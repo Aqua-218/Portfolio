@@ -170,3 +170,28 @@ fn 輪郭は塗りの外側1マス() {
         }
     }
 }
+
+#[test]
+fn 輪郭は閉じている() {
+    // Leanでも証明している(proofs/PxCat/Closed.lean)。ここでは足したコマをすぐ確かめる
+    for name in ALL {
+        let out = outline(&frame(name));
+        let at = |x: usize, y: usize| x < out.width && y < out.height && out.get(x, y);
+        for y in 0..out.height {
+            for x in 0..out.width {
+                if !at(x, y) {
+                    continue;
+                }
+                let near = (0..3).any(|dy| {
+                    (0..3).any(|dx| {
+                        (dx, dy) != (1, 1)
+                            && x + dx >= 1
+                            && y + dy >= 1
+                            && at(x + dx - 1, y + dy - 1)
+                    })
+                });
+                assert!(near, "{name:?} ({x}, {y}) の輪郭が離れ小島");
+            }
+        }
+    }
+}

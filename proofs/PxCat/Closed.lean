@@ -18,6 +18,14 @@ def frameData : frames.FrameName → Array (Array Std.U8 20#usize) 12#usize × N
   | .TailB => (frames.TAIL_B, 7, 4)
   | .Peek => (frames.PEEK, 7, 6)
   | .PeekBlink => (frames.PEEK_BLINK, 7, 6)
+  | .GroomA => (frames.GROOM_A, 14, 12)
+  | .GroomB => (frames.GROOM_B, 14, 12)
+  | .Loaf => (frames.LOAF, 13, 7)
+  | .Stretch => (frames.STRETCH, 20, 10)
+  | .RollA => (frames.ROLL_A, 20, 8)
+  | .RollB => (frames.ROLL_B, 20, 8)
+  | .PounceA => (frames.POUNCE_A, 20, 8)
+  | .PounceB => (frames.POUNCE_B, 20, 8)
 
 /-- コマのマス。計算できる形 -/
 def frameCell (n : frames.FrameName) (x y : Nat) : sprite.Cell :=

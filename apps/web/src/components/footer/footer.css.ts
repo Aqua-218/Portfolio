@@ -94,3 +94,8 @@ export const trail = style({
   maxWidth: "60%",
   height: "auto",
 });
+
+/** 遊ぶ猫たち */
+export const play = style({
+  marginTop: "clamp(1.5rem, 4vw, 2.5rem)",
+});

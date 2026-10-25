@@ -60,5 +60,16 @@ fn 寝る三毛() {
 #[test]
 fn 知らない名前は受け取らない() {
     assert!(parse_frame("jump").is_none());
-    assert!(parse_coat("shiro").is_none());
+    assert!(parse_coat("sabi").is_none());
+}
+
+#[test]
+fn 足したコマと毛色も受け取る() {
+    for name in [
+        "groomA", "groomB", "loaf", "stretch", "rollA", "rollB", "pounceA", "pounceB",
+    ] {
+        assert!(parse_frame(name).is_some(), "{name}");
+    }
+    assert!(parse_coat("chatora").is_some());
+    assert!(parse_coat("shiro").is_some());
 }

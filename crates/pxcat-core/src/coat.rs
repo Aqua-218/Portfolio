@@ -1,4 +1,4 @@
-//! 毛色。黒・キジ・三毛で塗り分ける。色はデザインのモック(pxcats.js)から写した。
+//! 毛色。黒・キジ・三毛は、色をデザインのモック(pxcats.js)から写した。茶トラと白は、遊ぶ猫のために足した。
 
 use crate::sprite::Cell;
 
@@ -27,6 +27,10 @@ pub enum Coat {
     Kiji,
     /// 三毛
     Mike,
+    /// 茶トラ
+    Chatora,
+    /// 白猫
+    Shiro,
 }
 
 /// 三毛のぶち。
@@ -95,6 +99,25 @@ pub const fn paint(fur: Coat, cell: Cell, x: usize, y: usize) -> Option<Rgb> {
             Cell::Eye => Some(rgb(0x8f_9e3c)),
             Cell::Nose => Some(rgb(0xe8_a0a0)),
             Cell::Closed => Some(rgb(0x3a_302a)),
+        },
+        Coat::Chatora => match cell {
+            Cell::Empty => None,
+            Cell::Fur => Some(rgb(0xd8_8a45)),
+            Cell::Stripe => Some(rgb(0xa8_5f2a)),
+            Cell::White => Some(rgb(0xf6_efe4)),
+            Cell::Eye => Some(rgb(0x9c_b04a)),
+            Cell::Nose => Some(rgb(0xe3_9a8c)),
+            Cell::Closed => Some(rgb(0x6b_3f1f)),
+        },
+        // 白い毛の中の白(胸や足先)は、少しだけ灰色にして分ける
+        Coat::Shiro => match cell {
+            Cell::Empty => None,
+            Cell::Fur => Some(rgb(0xf4_f1ea)),
+            Cell::Stripe => Some(rgb(0xe2_ddd2)),
+            Cell::White => Some(rgb(0xd9_d4c8)),
+            Cell::Eye => Some(rgb(0x6f_a3d6)),
+            Cell::Nose => Some(rgb(0xec_a5a5)),
+            Cell::Closed => Some(rgb(0x8a_8378)),
         },
     }
 }

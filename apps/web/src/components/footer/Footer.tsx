@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { HiddenCatHint } from "@/components/hidden-cat/HiddenCat";
 import { plan, Trail } from "@/components/paw/Trail";
+import { Playground } from "@/components/play/Playground";
 import * as s from "./footer.css";
 
 const SITEMAP = [
@@ -134,6 +135,7 @@ export function Footer() {
 
   return (
     <>
+      <Playground seed={footerSeed(pathname)} count={3} className={s.play} />
       <FooterTrail pathname={pathname} />
       <nav className={s.sitemap} aria-labelledby="sm-h">
         <h2 className={s.heading} id="sm-h">
