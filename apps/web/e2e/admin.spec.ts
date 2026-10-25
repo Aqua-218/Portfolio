@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync } from "node:fs";
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 
 /** Wasmや大きなモジュールを初めて読み込むのを待つ時間。e2eを並べて走らせると、読み込みが遅くなる */
 const WASM = 15_000;
@@ -511,6 +511,164 @@ tags: [Z1ゼミ]
       "下書きがほかで書き換えられています。一覧へ戻って開き直してください。",
     );
     await expect(page.getByText("変更あり")).toBeVisible();
+  });
+
+  test.describe("公開", () => {
+    const DRAFT = EVENT.replace(
+      "セキュリティ・キャンプ全国大会",
+      "セキュキャン(下書き)",
+    );
+    const repo = "/repos/Aqua-218/Portfolio";
+    const branch = "draft/events/2026-08-10-seccamp.md";
+    const ok = (name: string) => ({
+      name,
+      status: "completed",
+      conclusion: "success",
+    });
+
+    /** 下書きがあり、PRはまだない。PRを作ると#12になる */
+    async function mock(
+      page: Page,
+      opts: { pulls?: unknown[]; checks?: unknown[] } = {},
+    ) {
+      const calls: { method: string; path: string; body: unknown }[] = [];
+      await page.route("**/admin/api?*", (r) => {
+        const req = r.request();
+        const path = new URL(req.url()).searchParams.get("path") ?? "";
+        const body: unknown = req.postData() ? req.postDataJSON() : null;
+        calls.push({ method: req.method(), path, body });
+        if (path.includes(`seccamp.md?ref=${branch}`))
+          return r.fulfill({ json: { content: b64(DRAFT), sha: "d1" } });
+        if (path.startsWith(`${repo}/pulls?`))
+          return r.fulfill({ json: opts.pulls ?? [] });
+        if (req.method() === "POST" && path === `${repo}/pulls`)
+          return r.fulfill({
+            status: 201,
+            json: {
+              number: 12,
+              title: (body as { title: string }).title,
+              html_url: "https://github.com/Aqua-218/Portfolio/pull/12",
+              head: { sha: "h1" },
+            },
+          });
+        if (path.includes("/check-runs"))
+          return r.fulfill({
+            json: { check_runs: opts.checks ?? [ok("build"), ok("vrt")] },
+          });
+        if (req.method() === "PUT" && path.endsWith("/merge"))
+          return r.fulfill({ json: { sha: "m9", merged: true } });
+        if (path.includes("/actions/runs?head_sha=m9"))
+          return r.fulfill({
+            json: { workflow_runs: [{ ...ok("CI"), status: "in_progress" }] },
+          });
+        return r.fallback();
+      });
+      return calls;
+    }
+
+    test("変わるところとタイトルを確かめてPRを作り、チェックが通ったらマージする", async ({
+      page,
+    }) => {
+      const calls = await mock(page);
+      await page.getByRole("button", { name: "2026-08-10-seccamp.md" }).click();
+      const publish = page.getByRole("region", { name: "公開" });
+      await publish
+        .getByRole("button", { name: "この下書きを公開する" })
+        .click();
+
+      const diff = publish.getByRole("list", { name: "変わるところ" });
+      await expect(diff).toContainText(
+        "- title: セキュリティ・キャンプ全国大会",
+      );
+      await expect(diff).toContainText("+ title: セキュキャン(下書き)");
+      const title = publish.getByLabel(/^PRのタイトル/);
+      await expect(title).toHaveValue(
+        "content: イベント「セキュキャン(下書き)」を更新する",
+      );
+      // 種類のないタイトルではPRを作れない
+      await title.fill("セキュキャンを直す");
+      await expect(publish.getByRole("alert")).toHaveText(
+        "「content: 」のように、種類から書いてください。",
+      );
+      await expect(
+        publish.getByRole("button", { name: "PRを作る" }),
+      ).toBeDisabled();
+      await title.fill("content: セキュキャンを直す");
+      await publish.getByRole("button", { name: "PRを作る" }).click();
+
+      await expect(publish).toContainText(
+        "PR #12のチェックがすべて通りました。",
+      );
+      await publish.getByRole("button", { name: "マージして公開する" }).click();
+      await expect(publish.getByRole("status")).toHaveText(
+        "マージしました。mainで走るものを待っています…",
+      );
+      await expect(
+        publish.getByRole("listitem").filter({ hasText: "CI" }),
+      ).toContainText("動いています");
+
+      expect(calls).toContainEqual({
+        method: "POST",
+        path: `${repo}/pulls`,
+        body: {
+          title: "content: セキュキャンを直す",
+          head: branch,
+          base: "main",
+          body: "管理画面から `content/events/2026-08-10-seccamp.md` を変える。",
+        },
+      });
+      expect(calls).toContainEqual({
+        method: "PUT",
+        path: `${repo}/pulls/12/merge`,
+        body: {
+          merge_method: "squash",
+          commit_title: "content: セキュキャンを直す (#12)",
+          sha: "h1",
+        },
+      });
+    });
+
+    test("もうPRがあれば、そのチェックを出す。落ちていればマージさせない", async ({
+      page,
+    }) => {
+      await mock(page, {
+        pulls: [
+          {
+            number: 7,
+            title: "content: 前に作ったPR",
+            html_url: "https://github.com/Aqua-218/Portfolio/pull/7",
+            head: { ref: branch, sha: "h7" },
+          },
+        ],
+        checks: [
+          ok("build"),
+          { name: "vrt", status: "completed", conclusion: "failure" },
+        ],
+      });
+      await page.getByRole("button", { name: "2026-08-10-seccamp.md" }).click();
+      const publish = page.getByRole("region", { name: "公開" });
+      await expect(publish).toContainText(
+        "PR #7のチェックで、落ちたものがあります。PRで理由を見てください。",
+      );
+      await expect(
+        publish.getByRole("listitem").filter({ hasText: "vrt" }),
+      ).toContainText("落ちました");
+      await expect(
+        publish.getByRole("button", { name: "マージして公開する" }),
+      ).toBeDisabled();
+    });
+
+    test("保存していない変更があれば、公開の前に保存させる", async ({
+      page,
+    }) => {
+      await mock(page);
+      await page.getByRole("button", { name: "2026-08-10-seccamp.md" }).click();
+      await page.getByLabel("タイトル").fill("まだ保存していない");
+      await expect(
+        page.getByText("公開するには、先に下書きに保存してください。"),
+      ).toBeVisible();
+      await expect(page.getByRole("region", { name: "公開" })).toHaveCount(0);
+    });
   });
 
   test("写真は開けない(アップロードで扱う)", async ({ page }) => {
