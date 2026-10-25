@@ -6,6 +6,7 @@
 // - Qiitaにも出さない。出した記事は apps/web/.dev/admin.json に置く
 // - 設定は入れたふりだけをする(値は残さず、最後の4字だけ覚える)
 // 管理画面が使うGitHub APIだけを、同じ形で返す。127.0.0.1でしか待たない
+import { execFileSync } from "node:child_process";
 import { createHash, randomBytes } from "node:crypto";
 import {
   mkdirSync,
@@ -239,6 +240,7 @@ async function github(method, full, req) {
       writeFileSync(path.join(root, f), Buffer.from(v, "base64"));
     }
     pull.state = "closed";
+    (store.published ??= []).unshift(new Date().toISOString());
     store.drafts = Object.fromEntries(
       Object.entries(store.drafts).filter(([b]) => b !== pull.head.ref),
     );
@@ -249,15 +251,35 @@ async function github(method, full, req) {
     return [
       200,
       {
-        workflow_runs: [
-          {
-            name: "開発モード(公開はcontent/に書いた)",
-            status: "completed",
-            conclusion: "success",
-          },
-        ],
+        // 公開(マージ)したものを、走ったActionsの代わりにする
+        workflow_runs: (store.published ?? []).map((at) => ({
+          name: "開発モード(公開はcontent/に書いた)",
+          status: "completed",
+          conclusion: "success",
+          created_at: at,
+        })),
       },
     ];
+  // content/を変えたコミット。手元のgitの履歴から
+  if (method === "GET" && p === "commits") {
+    const since = q.get("since") ?? "1970-01-01";
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(since)) return [422, {}];
+    const page = Number(q.get("page") ?? 1);
+    const per = Number(q.get("per_page") ?? 30);
+    const log = execFileSync(
+      "git",
+      ["log", `--since=${since}`, "--format=%H%x09%aI%x09%s", "--", "content"],
+      { cwd: root, encoding: "utf8" },
+    );
+    const list = log
+      .split("\n")
+      .filter(Boolean)
+      .map((line) => {
+        const [sha = "", date = "", message = ""] = line.split("\t");
+        return { sha, html_url: "", commit: { message, author: { date } } };
+      });
+    return [200, list.slice((page - 1) * per, page * per)];
+  }
   return [404, { error: "開発モードでは、まだ使えません" }];
 }
 
