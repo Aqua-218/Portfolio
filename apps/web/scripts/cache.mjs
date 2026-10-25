@@ -2,13 +2,7 @@
 // ビルドでは、使った図とOGPをcontent/.cache/.usedに書き足していく(src/lib/markdown.ts)。
 //   node scripts/cache.mjs start  ビルドの前に.usedを消す
 //   node scripts/cache.mjs prune  ビルドのあとに、.usedにないものを消す
-import {
-  existsSync,
-  readdirSync,
-  readFileSync,
-  rmSync,
-  writeFileSync,
-} from "node:fs";
+import { readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -20,31 +14,42 @@ const dir = fileURLToPath(new URL("../../../content/.cache/", import.meta.url));
  */
 export function prune(cache) {
   const usedFile = path.join(cache, ".used");
-  if (!existsSync(usedFile)) return { mermaid: [], ogp: [] };
-  const used = new Set(
-    readFileSync(usedFile, "utf8").split("\n").filter(Boolean),
-  );
+  let log;
+  try {
+    log = readFileSync(usedFile, "utf8");
+  } catch {
+    return { mermaid: [], ogp: [] };
+  }
+  const used = new Set(log.split("\n").filter(Boolean));
 
   const mermaidDir = path.join(cache, "mermaid");
-  const mermaid = existsSync(mermaidDir)
-    ? readdirSync(mermaidDir).filter(
-        (f) => f.endsWith(".svg") && !used.has(`mermaid ${f.slice(0, -4)}`),
-      )
-    : [];
+  let svgs = [];
+  try {
+    svgs = readdirSync(mermaidDir);
+  } catch {
+    // 図がまだない
+  }
+  const mermaid = svgs.filter(
+    (f) => f.endsWith(".svg") && !used.has(`mermaid ${f.slice(0, -4)}`),
+  );
   for (const f of mermaid) rmSync(path.join(mermaidDir, f));
 
   const ogpFile = path.join(cache, "ogp.json");
-  let ogp = [];
-  if (existsSync(ogpFile)) {
-    const entries = Object.entries(JSON.parse(readFileSync(ogpFile, "utf8")));
-    ogp = entries.map(([url]) => url).filter((url) => !used.has(`ogp ${url}`));
-    if (ogp.length > 0) {
-      const kept = entries.filter(([url]) => used.has(`ogp ${url}`));
-      writeFileSync(
-        ogpFile,
-        `${JSON.stringify(Object.fromEntries(kept), null, 2)}\n`,
-      );
-    }
+  let entries = [];
+  try {
+    entries = Object.entries(JSON.parse(readFileSync(ogpFile, "utf8")));
+  } catch {
+    // OGPがまだない
+  }
+  const ogp = entries
+    .map(([url]) => url)
+    .filter((url) => !used.has(`ogp ${url}`));
+  if (ogp.length > 0) {
+    const kept = entries.filter(([url]) => used.has(`ogp ${url}`));
+    writeFileSync(
+      ogpFile,
+      `${JSON.stringify(Object.fromEntries(kept), null, 2)}\n`,
+    );
   }
   rmSync(usedFile);
   return { mermaid, ogp };
