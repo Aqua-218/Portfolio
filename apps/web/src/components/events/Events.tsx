@@ -1,11 +1,11 @@
 import type { Event } from "@portfolio/content-types";
-import { render } from "@portfolio/markdown";
 import Link from "next/link";
 import * as a from "@/components/about/about.css";
 import { Reveal } from "@/components/reveal/Reveal";
 import * as r from "@/components/rows/rows.css";
 import { groupHeading } from "@/components/section/section.css";
 import { site } from "@/lib/content";
+import { markdown } from "@/lib/markdown";
 import * as s from "./events.css";
 
 /** "2026-08-10" と "2026-08-15" → "8/10–15"。月をまたぐときは "8/31–9/2"。 */
@@ -53,7 +53,7 @@ export async function EventItem({
         <p className={s.venue}>@ {event.venue}</p>
         <div
           className={s.body}
-          dangerouslySetInnerHTML={{ __html: await render(event.body) }}
+          dangerouslySetInnerHTML={{ __html: await markdown(event.body) }}
         />
       </div>
     </Reveal>
