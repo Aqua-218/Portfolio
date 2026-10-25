@@ -1,0 +1,43 @@
+name: Audit
+
+# 依存に知られた脆弱性がないか調べる。コードが変わらなくても新しい脆弱性は見つかるので、毎週も回す
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    # 毎週月曜 9:00(日本時間)
+    - cron: "0 0 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: audit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  npm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@8418fedb1110381a0d3ba51a7a415d7c1b884550 # v5.2.2
+        with:
+          install_args: node pnpm
+      # ロックファイルだけを見るので、インストールはいらない。重大度が高いものがあれば落ちる
+      - run: pnpm audit --audit-level high
+
+  cargo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@8418fedb1110381a0d3ba51a7a415d7c1b884550 # v5.2.2
+        with:
+          install_args: rust github:EmbarkStudios/cargo-deny
+      # 脆弱性・ライセンス・出どころ(deny.toml)
+      - run: cargo deny --locked check
