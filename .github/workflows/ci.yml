@@ -186,6 +186,8 @@ jobs:
         with:
           name: lighthouse
           path: apps/web/.lighthouse/
+          # 名前が.で始まるフォルダなので、これがないと何も残らない
+          include-hidden-files: true
           retention-days: 7
 
   lean:
