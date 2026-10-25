@@ -16,6 +16,7 @@ export const PAGES = {
   stack: { title: "Stack", subtitle: "このサイトの技術の無駄遣い" },
   cats: { title: "Cats", subtitle: "猫たち" },
   license: { title: "License", subtitle: "ライセンス・クレジット" },
+  blog: { title: "Blog", subtitle: "技術ブログ" },
 } as const;
 
 /** OGPの共通の項目。ページでopenGraphを書くと親のものは消えるので、毎回入れる */
