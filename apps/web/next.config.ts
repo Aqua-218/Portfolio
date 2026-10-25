@@ -41,6 +41,10 @@ const dev: NextConfig = {
       { source: "/admin/api/", destination: `${DEV_ADMIN}/admin/api` },
       { source: "/admin/qiita", destination: `${DEV_ADMIN}/admin/qiita` },
       { source: "/admin/qiita/", destination: `${DEV_ADMIN}/admin/qiita` },
+      {
+        source: "/admin/settings",
+        destination: `${DEV_ADMIN}/admin/settings`,
+      },
     ]),
 };
 
