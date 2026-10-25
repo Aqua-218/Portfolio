@@ -162,13 +162,17 @@ export function Curtain() {
       if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)
         return;
       const a = e.target instanceof Element ? e.target.closest("a") : null;
+      // Mermaidの図の中のリンク(SVGのa)もあるので、hrefとtargetは属性から読む
+      const href = a?.getAttribute("href") ?? a?.getAttribute("xlink:href");
+      const target = a?.getAttribute("target");
       if (
         !a ||
-        (a.target && a.target !== "_self") ||
+        !href ||
+        (target && target !== "_self") ||
         a.hasAttribute("download")
       )
         return;
-      const url = new URL(a.href, location.href);
+      const url = new URL(href, location.href);
       if (url.origin !== location.origin) return;
       if (normalize(url.pathname) === normalize(location.pathname)) return;
       // 幕が動いている間は、幕を出さずにそのまま移る(モックと同じ)
