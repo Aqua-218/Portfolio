@@ -48,6 +48,7 @@ fn fixture(name: &str) -> PathBuf {
         "shelf",
         "stack",
         "license",
+        "blog",
     ] {
         let _ = writeln!(cats, "{page} = \"a\"");
     }
