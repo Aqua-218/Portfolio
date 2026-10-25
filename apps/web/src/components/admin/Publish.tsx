@@ -67,12 +67,19 @@ function Checks({ list }: { list: Check[] }) {
 export function Publish({
   path,
   text,
+  diffPath = path,
+  added,
   defaultTitle,
   onMerged,
 }: {
+  /** 下書きのブランチを決めるファイル */
   path: string;
-  /** 下書きに保存してある中身 */
+  /** 下書きに保存してある中身。違いを見せるのに使う */
   text: string;
+  /** 違いを見せるファイル。写真のときはcats.toml */
+  diffPath?: string;
+  /** 違いの代わりに、足すことだけ書くファイル(写真) */
+  added?: string;
   defaultTitle: string;
   onMerged: () => void;
 }) {
@@ -135,7 +142,7 @@ export function Publish({
 
   const start = () => {
     setError(null);
-    readFile(path)
+    readFile(diffPath)
       .then(({ text: before }) => {
         setState({ kind: "confirm", before, title: defaultTitle });
       })
@@ -209,6 +216,14 @@ export function Publish({
       {state.kind === "confirm" && (
         <>
           <h4 className={s.subTitle}>変わるところ</h4>
+          {added !== undefined && (
+            <p className={s.note}>
+              足すファイル: <code>{added}</code>
+            </p>
+          )}
+          <p className={s.note}>
+            <code>{diffPath}</code>
+          </p>
           <ol className={s.diff} aria-label="変わるところ">
             {around(diffLines(state.before, text)).map((l, i) =>
               l === null ? (
