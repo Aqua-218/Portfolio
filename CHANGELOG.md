@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.10.1](https://github.com/Aqua-218/Portfolio/compare/v0.10.0...v0.10.1) (2026-10-25)
+
+
+### 直したこと
+
+* **web:** GETとHEADのほかのメソッドは405とそのページにする ([#289](https://github.com/Aqua-218/Portfolio/issues/289)) ([c8fcf3e](https://github.com/Aqua-218/Portfolio/commit/c8fcf3e9efe642dd191e00829003109741be05cb)), closes [#288](https://github.com/Aqua-218/Portfolio/issues/288)
+* **web:** フッターの足あとをページごとに散らす ([#279](https://github.com/Aqua-218/Portfolio/issues/279)) ([f5e540c](https://github.com/Aqua-218/Portfolio/commit/f5e540cdec2423ee10af86cbb8eec057495dd571)), closes [#278](https://github.com/Aqua-218/Portfolio/issues/278)
+* **web:** 差し色の文字のコントラストを足りるようにする ([#287](https://github.com/Aqua-218/Portfolio/issues/287)) ([2b55b9f](https://github.com/Aqua-218/Portfolio/commit/2b55b9f68efcc9a713700b0c57e141e685a586cb)), closes [#226](https://github.com/Aqua-218/Portfolio/issues/226)
+* **web:** 開発メニューを右下に移す ([#283](https://github.com/Aqua-218/Portfolio/issues/283)) ([46b10d7](https://github.com/Aqua-218/Portfolio/commit/46b10d79b7f83a3df26eb7c98a553009185aaa93)), closes [#282](https://github.com/Aqua-218/Portfolio/issues/282)
+
 ## [0.10.0](https://github.com/Aqua-218/Portfolio/compare/v0.9.0...v0.10.0) (2026-10-25)
 
 
