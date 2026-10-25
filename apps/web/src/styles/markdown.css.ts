@@ -61,3 +61,32 @@ globalStyle(".lc-u", {
   fontSize: "0.75rem",
   color: vars.color.muted,
 });
+
+/** 画像のあるリンクカード。文字を左、画像を右に置く。スマホの幅では画像を上に */
+globalStyle(".lcard-img", {
+  gridTemplateColumns: "minmax(0, 1fr) 9rem",
+  columnGap: "1rem",
+  alignItems: "start",
+  "@media": {
+    "(max-width: 640px)": { gridTemplateColumns: "minmax(0, 1fr)" },
+  },
+});
+
+globalStyle(".lcard-img > span", {
+  gridColumn: 1,
+});
+
+globalStyle(".lc-img", {
+  gridColumn: 2,
+  gridRow: "1 / span 3",
+  alignSelf: "start",
+  width: "100%",
+  height: "auto",
+  aspectRatio: "1.91 / 1",
+  objectFit: "cover",
+  borderRadius: vars.radius.md,
+  background: vars.color.tatami,
+  "@media": {
+    "(max-width: 640px)": { gridColumn: 1, gridRow: 1 },
+  },
+});
