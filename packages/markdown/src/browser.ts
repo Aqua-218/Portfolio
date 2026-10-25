@@ -25,3 +25,5 @@ export function renderPreview(
     flavor,
   );
 }
+
+export { toc, type TocItem } from "./toc";

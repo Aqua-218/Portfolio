@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import * as s from "./admin.css";
 import { contentFiles, drafts } from "./github";
 import { group } from "./groups";
+import { NewPost } from "./NewPost";
 import { Upload } from "./Upload";
 
 type State =
@@ -65,9 +66,42 @@ export function Contents({ onOpen }: { onOpen: (path: string) => void }) {
     .filter((p) => p.startsWith("content/cats/") && p.endsWith(".jpg"))
     .filter((p) => !state.paths.includes(p))
     .sort();
+  /** mainにまだない、書きかけの記事 */
+  const newPosts = [...state.drafts]
+    .filter((p) => p.startsWith("content/blog/") && p.endsWith(".md"))
+    .filter((p) => !state.paths.includes(p))
+    .sort();
   return (
     <section className={s.contents} aria-label="content/ の一覧">
       <Upload ids={photoIds} onOpen={onOpen} />
+      <NewPost
+        taken={new Set([...state.paths, ...state.drafts])}
+        onOpen={onOpen}
+      />
+      {newPosts.length > 0 && (
+        <div>
+          <h3 className={s.groupTitle}>
+            書きかけの新しい記事
+            <span className={s.count}>{newPosts.length}</span>
+          </h3>
+          <ul className={s.list}>
+            {newPosts.map((p) => (
+              <li key={p} title={p}>
+                <button
+                  type="button"
+                  className={s.item}
+                  onClick={() => {
+                    onOpen(p);
+                  }}
+                >
+                  {p.replace(/^content\/blog\//, "")}
+                </button>
+                <span className={s.draft}>下書き</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       {newPhotos.length > 0 && (
         <div>
           <h3 className={s.groupTitle}>

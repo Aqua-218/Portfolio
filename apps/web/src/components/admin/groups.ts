@@ -26,6 +26,7 @@ const FILES: Readonly<Record<string, string>> = {
 
 const KINDS = [
   { key: "events", title: "イベント", dir: "content/events/" },
+  { key: "blog", title: "ブログ", dir: "content/blog/" },
   { key: "pages", title: "ページ", dir: null },
   { key: "cats", title: "猫の写真", dir: "content/cats/" },
   { key: "icons", title: "アイコン", dir: "content/icons/" },

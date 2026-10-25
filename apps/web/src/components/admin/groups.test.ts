@@ -9,6 +9,7 @@ const PATHS = [
   "content/cats/kuro.jpg",
   "content/icons/lean.svg",
   "content/samples/markdown.md",
+  "content/blog/rust-wasm-cat.md",
 ];
 
 describe("group", () => {
@@ -26,6 +27,13 @@ describe("group", () => {
             path: "content/events/2026-08-10-seccamp.md",
             label: "2026-08-10-seccamp.md",
           },
+        ],
+      },
+      {
+        key: "blog",
+        title: "ブログ",
+        items: [
+          { path: "content/blog/rust-wasm-cat.md", label: "rust-wasm-cat.md" },
         ],
       },
       {

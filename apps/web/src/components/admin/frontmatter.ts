@@ -16,21 +16,25 @@ export interface EventDoc {
   body: string;
 }
 
-/** YAMLの1つの値。引用符で囲んであれば外す */
-function scalar(raw: string): string {
+/** YAMLの1つの値。引用符で囲んであれば外し、中のエスケープを戻す */
+export function scalar(raw: string): string {
   const v = raw.trim();
-  if (
-    v.length >= 2 &&
-    (v.startsWith('"') || v.startsWith("'")) &&
-    v.endsWith(v[0] ?? "")
-  ) {
-    return v.slice(1, -1);
+  if (v.length >= 2 && v.startsWith("'") && v.endsWith("'")) {
+    return v.slice(1, -1).replaceAll("''", "'");
+  }
+  if (v.length >= 2 && v.startsWith('"') && v.endsWith('"')) {
+    // quoteはJSONの形で囲む。JSONとして読めなければ、囲みだけ外す
+    try {
+      return JSON.parse(v) as string;
+    } catch {
+      return v.slice(1, -1);
+    }
   }
   return v;
 }
 
 /** [a, b]の形の配列 */
-function list(raw: string): string[] {
+export function list(raw: string): string[] {
   const v = raw.trim();
   if (!v.startsWith("[") || !v.endsWith("]"))
     return v === "" ? [] : [scalar(v)];
@@ -83,7 +87,7 @@ export function parse(src: string): EventDoc | null {
 }
 
 /** YAMLで特別な意味を持つ文字が入っていれば、引用符で囲む */
-function quote(v: string): string {
+export function quote(v: string): string {
   const special =
     // 先頭が記号、途中に「: 」「 #」やカンマ・括弧、前後の空白、空
     /^[\s'"#&*!|>%@`[\]{},-]|: | #|[,[\]{}]|\s$|^$/.test(v) ||
