@@ -12,7 +12,8 @@
     "test": "vitest run",
     "e2e": "playwright test",
     "vrt": "sh vrt/run.sh",
-    "lighthouse": "node scripts/lighthouse.mjs"
+    "lighthouse": "node scripts/lighthouse.mjs",
+    "apache": "sh apache/run.sh"
   },
   "dependencies": {
     "@fontsource/geist": "5.3.0",
