@@ -4,7 +4,7 @@ import { checkFile, type FileProblem } from "@portfolio/content-wasm";
 import { useEffect, useState } from "react";
 import * as s from "./admin.css";
 import { type EventDoc, parse, serialize } from "./frontmatter";
-import { readFile } from "./github";
+import { readLatest, saveDraft } from "./github";
 import { Preview } from "./Preview";
 import { byField, type Field } from "./validate";
 
@@ -23,9 +23,28 @@ function current(state: State): string | null {
   return null;
 }
 
-/** 1つのファイルを編集する。保存は下書きのブランチへ(#86) */
+type Saving =
+  | { kind: "idle" }
+  | { kind: "saving" }
+  | { kind: "saved" }
+  | { kind: "error"; message: string };
+
+/** 保存に失敗したときの文 */
+function saveError(e: unknown): string {
+  const status = e instanceof Error ? e.message : "";
+  if (status === "401")
+    return "ログインが切れました。ログインし直してください。";
+  if (status === "409")
+    return "下書きがほかで書き換えられています。一覧へ戻って開き直してください。";
+  return "保存できませんでした。もう一度押してください。";
+}
+
+/** 1つのファイルを編集する。保存は下書きのブランチへ。mainには書かない */
 export function Editor({ path, onBack }: { path: string; onBack: () => void }) {
   const [state, setState] = useState<State>({ kind: "loading" });
+  /** 下書きのブランチにあるものを開いているか */
+  const [draft, setDraft] = useState(false);
+  const [saving, setSaving] = useState<Saving>({ kind: "idle" });
   /** プレビューを出しているか */
   const [previewing, setPreviewing] = useState(false);
   const slug = path.replace(/^.*\//, "").replace(/\.md$/, "");
@@ -35,9 +54,10 @@ export function Editor({ path, onBack }: { path: string; onBack: () => void }) {
 
   useEffect(() => {
     let alive = true;
-    readFile(path)
-      .then(({ text }) => {
+    readLatest(path)
+      .then(({ text, draft: fromDraft }) => {
         if (!alive) return;
+        setDraft(fromDraft);
         const doc = path.startsWith("content/events/") ? parse(text) : null;
         setState(
           doc
@@ -89,6 +109,25 @@ export function Editor({ path, onBack }: { path: string; onBack: () => void }) {
       </span>
     ));
 
+  const save = () => {
+    if (text === null) return;
+    setSaving({ kind: "saving" });
+    saveDraft(path, text)
+      .then(() => {
+        // 保存したものを、変更の比べる元にする
+        setState((st) =>
+          st.kind === "event" || st.kind === "text"
+            ? { ...st, original: text }
+            : st,
+        );
+        setDraft(true);
+        setSaving({ kind: "saved" });
+      })
+      .catch((e: unknown) => {
+        setSaving({ kind: "error", message: saveError(e) });
+      });
+  };
+
   const back = () => {
     if (dirty && !confirm("保存していない変更があります。一覧へ戻りますか？"))
       return;
@@ -113,8 +152,38 @@ export function Editor({ path, onBack }: { path: string; onBack: () => void }) {
           一覧へ戻る
         </button>
         <code className={s.path}>{path}</code>
+        {draft && <span className={s.draft}>下書き</span>}
         {dirty && <span className={s.dirty}>変更あり</span>}
+        {text !== null && (
+          <button
+            type="button"
+            className={s.save}
+            disabled={!dirty || saving.kind === "saving"}
+            onClick={save}
+          >
+            下書きに保存
+          </button>
+        )}
       </div>
+
+      {saving.kind === "saving" && (
+        <p className={s.note} role="status">
+          保存しています…
+        </p>
+      )}
+      {saving.kind === "saved" && !dirty && (
+        <p className={s.note} role="status">
+          下書きに保存しました。まだ公開していません。
+        </p>
+      )}
+      {saving.kind === "error" && (
+        <p className={s.error} role="alert">
+          {saving.message}
+        </p>
+      )}
+      {draft && saving.kind === "idle" && (
+        <p className={s.note}>下書きを開いています。まだ公開していません。</p>
+      )}
 
       {text !== null && (
         <p className={s.note} aria-live="polite">

@@ -97,6 +97,9 @@ export const list = style({
 });
 
 globalStyle(`${list} li`, {
+  display: "flex",
+  alignItems: "center",
+  gap: "0.5rem",
   padding: "0.5rem 0",
   borderBottom: `1px solid ${vars.color.line}`,
   overflowWrap: "anywhere",
@@ -124,6 +127,33 @@ export const dirty = style({
   fontSize: "0.75rem",
   fontWeight: 700,
 });
+
+/** 下書きがあることの印。「変更あり」と並ぶので、色を変える */
+export const draft = style({
+  padding: "0.15rem 0.5rem",
+  borderRadius: vars.radius.md,
+  border: `1.5px solid ${vars.color.ink}`,
+  color: vars.color.ink,
+  fontFamily: vars.font.jp,
+  fontSize: "0.75rem",
+  fontWeight: 700,
+});
+
+/** 保存のボタン。行の右の端に置く */
+export const save = style([
+  button,
+  {
+    marginLeft: "auto",
+    background: vars.color.ink,
+    color: vars.color.paper,
+    ":hover": {
+      background: vars.color.mike,
+      borderColor: vars.color.mike,
+      color: vars.color.paper,
+    },
+    ":disabled": { opacity: 0.4, cursor: "default" },
+  },
+]);
 
 export const fields = style({
   display: "grid",
@@ -173,7 +203,7 @@ export const code = style({
 });
 
 export const item = style({
-  width: "100%",
+  flex: 1,
   padding: 0,
   border: 0,
   background: "none",

@@ -192,7 +192,8 @@ export function allowed(method: string, path: string, repo: string): boolean {
   if (!["GET", "POST", "PUT", "PATCH"].includes(method)) return false;
   // .. や %、\ など、パスをずらす書き方は通さない
   if (
-    !/^\/[A-Za-z0-9._/-]*(\?[A-Za-z0-9._=&-]*)?$/.test(path) ||
+    // クエリの値には下書きのブランチ(draft/events/x.md)が入るので、/も通す
+    !/^\/[A-Za-z0-9._/-]*(\?[A-Za-z0-9._=&/-]*)?$/.test(path) ||
     path.includes("..")
   ) {
     return false;
@@ -208,6 +209,53 @@ export function allowed(method: string, path: string, repo: string): boolean {
     return false;
   }
   return !(area === "actions" && method !== "GET");
+}
+
+/** 下書きのブランチ。管理画面が書けるのはここだけ */
+const DRAFT = "draft/";
+
+/**
+ * 書き込みの中身まで見て、通してよいか。allowedを通ったものだけに使う。
+ * mainはルールセットで守っている(PRが要り、チェックが通らないとマージできない)が、ここでも下書きのブランチにしか書かせない。
+ * - contents: content/の中だけ、下書きのブランチへ
+ * - git: blob・tree・commitは作ってよい。ブランチを作る・動かすのは下書きだけ
+ * - pulls: 下書きからmainへのPRを作る・閉じる・マージする(マージはチェックが通らないとGitHubが断る)
+ */
+export function writable(
+  method: string,
+  path: string,
+  body: string,
+  repo: string,
+): boolean {
+  if (method === "GET") return true;
+  const rest = path.slice(`/repos/${repo}/`.length).split("?")[0] ?? "";
+  let data: Record<string, unknown>;
+  try {
+    const parsed: unknown = JSON.parse(body);
+    if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed))
+      return false;
+    data = parsed as Record<string, unknown>;
+  } catch {
+    return false;
+  }
+  const draft = (v: unknown, prefix = "") =>
+    typeof v === "string" &&
+    v.startsWith(prefix + DRAFT) &&
+    v.length > (prefix + DRAFT).length;
+
+  if (method === "PUT" && /^contents\/content\/[^?]+$/.test(rest))
+    return draft(data.branch);
+  if (method === "POST" && /^git\/(blobs|trees|commits)$/.test(rest))
+    return true;
+  if (method === "POST" && rest === "git/refs")
+    return draft(data.ref, "refs/heads/");
+  if (method === "PATCH" && rest.startsWith(`git/refs/heads/${DRAFT}`))
+    return rest.length > `git/refs/heads/${DRAFT}`.length;
+  if (method === "POST" && rest === "pulls")
+    return draft(data.head) && data.base === "main";
+  if (method === "PATCH" && /^pulls\/\d+$/.test(rest)) return true;
+  if (method === "PUT" && /^pulls\/\d+\/merge$/.test(rest)) return true;
+  return false;
 }
 
 /**
@@ -377,6 +425,10 @@ export class Admin {
       return json(403, { error: "別のサイトからは操作できません" });
     if (!allowed(req.method, path, this.d.config.repo))
       return json(403, { error: "その操作はできません" });
+    // 書き込みは中身まで見る。セッションやトークンに触る前に断る
+    const body = req.method === "GET" ? null : await req.text();
+    if (!writable(req.method, path, body ?? "", this.d.config.repo))
+      return json(403, { error: "その操作はできません" });
     const set: string[] = [];
     const session =
       (await this.session(req, set)) ?? (await this.resume(req, set));
@@ -388,7 +440,6 @@ export class Admin {
         ...set,
         cookie(SESSION_COOKIE, "", 0, "Lax"),
       ]);
-    const body = req.method === "GET" ? null : await req.text();
     const res = await this.github(req.method, path, token, body);
     const text =
       res.status === 403 || res.status === 404

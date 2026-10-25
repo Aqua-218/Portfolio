@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from "react";
 import * as s from "./admin.css";
-import { contentFiles } from "./github";
+import { contentFiles, drafts } from "./github";
 import { group } from "./groups";
 
 type State =
   | { kind: "loading" }
   | { kind: "error"; message: string }
-  | { kind: "ready"; paths: string[] };
+  /** draftsは、下書きのブランチがあるファイル */
+  | { kind: "ready"; paths: string[]; drafts: Set<string> };
 
 /** content/の一覧。種類ごとに分け、名前で絞り込める */
 /** 文字のファイルだけ開ける。写真はアップロード(#85)で扱う */
@@ -22,9 +23,9 @@ export function Contents({ onOpen }: { onOpen: (path: string) => void }) {
 
   useEffect(() => {
     let alive = true;
-    contentFiles()
-      .then((paths) => {
-        if (alive) setState({ kind: "ready", paths });
+    Promise.all([contentFiles(), drafts()])
+      .then(([paths, draftPaths]) => {
+        if (alive) setState({ kind: "ready", paths, drafts: draftPaths });
       })
       .catch((e: unknown) => {
         if (!alive) return;
@@ -86,6 +87,9 @@ export function Contents({ onOpen }: { onOpen: (path: string) => void }) {
                   </button>
                 ) : (
                   item.label
+                )}
+                {state.drafts.has(item.path) && (
+                  <span className={s.draft}>下書き</span>
                 )}
               </li>
             ))}
