@@ -9,6 +9,7 @@ export { parseOgp, type Fetcher, type Ogp } from "./cards";
 export { toVars } from "./diagrams";
 export { MermaidCache, drawWithChromium, type Drawer } from "./mermaid";
 export { OgpCache, fetchOgp } from "./ogp";
+export { toc, type TocItem } from "./toc";
 
 export interface RenderOptions {
   /** リンクカードのOGPのキャッシュ。なければリンクカードにしない */
