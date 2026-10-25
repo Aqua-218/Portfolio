@@ -6,7 +6,7 @@
     "content": "cd ../.. && cargo run -q -p content --bin content-check -- content --out apps/web/.content/site.json",
     "images": "cd ../.. && cargo run -q -p imgpipe -- content/cats apps/web/public/img/cats --url-prefix /img/cats --manifest apps/web/.content/images.json",
     "icons": "rm -rf public/icons && cp -r ../../content/icons public/icons",
-    "dev": "pnpm run content && pnpm run images && pnpm run icons && next dev",
+    "dev": "pnpm run content && pnpm run images && pnpm run icons && node scripts/dev.mjs",
     "build": "pnpm run content && pnpm run images && pnpm run icons && node scripts/cache.mjs start && next build && node scripts/cache.mjs prune && node scripts/fonts.mjs && node scripts/headers.mjs",
     "typecheck": "pnpm run content && next typegen && tsc --noEmit",
     "test": "vitest run",

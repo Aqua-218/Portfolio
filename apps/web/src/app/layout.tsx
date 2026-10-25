@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import type { ReactNode } from "react";
 import { Curtain } from "@/components/curtain/Curtain";
 import { CardImages } from "@/components/markdown/CardImages";
@@ -12,6 +13,14 @@ import "@/styles/code.css";
 import "@/styles/markdown.css";
 import "@/styles/global.css";
 import { wrap } from "@/styles/layout.css";
+
+/**
+ * 開発メニュー。pnpm devのときだけ読み込む。本番のビルドではこの分かれ道ごと消え、中身は入らない
+ */
+const DevMenu =
+  process.env.NODE_ENV === "development"
+    ? dynamic(() => import("@/components/dev/DevMenu").then((m) => m.DevMenu))
+    : () => null;
 
 // フォントは、ビルドではscripts/fonts.mjsがページに書き込む。開発中はFontsourceのものを読む
 if (process.env.NODE_ENV === "development") {
@@ -51,6 +60,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <CardImages />
         <Diagrams />
         <Embeds />
+        <DevMenu />
       </body>
     </html>
   );

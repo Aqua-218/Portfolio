@@ -38,3 +38,5 @@ specs/states/
 *.swp
 .vscode/
 .idea/
+# 開発モードの管理画面の下書きなど(scripts/dev-admin.mjs)
+apps/web/.dev/
