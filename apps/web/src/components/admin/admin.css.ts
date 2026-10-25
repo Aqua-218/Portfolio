@@ -383,3 +383,124 @@ export const coats = style({
   fontFamily: vars.font.jp,
   fontSize: "0.875rem",
 });
+
+// ---- ダッシュボード ----
+
+export const dashboard = style({
+  display: "grid",
+  gap: "1rem",
+});
+
+/** よく使う操作 */
+export const actions = style({
+  display: "flex",
+  flexWrap: "wrap",
+  gap: "0.5rem",
+});
+
+/** よく使う操作のうち、いちばん使うもの。保存のボタンと同じ色で、左に寄せる */
+export const primary = style([save, { marginLeft: 0 }]);
+
+/** カードを、広さに合わせて並べる。狭ければ1列 */
+export const cards = style({
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 17rem), 1fr))",
+  gap: "1rem",
+});
+
+export const card = style({
+  display: "grid",
+  alignContent: "start",
+  gap: "0.6rem",
+  minWidth: 0,
+  padding: "1rem 1.1rem",
+  border: `1px solid ${vars.color.line}`,
+  borderRadius: vars.radius.md,
+  background: vars.color.paper,
+});
+
+export const cardTitle = style({
+  display: "flex",
+  alignItems: "baseline",
+  justifyContent: "space-between",
+  margin: 0,
+  fontFamily: vars.font.jp,
+  fontSize: "0.875rem",
+  fontWeight: 700,
+});
+
+export const cardCount = style({
+  fontSize: "1.5rem",
+  fontWeight: 800,
+  lineHeight: 1,
+});
+
+export const cardList = style({
+  listStyle: "none",
+  margin: 0,
+  padding: 0,
+  display: "grid",
+  gap: "0.4rem",
+  fontFamily: vars.font.jp,
+  fontSize: "0.8125rem",
+});
+
+globalStyle(`${cardList} li`, {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  gap: "0.5rem",
+  minWidth: 0,
+});
+
+globalStyle(`${cardList} li > button`, {
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap",
+});
+
+export const cardText = style({
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap",
+});
+
+export const badge = style({
+  flexShrink: 0,
+  padding: "0.1rem 0.5rem",
+  border: `1px solid ${vars.color.line}`,
+  borderRadius: vars.radius.round,
+  color: vars.color.muted,
+  fontSize: "0.75rem",
+  whiteSpace: "nowrap",
+});
+
+export const badgePassed = style([
+  badge,
+  { borderColor: vars.color.leaf, color: vars.color.leaf },
+]);
+
+export const badgeFailed = style([
+  badge,
+  { borderColor: vars.color.mike, color: vars.color.mike, fontWeight: 700 },
+]);
+
+/** 種類ごとの数 */
+export const tally = style({
+  listStyle: "none",
+  margin: 0,
+  padding: 0,
+  display: "flex",
+  flexWrap: "wrap",
+  gap: "0.5rem 1rem",
+  fontFamily: vars.font.jp,
+  fontSize: "0.8125rem",
+  color: vars.color.muted,
+});
+
+export const tallyNumber = style({
+  marginRight: "0.3rem",
+  color: vars.color.ink,
+  fontSize: "1.125rem",
+  fontWeight: 800,
+});

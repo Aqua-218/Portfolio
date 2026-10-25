@@ -31,6 +31,8 @@ export interface SectionProps {
   more?: string;
   /** 各ページのいちばん上のセクション */
   page?: boolean;
+  /** 見出しを上に置き、中身を横いっぱいに使う(管理画面) */
+  wide?: boolean;
   children: ReactNode;
 }
 
@@ -42,14 +44,15 @@ export function Section({
   subtitle,
   more,
   page,
+  wide,
   children,
 }: SectionProps) {
   const photo = site().cats.sections[name];
   return (
     <InViewSection
-      className={
-        page ? `${s.sec} ${s.page}` : more ? `${s.sec} ${s.home}` : s.sec
-      }
+      className={[s.sec, page ? s.page : more ? s.home : "", wide ? s.wide : ""]
+        .filter(Boolean)
+        .join(" ")}
       inClass={s.inView}
       aria-labelledby={id}
     >

@@ -12,7 +12,14 @@ export const metadata: Metadata = {
 /** 管理画面。content/をブラウザから編集して、GitHubにコミットする */
 export default function Admin() {
   return (
-    <Section name="admin" id="p-admin" title="Admin" subtitle="管理画面" page>
+    <Section
+      name="admin"
+      id="p-admin"
+      title="Admin"
+      subtitle="管理画面"
+      page
+      wide
+    >
       <Lead>content/ をここから編集して、GitHub にコミットします。</Lead>
       <Login />
     </Section>

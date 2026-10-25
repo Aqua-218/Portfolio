@@ -751,7 +751,7 @@ test.describe("写真を足す", () => {
       return r.fulfill({ status: 404 });
     });
     await page.goto("/admin/");
-    await page.getByText("写真を足す").click();
+    await page.locator("summary", { hasText: "写真を足す" }).click();
 
     const gps = withGps();
     expect(metadata(gps)).toContain("Exif");
@@ -910,7 +910,7 @@ test.describe("写真を足す", () => {
       }),
     );
     await page.goto("/admin/");
-    await page.getByText("写真を足す").click();
+    await page.locator("summary", { hasText: "写真を足す" }).click();
     await page.getByLabel("写真を選ぶ").setInputFiles({
       name: "a.jpg",
       mimeType: "image/jpeg",
@@ -1039,7 +1039,7 @@ ignorePublish: false
       page.getByText("その名前の記事はもうあります。"),
     ).toBeVisible();
     await name.fill("new-cat");
-    await page.getByRole("button", { name: "新しい記事を書く" }).click();
+    await page.getByRole("button", { name: "書き始める" }).click();
     const editor = page.getByRole("region", {
       name: "content/blog/new-cat.md の編集",
     });
@@ -1063,7 +1063,7 @@ ignorePublish: false
     await expect(
       page.getByText("Qiitaに新しく投稿します(公開)。"),
     ).toBeVisible();
-    expect(qiita.map((c) => c.method)).toEqual(["GET"]);
+    expect(qiita.filter((c) => c.method !== "GET")).toEqual([]);
     await page.getByRole("button", { name: "投稿する" }).click();
     await expect(
       page.getByText("idと日時を下書きに書き戻しました。", { exact: false }),
@@ -1206,5 +1206,126 @@ test.describe("設定", () => {
     await expect(
       page.getByRole("region", { name: "設定" }).getByRole("alert"),
     ).toHaveText("Qiitaがこのトークンを受けつけません。");
+  });
+});
+
+test.describe("ダッシュボード", () => {
+  const b64 = (t: string) => Buffer.from(t, "utf8").toString("base64");
+  const ID = "0123456789abcdef0123";
+
+  test("下書き・公開待ち・最近の公開・ブログのQiitaへの出し具合・中身の数を出す", async ({
+    page,
+  }) => {
+    await page.route("**/admin/auth/me", (r) =>
+      r.fulfill({ status: 200, json: { login: "neko" } }),
+    );
+    await page.route("**/admin/api?*", (r) => {
+      const path = new URL(r.request().url()).searchParams.get("path") ?? "";
+      if (path.includes("/git/matching-refs/"))
+        return r.fulfill({
+          json: [{ ref: "refs/heads/draft/events/2026-08-10-seccamp.md" }],
+        });
+      if (path.includes("/git/trees/"))
+        return r.fulfill({
+          json: {
+            tree: [
+              { path: "content/events/2026-08-10-seccamp.md", type: "blob" },
+              { path: "content/blog/cat.md", type: "blob" },
+              { path: "content/profile.toml", type: "blob" },
+            ],
+          },
+        });
+      if (path.includes("/pulls?"))
+        return r.fulfill({
+          json: [
+            {
+              number: 7,
+              title: "content: イベント「セキュキャン」を更新する",
+              html_url: "https://github.com/x/pull/7",
+              head: {
+                ref: "draft/events/2026-08-10-seccamp.md",
+                sha: "p7",
+              },
+            },
+          ],
+        });
+      if (path.includes("/commits/p7/check-runs"))
+        return r.fulfill({
+          json: {
+            check_runs: [
+              { name: "build", status: "completed", conclusion: "failure" },
+            ],
+          },
+        });
+      if (path.includes("/actions/runs?branch=main"))
+        return r.fulfill({
+          json: {
+            workflow_runs: [
+              {
+                name: "deploy",
+                display_title: "公開",
+                status: "completed",
+                conclusion: "success",
+                created_at: "2026-10-25T05:00:00Z",
+              },
+            ],
+          },
+        });
+      if (path.includes("blog/cat.md?ref=main"))
+        return r.fulfill({
+          json: {
+            content: b64(
+              `---\ntitle: 猫\ntags:\n  - Rust\nprivate: false\nupdated_at: '2026-10-01T00:00:00+09:00'\nid: ${ID}\norganization_url_name: null\nslide: false\nignorePublish: false\n---\n本文\n`,
+            ),
+            sha: "c1",
+          },
+        });
+      return r.fulfill({ status: 404 });
+    });
+    await page.route("**/admin/qiita?*", (r) =>
+      r.fulfill({
+        json: [{ id: ID, updated_at: "2026-10-05T00:00:00+09:00" }],
+      }),
+    );
+    await page.goto("/admin/");
+
+    const drafts = page.getByRole("region", { name: "下書き" });
+    await expect(drafts.getByRole("heading")).toContainText("1");
+    await drafts
+      .getByRole("button", { name: "events/2026-08-10-seccamp.md" })
+      .isVisible();
+    const pulls = page.getByRole("region", { name: "公開待ち" });
+    await expect(
+      pulls.getByRole("button", {
+        name: "content: イベント「セキュキャン」を更新する",
+      }),
+    ).toBeVisible();
+    await expect(pulls.getByText("落ちました")).toBeVisible();
+    const runs = page.getByRole("region", { name: "最近の公開" });
+    await expect(runs.getByText("deploy")).toBeVisible();
+    await expect(runs.getByText("通りました")).toBeVisible();
+    const blog = page.getByRole("region", { name: "ブログとQiita" });
+    await expect(blog.getByText("Qiitaのほうが新しい")).toBeVisible();
+    await expect(
+      blog.getByText("「猫」はQiitaのほうが新しく直されています。"),
+    ).toBeVisible();
+    const content = page.getByRole("region", { name: "中身" });
+    await expect(content.getByRole("heading")).toContainText("3");
+
+    // 「新しい記事を書く」で、記事のファイル名の欄へ
+    await page.getByRole("button", { name: "新しい記事を書く" }).click();
+    await expect(page.getByLabel(/^新しい記事のファイル名/)).toBeFocused();
+    // 「写真を足す」で、写真の入口を開く
+    await page.getByRole("button", { name: "写真を足す" }).click();
+    await expect(page.locator("#admin-upload")).toHaveAttribute("open", "");
+    // 下書きを押すと開く
+    await drafts
+      .getByRole("button", { name: "events/2026-08-10-seccamp.md" })
+      .click();
+    await expect(
+      page.getByRole("region", {
+        name: "content/events/2026-08-10-seccamp.md の編集",
+      }),
+    ).toBeVisible();
   });
 });

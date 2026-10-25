@@ -38,6 +38,7 @@ export function NewPost({
       <label className={s.field}>
         新しい記事のファイル名(URLになる。例: rust-wasm-cat)
         <input
+          id="admin-new-post"
           className={s.input}
           value={slug}
           spellCheck={false}
@@ -56,7 +57,7 @@ export function NewPost({
         className={s.button}
         disabled={slug === "" || problem !== ""}
       >
-        新しい記事を書く
+        書き始める
       </button>
     </form>
   );
