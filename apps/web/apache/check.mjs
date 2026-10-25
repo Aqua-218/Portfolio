@@ -87,6 +87,7 @@ test("ファイルの種類と、名前にハッシュの入るものの長い�
     ["/opengraph-image", /^image\/png$/, "no-cache"],
     ["/favicon.ico", /^image\/(x-icon|vnd\.microsoft\.icon)$/, "no-cache"],
     ["/icon.svg", /^image\/svg\+xml/, "no-cache"],
+    ["/blog/feed.xml", /^application\/atom\+xml/, "no-cache"],
   ];
   for (const [path, type, cache] of cases) {
     const res = await get(path);
