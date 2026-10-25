@@ -43,8 +43,15 @@ function imageOrigins(html) {
   );
 }
 
+/** 埋め込み(ブログの記事のYouTube・Xなど)のiframeの出どころ */
+function frameOrigins(html) {
+  return [
+    ...html.matchAll(/<iframe[^>]*\bsrc="(https:\/\/[a-z0-9.-]+)[/"]/g),
+  ].map(([, origin = ""]) => origin);
+}
+
 /** ページのCSP。管理画面だけ、ログインのフォームがGitHubへ移る */
-export function csp({ hashes, styles, images, admin }) {
+export function csp({ hashes, styles, images, frames = [], admin }) {
   return [
     "default-src 'none'",
     // ドット猫と検証はWebAssemblyなので、Wasmの読み込みだけ許す(evalは許さない)
@@ -58,7 +65,10 @@ export function csp({ hashes, styles, images, admin }) {
     "connect-src 'self'",
     admin ? "form-action 'self' https://github.com" : "form-action 'self'",
     "frame-ancestors 'none'",
-    "frame-src 'none'",
+    // 枠は、記事の埋め込みで使う出どころだけ。なければ何も読まない
+    frames.length > 0
+      ? `frame-src ${[...new Set(frames)].sort().join(" ")}`
+      : "frame-src 'none'",
     "base-uri 'none'",
     "object-src 'none'",
     "manifest-src 'self'",
@@ -170,10 +180,11 @@ const dirs = pageDirs(out).map((dir) => ({
 }));
 
 // ページの中で移ると(幕のあとのrouter.push)、ドキュメントは最初のページのまま、CSPも最初のページのものが効く。
-// 移った先の図の<style>や、リンクカードの画像が止められないよう、この2つはサイト全体の分を全ページに入れる。
+// 移った先の図の<style>や、リンクカードの画像、埋め込みの枠が止められないよう、この3つはサイト全体の分を全ページに入れる。
 // インラインのスクリプトは、ページの中で移っても動かさないので、ページごとでいい
 const styles = dirs.flatMap((d) => d.htmls.flatMap(styleHashes));
 const images = dirs.flatMap((d) => d.htmls.flatMap(imageOrigins));
+const frames = dirs.flatMap((d) => d.htmls.flatMap(frameOrigins));
 
 for (const { dir, htmls } of dirs) {
   const admin = path.relative(out, dir).split(path.sep)[0] === "admin";
@@ -181,6 +192,7 @@ for (const { dir, htmls } of dirs) {
     hashes: htmls.flatMap(scriptHashes),
     styles,
     images,
+    frames,
     admin,
   });
   writeFileSync(
