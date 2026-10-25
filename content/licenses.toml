@@ -105,13 +105,13 @@ text = "line-seed-jp"
 group = "site"
 name = "猫の写真"
 license = "© 2026 Keiya Komine. All Rights Reserved."
-note = "サイト内の写真は、すべて本人が用意した猫の写真です。無断転載禁止(非商用も含みます)。"
+note = "トップのモザイクを含め、サイト内の写真は、すべて本人が用意した猫の写真です。無断転載禁止(非商用も含みます)。"
 
 [[license]]
 group = "site"
 name = "ドット絵の猫・デザイン・文章"
 license = "© 2026 Keiya Komine. All Rights Reserved."
-note = "このサイトのために作ったオリジナルです。無断転載禁止(非商用も含みます)。"
+note = "ロゴや見出しの横の猫、幕を走る黒猫、足あと、隠れている猫など、ドット絵の猫はこのサイトのために作ったオリジナルです。デザイン・文章も同じです。無断転載禁止(非商用も含みます)。"
 
 [[license]]
 group = "others"
