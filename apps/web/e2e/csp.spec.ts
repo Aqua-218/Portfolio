@@ -14,6 +14,9 @@ const PAGES = [
   "/cats/",
   "/license/",
   "/markdown/",
+  "/blog/",
+  // 埋め込み(YouTube・X)のある記事
+  "/blog/sample/",
   "/errors/500/",
   "/nai/",
 ];
@@ -30,6 +33,11 @@ for (const path of PAGES) {
     page.on("pageerror", (e) => {
       problems.push(e.message);
     });
+    // 外のサイト(埋め込み・リンクカードの画像)は読まない。CSPで止められるなら、読みに行く前に違反が出る
+    await page.route(
+      (url) => url.hostname !== "localhost",
+      (route) => route.abort(),
+    );
     const res = await page.goto(path);
     const h = res?.headers() ?? {};
     expect(h["content-security-policy"]).toMatch(
