@@ -76,8 +76,3 @@ export async function body(post: Pick<Post, "body">) {
   const html = await qiitaMarkdown(post.body);
   return { html, toc: toc(html) };
 }
-
-/** Qiitaの記事のURL。Qiitaが記事の持ち主のURLへ移してくれる */
-export function qiitaUrl(id: string): string {
-  return `https://qiita.com/items/${id}`;
-}
