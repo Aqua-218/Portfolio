@@ -244,7 +244,7 @@ describe("ログイン", () => {
       /__Host-admin=[^;]+; Max-Age=\d+; Path=\/; Secure; HttpOnly; SameSite=Lax/,
     );
     expect(set).not.toContain(DEVICE_COOKIE + "=");
-    expect(set + (await r.text())).not.toContain("ghu_");
+    expect(set + (await r.text())).not.toContain("ghu_access1");
   });
 
   it("KVのセッションは暗号化してあり、トークンが平文で入らない", async () => {
@@ -423,7 +423,9 @@ describe("この端末で覚える", () => {
     ])
       expect(c).toContain(part);
     expect(c).not.toContain("Domain");
-    expect(c).not.toContain("gh");
+    // 値はランダムなので、たまたま「gh」を含むことはある。トークンそのものが入っていないかを見る
+    expect(c).not.toContain("ghu_access1");
+    expect(c).not.toContain("ghr_refresh1");
   });
 
   it("セッションが切れても、覚えた端末なら入り直し、Cookieの値を新しくする", async () => {
