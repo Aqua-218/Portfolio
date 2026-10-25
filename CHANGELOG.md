@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.9.0](https://github.com/Aqua-218/Portfolio/compare/v0.8.0...v0.9.0) (2026-10-25)
+
+
+### 新しいこと
+
+* **admin:** Qiitaの記事を選んで取り込む ([#265](https://github.com/Aqua-218/Portfolio/issues/265)) ([40e1fa5](https://github.com/Aqua-218/Portfolio/commit/40e1fa58368b79c28fdb754302c5296e8c4dc7bc)), closes [#246](https://github.com/Aqua-218/Portfolio/issues/246)
+* **admin:** WorkerからQiitaへ中継する ([#257](https://github.com/Aqua-218/Portfolio/issues/257)) ([948a800](https://github.com/Aqua-218/Portfolio/commit/948a800a75882cd7bbbc7ccba30553b8135ebbdb))
+* **admin:** Workerの設定を管理画面から入れ替える ([#263](https://github.com/Aqua-218/Portfolio/issues/263)) ([29dd335](https://github.com/Aqua-218/Portfolio/commit/29dd3357b13c33fbaf2327475b1f9491cea4c419)), closes [#262](https://github.com/Aqua-218/Portfolio/issues/262)
+* **admin:** 管理画面からブログを書いてQiitaに出す ([#260](https://github.com/Aqua-218/Portfolio/issues/260)) ([7b9b665](https://github.com/Aqua-218/Portfolio/commit/7b9b665362d6b428592baf119a9871740997e919)), closes [#245](https://github.com/Aqua-218/Portfolio/issues/245)
+* **admin:** 管理画面のトップをダッシュボードにする ([#264](https://github.com/Aqua-218/Portfolio/issues/264)) ([101cb3e](https://github.com/Aqua-218/Portfolio/commit/101cb3e04803696d904a33d669e735c619ff6ff0)), closes [#261](https://github.com/Aqua-218/Portfolio/issues/261)
+* **admin:** 管理画面をダッシュボードらしい作りにする ([#267](https://github.com/Aqua-218/Portfolio/issues/267)) ([6236bf6](https://github.com/Aqua-218/Portfolio/commit/6236bf62453ca30d7e6b2286c96d333ffcf91814)), closes [#266](https://github.com/Aqua-218/Portfolio/issues/266)
+* **ci:** 公開したらQiitaに投稿・更新する ([#256](https://github.com/Aqua-218/Portfolio/issues/256)) ([142bc2b](https://github.com/Aqua-218/Portfolio/commit/142bc2b04970f7c8d38633a44177c072ce5d46f4)), closes [#244](https://github.com/Aqua-218/Portfolio/issues/244)
+* **content:** ブログの記事をQiita CLIと同じ形で置く ([#247](https://github.com/Aqua-218/Portfolio/issues/247)) ([cbc655b](https://github.com/Aqua-218/Portfolio/commit/cbc655bb535719720b28a75393e70cd53318b27b)), closes [#239](https://github.com/Aqua-218/Portfolio/issues/239)
+* **markdown:** Qiitaの埋め込みを出す ([#250](https://github.com/Aqua-218/Portfolio/issues/250)) ([78f29f4](https://github.com/Aqua-218/Portfolio/commit/78f29f466ea19d088c3ea8e88953447bb2808c89)), closes [#241](https://github.com/Aqua-218/Portfolio/issues/241)
+* **markdown:** Qiitaの記法をそのまま描く ([#248](https://github.com/Aqua-218/Portfolio/issues/248)) ([14ecad9](https://github.com/Aqua-218/Portfolio/commit/14ecad9bf61628e2a1b932ef454b65943da99a1b)), closes [#240](https://github.com/Aqua-218/Portfolio/issues/240)
+* **web:** pnpm devのときだけの開発モード ([#255](https://github.com/Aqua-218/Portfolio/issues/255)) ([308878a](https://github.com/Aqua-218/Portfolio/commit/308878a966c79dc7b04a08d64e23f322d1d74cb1)), closes [#251](https://github.com/Aqua-218/Portfolio/issues/251)
+* **web:** ブログのフィードを出す ([#259](https://github.com/Aqua-218/Portfolio/issues/259)) ([c10a6ff](https://github.com/Aqua-218/Portfolio/commit/c10a6fff5048eb95ff7f41d7f5b6f8f22056d6f6)), closes [#243](https://github.com/Aqua-218/Portfolio/issues/243)
+* **web:** ブログの一覧と記事のページ ([#252](https://github.com/Aqua-218/Portfolio/issues/252)) ([f8ceee3](https://github.com/Aqua-218/Portfolio/commit/f8ceee3d45e7c25bbe9b6f294907c73d9d0d96c1)), closes [#242](https://github.com/Aqua-218/Portfolio/issues/242)
+
+
+### 直したこと
+
+* **web:** フォントに入れる字がビルドごとに変わるのを直す ([#254](https://github.com/Aqua-218/Portfolio/issues/254)) ([66a09c2](https://github.com/Aqua-218/Portfolio/commit/66a09c297af94ef088da915dcdd6c57e897c448c))
+* **web:** 見た目テストで外のサイトを読まず、記事のページの高さを揺らさない ([#268](https://github.com/Aqua-218/Portfolio/issues/268)) ([c32340c](https://github.com/Aqua-218/Portfolio/commit/c32340cb6826e14c3505da61b811e3e87d909b4c))
+
 ## [0.8.0](https://github.com/Aqua-218/Portfolio/compare/v0.7.0...v0.8.0) (2026-10-25)
 
 
