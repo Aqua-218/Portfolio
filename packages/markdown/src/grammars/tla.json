@@ -1,0 +1,72 @@
+{
+  "name": "tla",
+  "displayName": "TLA+",
+  "scopeName": "source.tla",
+  "aliases": ["tlaplus", "pluscal"],
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#strings" },
+    { "include": "#modules" },
+    { "include": "#definitions" },
+    { "include": "#keywords" },
+    { "include": "#constants" },
+    { "include": "#numbers" },
+    { "include": "#operators" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        { "name": "comment.line.tla", "match": "\\\\\\*.*$" },
+        {
+          "name": "comment.block.tla",
+          "begin": "\\(\\*",
+          "end": "\\*\\)",
+          "patterns": [{ "include": "#comments" }]
+        }
+      ]
+    },
+    "strings": {
+      "name": "string.quoted.double.tla",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        { "name": "constant.character.escape.tla", "match": "\\\\." }
+      ]
+    },
+    "modules": {
+      "match": "^\\s*-{4,}\\s*(MODULE)\\s+(\\w+)\\s*-{4,}",
+      "captures": {
+        "1": { "name": "keyword.other.module.tla" },
+        "2": { "name": "entity.name.type.module.tla" }
+      }
+    },
+    "definitions": {
+      "match": "^\\s*(\\w+)(?=\\s*(\\([^)]*\\))?\\s*==)",
+      "captures": { "1": { "name": "entity.name.function.tla" } }
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.tla",
+          "match": "\\b(EXTENDS|CONSTANTS?|VARIABLES?|ASSUME|THEOREM|LEMMA|PROOF|BY|QED|LET|IN|IF|THEN|ELSE|CASE|OTHER|EXCEPT|CHOOSE|UNION|SUBSET|DOMAIN|ENABLED|UNCHANGED|INSTANCE|WITH|LOCAL|RECURSIVE)\\b"
+        },
+        {
+          "name": "keyword.control.pluscal.tla",
+          "match": "\\b(algorithm|process|procedure|variables?|begin|end|while|do|if|then|else|elsif|either|or|await|when|with|goto|skip|return|call|macro|define|fair)\\b"
+        }
+      ]
+    },
+    "constants": {
+      "name": "constant.language.tla",
+      "match": "\\b(TRUE|FALSE|BOOLEAN|Nat|Int|STRING)\\b"
+    },
+    "numbers": {
+      "name": "constant.numeric.tla",
+      "match": "\\b\\d+\\b"
+    },
+    "operators": {
+      "name": "keyword.operator.tla",
+      "match": "/\\\\|\\\\/|=>|<=>|==|:=|\\\\in|\\\\notin|\\\\A|\\\\E|\\\\cup|\\\\cap|\\\\subseteq|\\|->|->|~|'|#|\\.\\.|<<|>>"
+    }
+  }
+}

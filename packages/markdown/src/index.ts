@@ -5,21 +5,35 @@ import remarkGfm from "remark-gfm";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
+import { getHighlighter, rehypeShikiFromHighlighter } from "./highlight";
 
 /**
  * MarkdownをHTMLにする。本番のページと管理画面のプレビューで同じものを使う。
  * 生のHTMLは通さない(書いても文字として出る)。
  */
-const processor = unified()
-  .use(remarkParse)
-  .use(remarkGfm)
-  .use(remarkRehype)
-  // 見出しにidをつけ、見出しそのものをそのidへのリンクにする
-  .use(rehypeSlug)
-  .use(rehypeAutolinkHeadings, { behavior: "wrap" })
-  .use(rehypeStringify);
+async function processor() {
+  const highlighter = await getHighlighter();
+  return (
+    unified()
+      .use(remarkParse)
+      .use(remarkGfm)
+      .use(remarkRehype)
+      // 見出しにidをつけ、見出しそのものをそのidへのリンクにする
+      .use(rehypeSlug)
+      .use(rehypeAutolinkHeadings, { behavior: "wrap" })
+      // コードに猫のテーマで色をつける。知らない言語は色なし
+      .use(rehypeShikiFromHighlighter, highlighter, {
+        theme: "cat",
+        fallbackLanguage: "text",
+      })
+      .use(rehypeStringify)
+  );
+}
 
-/** MarkdownをHTMLの文字列にする。Shikiなど時間のかかる処理も入るので、非同期にしておく */
+let cached: ReturnType<typeof processor> | undefined;
+
+/** MarkdownをHTMLの文字列にする。色づけの道具を読むので非同期 */
 export async function render(markdown: string): Promise<string> {
-  return String(await processor.process(markdown));
+  cached ??= processor();
+  return String(await (await cached).process(markdown));
 }
