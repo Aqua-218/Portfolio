@@ -119,6 +119,9 @@ test.describe("守りのヘッダー", () => {
     page.on("console", (m) => {
       if (m.text().includes("Content Security Policy")) refused.push(m.text());
     });
+    page.on("pageerror", (e) => {
+      refused.push(e.message);
+    });
     await page.route("**/admin/auth/me", (r) =>
       r.fulfill({ status: 200, json: { login: "neko" } }),
     );
@@ -132,6 +135,8 @@ test.describe("守りのヘッダー", () => {
     expect(headers["referrer-policy"]).toBe("no-referrer");
     // ハイドレーションして、ログインの状態が出る(インラインのスクリプトがハッシュで許されている)
     await expect(page.getByText("neko でログインしています")).toBeVisible();
+    // ロゴのドット猫(WebAssembly)も描ける
+    await expect(page.locator("header svg.px-svg")).toBeAttached();
     expect(refused).toEqual([]);
   });
 
@@ -153,5 +158,77 @@ test.describe("守りのヘッダー", () => {
         }),
     );
     expect(ran).toBe(false);
+  });
+});
+
+test.describe("content/の一覧", () => {
+  const TREE = {
+    tree: [
+      { path: "content", type: "tree" },
+      { path: "content/events/2026-08-10-seccamp.md", type: "blob" },
+      { path: "content/events/2025-11-30-u22-final.md", type: "blob" },
+      { path: "content/profile.toml", type: "blob" },
+      { path: "content/cats/kuro.jpg", type: "blob" },
+      { path: "content/.cache/ogp.json", type: "blob" },
+      { path: "apps/web/package.json", type: "blob" },
+    ],
+  };
+
+  test.beforeEach(async ({ page }) => {
+    await page.route("**/admin/auth/me", (r) =>
+      r.fulfill({ status: 200, json: { login: "neko" } }),
+    );
+  });
+
+  test("ログインすると、Workerを通してmainのファイルを読み、種類ごとに出す", async ({
+    page,
+  }) => {
+    let asked: { path: string | null; admin: string | undefined } | undefined;
+    await page.route("**/admin/api?*", (r) => {
+      asked = {
+        path: new URL(r.request().url()).searchParams.get("path"),
+        admin: r.request().headers()["x-admin"],
+      };
+      return r.fulfill({ status: 200, json: TREE });
+    });
+    await page.goto("/admin/");
+    const list = page.getByRole("region", { name: "content/ の一覧" });
+    await expect(
+      list.getByRole("heading", { name: /^イベント/ }),
+    ).toBeVisible();
+    await expect(list.getByRole("heading", { name: /^ページ/ })).toBeVisible();
+    await expect(list.getByText("プロフィール")).toBeVisible();
+    await expect(list.getByText("kuro.jpg")).toBeVisible();
+    // content/の外と.cacheは出さない
+    await expect(list.getByText("package.json")).toHaveCount(0);
+    await expect(list.getByText("ogp.json")).toHaveCount(0);
+    expect(asked).toEqual({
+      path: "/repos/Aqua-218/Portfolio/git/trees/main?recursive=1",
+      admin: "1",
+    });
+  });
+
+  test("名前で絞り込める", async ({ page }) => {
+    await page.route("**/admin/api?*", (r) =>
+      r.fulfill({ status: 200, json: TREE }),
+    );
+    await page.goto("/admin/");
+    const list = page.getByRole("region", { name: "content/ の一覧" });
+    await list
+      .getByRole("searchbox", { name: "名前で絞り込む" })
+      .fill("seccamp");
+    await expect(list.getByText("2026-08-10-seccamp.md")).toBeVisible();
+    await expect(list.getByText("2025-11-30-u22-final.md")).toHaveCount(0);
+    await expect(list.getByRole("heading", { name: /^ページ/ })).toHaveCount(0);
+    await list.getByRole("searchbox", { name: "名前で絞り込む" }).fill("nyan");
+    await expect(list.getByText("見つかりません")).toBeVisible();
+  });
+
+  test("ログインが切れていたら、そう出す", async ({ page }) => {
+    await page.route("**/admin/api?*", (r) => r.fulfill({ status: 401 }));
+    await page.goto("/admin/");
+    await expect(page.locator("main").getByRole("alert")).toHaveText(
+      "ログインが切れました。ログインし直してください。",
+    );
   });
 });

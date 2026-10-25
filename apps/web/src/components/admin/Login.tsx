@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import * as s from "./admin.css";
+import { Contents } from "./Contents";
 
 /**
  * ログインに失敗したときの文。Workerからは記号(?error=owner など)だけが来る。
@@ -62,16 +63,19 @@ export function Login() {
 
   if (state.kind === "in") {
     return (
-      <div className={s.row}>
-        <p className={s.note}>{state.login} でログインしています</p>
-        <button
-          type="button"
-          className={s.button}
-          onClick={() => void logout()}
-        >
-          ログアウト
-        </button>
-      </div>
+      <>
+        <div className={s.row}>
+          <p className={s.note}>{state.login} でログインしています</p>
+          <button
+            type="button"
+            className={s.button}
+            onClick={() => void logout()}
+          >
+            ログアウト
+          </button>
+        </div>
+        <Contents />
+      </>
     );
   }
 

@@ -1,4 +1,4 @@
-import { style } from "@vanilla-extract/css";
+import { globalStyle, style } from "@vanilla-extract/css";
 import { vars } from "@/styles/theme.css";
 
 export const form = style({
@@ -50,4 +50,54 @@ export const error = style({
   borderRadius: vars.radius.md,
   fontFamily: vars.font.jp,
   fontSize: "0.9375rem",
+});
+
+export const contents = style({
+  display: "grid",
+  gap: "1.5rem",
+  marginTop: "2rem",
+});
+
+export const search = style({
+  width: "100%",
+  maxWidth: "24rem",
+  padding: "0.55rem 0.8rem",
+  border: `1px solid ${vars.color.line}`,
+  borderRadius: vars.radius.md,
+  background: vars.color.paper,
+  color: vars.color.ink,
+  fontFamily: vars.font.jp,
+  fontSize: "0.9375rem",
+  ":focus": { outline: `2px solid ${vars.color.mike}`, outlineOffset: "1px" },
+});
+
+export const groupTitle = style({
+  display: "flex",
+  alignItems: "baseline",
+  gap: "0.5rem",
+  margin: "0 0 0.6rem",
+  fontFamily: vars.font.jp,
+  fontSize: "0.875rem",
+  fontWeight: 700,
+});
+
+export const count = style({
+  fontSize: "0.75rem",
+  fontWeight: 400,
+  color: vars.color.muted,
+});
+
+export const list = style({
+  listStyle: "none",
+  margin: 0,
+  padding: 0,
+  borderTop: `1px solid ${vars.color.line}`,
+  fontFamily: vars.font.jp,
+  fontSize: "0.875rem",
+});
+
+globalStyle(`${list} li`, {
+  padding: "0.5rem 0",
+  borderBottom: `1px solid ${vars.color.line}`,
+  overflowWrap: "anywhere",
 });
