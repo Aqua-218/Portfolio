@@ -3,7 +3,7 @@ import { createReadStream, readFileSync, statSync } from "node:fs";
 import { createServer } from "node:http";
 import { createSecureServer } from "node:http2";
 import { dirname, extname, join, normalize } from "node:path";
-import { createBrotliCompress, createGzip } from "node:zlib";
+import { brotliCompressSync, gzipSync } from "node:zlib";
 
 const root = new URL("../out/", import.meta.url).pathname;
 const port = Number(process.env.PORT ?? 4173);
@@ -58,6 +58,20 @@ function htaccessHeaders(file) {
 /** 文字のファイルは、本番(Cloudflare・ロリポップ)と同じく縮めて送る。Lighthouseで本番に近い大きさを測るため */
 const compressible = new Set([".html", ".js", ".css", ".svg", ".txt", ".wasm"]);
 
+/** 縮めたものは覚えておく。毎回brotliで縮めると、e2eを並べて走らせたときに遅くなる */
+const compressed = new Map();
+
+function compress(file, encoding) {
+  const key = `${encoding}:${file}`;
+  let body = compressed.get(key);
+  if (!body) {
+    const raw = readFileSync(file);
+    body = encoding === "br" ? brotliCompressSync(raw) : gzipSync(raw);
+    compressed.set(key, body);
+  }
+  return body;
+}
+
 function send(req, res, status, file, headers) {
   const accept = String(req.headers["accept-encoding"] ?? "");
   const encoding = !compressible.has(extname(file))
@@ -72,10 +86,8 @@ function send(req, res, status, file, headers) {
     vary: "accept-encoding",
     ...(encoding ? { "content-encoding": encoding } : {}),
   });
-  const body = createReadStream(file);
-  if (encoding === "br") body.pipe(createBrotliCompress()).pipe(res);
-  else if (encoding === "gzip") body.pipe(createGzip()).pipe(res);
-  else body.pipe(res);
+  if (encoding) res.end(compress(file, encoding));
+  else createReadStream(file).pipe(res);
 }
 
 /**
