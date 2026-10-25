@@ -80,3 +80,32 @@ fn ないファイルとフォルダはディスクと同じ文になる() {
         "ファイルがありません"
     );
 }
+
+#[test]
+fn ブログの記事を読み間違いはファイルの場所つきで出す() {
+    let mut mem = memory(content());
+    mem.files.insert(
+        "blog/rust-cat.md".to_owned(),
+        "---\ntitle: Rustで猫\ntags: [Rust]\n---\n本文\n"
+            .as_bytes()
+            .to_vec(),
+    );
+    let site = load_from(&mem).expect("読めない");
+    assert_eq!(site.blog.len(), 1);
+    assert_eq!(site.blog[0].slug, "rust-cat");
+
+    mem.files.insert(
+        "blog/bad.md".to_owned(),
+        b"---\ntitle: t\ntags: []\n---\nx\n".to_vec(),
+    );
+    let problems: Vec<String> = load_from(&mem)
+        .unwrap_err()
+        .iter()
+        .map(ToString::to_string)
+        .collect();
+    assert_eq!(problems.len(), 1, "{problems:?}");
+    assert!(
+        problems[0].starts_with("content/blog/bad.md:3: tags は1〜5個"),
+        "{problems:?}"
+    );
+}
