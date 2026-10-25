@@ -124,6 +124,11 @@ Options -Indexes
   AddCharset utf-8 .html .txt .css .js .json .svg .xml
 </IfModule>
 
+# ブログのフィード
+<FilesMatch "^feed\\.xml$">
+  ForceType "application/atom+xml; charset=utf-8"
+</FilesMatch>
+
 # OGPの画像は拡張子がない(Next.jsのopengraph-image)
 <FilesMatch "^opengraph-image$">
   ForceType image/png
