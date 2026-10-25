@@ -22,11 +22,6 @@ export const page = style({
   marginTop: "clamp(0.5rem, 2vw, 1.5rem)",
 });
 
-/** 中身に広さの要るページ(管理画面)。見出しを上に置き、中身を横いっぱいに使う */
-export const wide = style({
-  gridTemplateColumns: "minmax(0, 1fr)",
-});
-
 /** Homeの抜粋。モックではセクションの上に線を引かない */
 export const home = style({
   borderTop: 0,
@@ -142,8 +137,6 @@ export const trail = style({
     "(max-width: 860px)": { display: "none" },
   },
 });
-
-globalStyle(`${wide} ${trail}`, { display: "none" });
 
 export const body = style({
   minWidth: 0,
