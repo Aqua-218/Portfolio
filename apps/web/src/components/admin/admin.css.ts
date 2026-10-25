@@ -340,7 +340,10 @@ globalStyle(`${checks} li`, {
 
 export const checkState = style({ color: vars.color.muted });
 
-export const checkFailed = style({ color: vars.color.mikeText, fontWeight: 700 });
+export const checkFailed = style({
+  color: vars.color.mikeText,
+  fontWeight: 700,
+});
 /** 写真を足す */
 export const upload = style({
   display: "grid",
