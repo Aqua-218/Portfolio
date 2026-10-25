@@ -11,11 +11,86 @@ use crate::shelf::{self, Work};
 use crate::skills::{self, Skills};
 use crate::work::{self, Company};
 use serde::Serialize;
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fmt;
 use std::fs;
 use std::path::Path;
 use ts_rs::TS;
+
+/// `content/`の読み方。ふつうはディスクから読み、管理画面(Wasm)では手元のファイルの中身から読む。
+pub trait Source {
+    /// 表示に使う、`content/`の場所(`content`など)
+    fn root(&self) -> String;
+    /// ファイルを読む。`rel`は`content/`からの相対パス
+    ///
+    /// # Errors
+    ///
+    /// ないときと読めないときは、エラー文を返す。
+    fn read(&self, rel: &str) -> Result<Vec<u8>, String>;
+    /// フォルダの中のファイルの名前。フォルダがなければ`None`
+    fn list(&self, rel: &str) -> Option<Vec<String>>;
+}
+
+/// ディスクの`content/`
+pub struct Disk<'a>(pub &'a Path);
+
+impl Source for Disk<'_> {
+    fn root(&self) -> String {
+        self.0.display().to_string()
+    }
+
+    fn read(&self, rel: &str) -> Result<Vec<u8>, String> {
+        fs::read(self.0.join(rel)).map_err(|e| {
+            if e.kind() == std::io::ErrorKind::NotFound {
+                "ファイルがありません".to_owned()
+            } else {
+                format!("読めません({e})")
+            }
+        })
+    }
+
+    fn list(&self, rel: &str) -> Option<Vec<String>> {
+        let entries = fs::read_dir(self.0.join(rel)).ok()?;
+        Some(
+            entries
+                .filter_map(Result::ok)
+                .filter(|e| e.file_type().is_ok_and(|t| t.is_file()))
+                .filter_map(|e| e.file_name().into_string().ok())
+                .collect(),
+        )
+    }
+}
+
+/// 手元のファイルの中身でできた`content/`。キーは`content/`からの相対パス
+pub struct Memory {
+    pub root: String,
+    pub files: BTreeMap<String, Vec<u8>>,
+}
+
+impl Source for Memory {
+    fn root(&self) -> String {
+        self.root.clone()
+    }
+
+    fn read(&self, rel: &str) -> Result<Vec<u8>, String> {
+        self.files
+            .get(rel)
+            .cloned()
+            .ok_or_else(|| "ファイルがありません".to_owned())
+    }
+
+    fn list(&self, rel: &str) -> Option<Vec<String>> {
+        let prefix = format!("{rel}/");
+        let names: Vec<String> = self
+            .files
+            .keys()
+            .filter_map(|k| k.strip_prefix(&prefix))
+            .filter(|n| !n.contains('/'))
+            .map(str::to_owned)
+            .collect();
+        (!names.is_empty()).then_some(names)
+    }
+}
 
 /// 検証の済んだ中身。
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, TS)]
@@ -49,14 +124,14 @@ impl fmt::Display for FileProblem {
     }
 }
 
-struct Loader<'a> {
-    dir: &'a Path,
+struct Loader<'a, S: Source> {
+    source: &'a S,
     problems: Vec<FileProblem>,
 }
 
-impl Loader<'_> {
+impl<S: Source> Loader<'_, S> {
     fn path(&self, rel: &str) -> String {
-        format!("{}/{rel}", self.dir.display())
+        format!("{}/{rel}", self.source.root())
     }
 
     fn report(&mut self, rel: &str, problems: Vec<Problem>) {
@@ -67,14 +142,13 @@ impl Loader<'_> {
     }
 
     fn read(&mut self, rel: &str) -> Option<String> {
-        match fs::read_to_string(self.dir.join(rel)) {
+        let text = self
+            .source
+            .read(rel)
+            .and_then(|b| String::from_utf8(b).map_err(|e| format!("読めません({e})")));
+        match text {
             Ok(text) => Some(text),
-            Err(e) => {
-                let message = if e.kind() == std::io::ErrorKind::NotFound {
-                    "ファイルがありません".to_owned()
-                } else {
-                    format!("読めません({e})")
-                };
+            Err(message) => {
                 self.report(rel, vec![Problem::new(None, message)]);
                 None
             }
@@ -92,14 +166,12 @@ impl Loader<'_> {
 
     /// フォルダの中の、拡張子が`ext`のファイルの名前(拡張子なし)を名前の順に返す。
     fn names(&mut self, rel: &str, ext: Option<&str>) -> Vec<String> {
-        let Ok(entries) = fs::read_dir(self.dir.join(rel)) else {
+        let Some(entries) = self.source.list(rel) else {
             self.report(rel, vec![Problem::new(None, "フォルダがありません")]);
             return Vec::new();
         };
         let mut names: Vec<String> = entries
-            .filter_map(Result::ok)
-            .filter(|e| e.file_type().is_ok_and(|t| t.is_file()))
-            .filter_map(|e| e.file_name().into_string().ok())
+            .into_iter()
             .filter(|n| !n.starts_with('.'))
             .filter_map(|n| match ext {
                 Some(ext) => n.strip_suffix(&format!(".{ext}")).map(str::to_owned),
@@ -128,12 +200,11 @@ impl Loader<'_> {
         let text = self.read("cats.toml")?;
         let mut files = Vec::new();
         for name in self.names("cats", None) {
-            match fs::read(self.dir.join("cats").join(&name)) {
+            match self.source.read(&format!("cats/{name}")) {
                 Ok(bytes) => files.push((name, bytes)),
-                Err(e) => self.report(
-                    &format!("cats/{name}"),
-                    vec![Problem::new(None, format!("読めません({e})"))],
-                ),
+                Err(message) => {
+                    self.report(&format!("cats/{name}"), vec![Problem::new(None, message)]);
+                }
             }
         }
         self.take("cats.toml", cats::parse(&text, &files))
@@ -146,8 +217,17 @@ impl Loader<'_> {
 ///
 /// 間違いがあれば、全部のファイルの間違いをまとめて返す。
 pub fn load(dir: &Path) -> Result<Site, Vec<FileProblem>> {
+    load_from(&Disk(dir))
+}
+
+/// `source`から`content/`を丸ごと読んで検証する。中身は[`load`]と同じ。
+///
+/// # Errors
+///
+/// 間違いがあれば、全部のファイルの間違いをまとめて返す。
+pub fn load_from(source: &impl Source) -> Result<Site, Vec<FileProblem>> {
     let mut l = Loader {
-        dir,
+        source,
         problems: Vec::new(),
     };
     let profile = l.toml("profile.toml", profile::parse);
