@@ -1,0 +1,29 @@
+# 管理画面のログインとGitHubの中継をするWorker。設計はIssue #79、手順はdocs/admin.md。
+name = "portfolio-admin"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+# Node互換(nodejs_compat)は入れない。2026年にnode:zlibでworkerdのバグが見つかったため、使わないものは入れない
+
+# サイトのドメインのうち、ここだけWorkerに回す。ほかはロリポップの静的なファイルを出す
+# ドメインが決まったら(#94)差し替える
+routes = [
+  { pattern = "example.com/admin/auth/*", zone_name = "example.com" },
+  { pattern = "example.com/admin/api", zone_name = "example.com" },
+]
+
+# セッション・端末の記憶・試行回数。中身は暗号化して入れる
+# `wrangler kv namespace create ADMIN_KV` で作ったidを入れる
+[[kv_namespaces]]
+binding = "ADMIN_KV"
+id = "ここにKVのid"
+
+[vars]
+GITHUB_CLIENT_ID = "ここにGitHub AppのClient ID"
+# 管理画面に入れるGitHubのユーザーのid(数字)。https://api.github.com/users/Aqua-218 のid
+OWNER_ID = "219285495"
+REPO = "Aqua-218/Portfolio"
+ORIGIN = "https://example.com"
+
+# 秘密の値はここに書かず、`wrangler secret put`で入れる
+# GITHUB_CLIENT_SECRET: GitHub AppのClient secret
+# KEY: 暗号の鍵。`openssl rand -base64 32`で作る
