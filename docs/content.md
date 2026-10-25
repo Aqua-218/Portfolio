@@ -208,6 +208,19 @@ tags: [Z1ゼミ]
 - `tags`が2個以上ないこと
 - 本文が空でないこと
 
+### 本文で使える記法
+
+本文は`packages/markdown`でHTMLにする。GitHubのMarkdown(GFM)に加えて、次が使える。生のHTMLは使えない(書いても文字として出る)。
+
+- 見出し: `##`などの見出しには、自動でアンカーがつく
+- コード: ` ```rust `のように言語を書くと、猫のテーマで色がつく。Rust・TypeScript・Lean 4・TLA+(`tla`)・TOML・YAML・JSON・Bashなど
+- 数式: `$...$`(文中)と`$$...$$`(独立)。ビルド時にMathMLにする
+- アラート: `> [!NOTE]`・`TIP`・`IMPORTANT`・`WARNING`・`CAUTION`。それぞれ猫がつく
+- リンクカード: URLだけの行はカードになる。OGPは`content/.cache/ogp.json`にためる
+- Mermaid: ` ```mermaid `の図は、ビルド時に描いてSVGにする。描いた図は`content/.cache/mermaid/`にためる
+
+`content/.cache/`は、手元でビルドしたときにできたものをコミットする。CIのビルドはOGPを取りに行かず、Chromiumもないので、新しいリンクカードや図を足したら、手元で一度ビルドしてから`content/.cache/`ごとコミットする。
+
 並び: 年度(4月〜3月)ごとにまとめ、年度の中は`date`の古い順。同じ日はファイル名の順。Homeには新しい順に3件だけ出す。
 
 ### events.toml
