@@ -13,6 +13,7 @@ const PAGES = [
   "/stack/",
   "/cats/",
   "/license/",
+  "/license/cc-by-sa-4/",
   "/markdown/",
   "/blog/",
   // 埋め込み(YouTube・X)のある記事

@@ -1,10 +1,12 @@
 # ライセンス・クレジット。icons には、このライセンスで使っている local: のアイコンを書く
+# text は原文(content/licenses/<text>.txt)。SPDXの原文か、その作品のLICENSEそのものを置く
 [[license]]
 group = "icons"
 name = "Simple Icons"
 url = "https://simpleicons.org/"
 license = "CC0 1.0"
 note = "Skills ページの言語・技術のアイコンの多くに使っています。ロゴの形と色は変えていません。"
+text = "cc0-1"
 
 [[license]]
 group = "icons"
@@ -12,6 +14,7 @@ name = "Rust のロゴ"
 url = "https://www.rust-lang.org/policies/media-guide"
 license = "CC BY-SA 4.0"
 note = "Rust Foundation のメディアガイドに沿って使っています。"
+text = "cc-by-sa-4"
 
 [[license]]
 group = "icons"
@@ -19,6 +22,7 @@ name = "Zig のロゴ"
 url = "https://github.com/ziglang/logo"
 license = "CC BY-SA 4.0"
 note = "Zig Software Foundation のロゴです。"
+text = "cc-by-sa-4"
 
 [[license]]
 group = "icons"
@@ -26,6 +30,7 @@ name = "Git のロゴ"
 url = "https://git-scm.com/downloads/logos"
 license = "CC BY 3.0"
 note = "Git Logo by Jason Long."
+text = "cc-by-3"
 
 [[license]]
 group = "icons"
@@ -33,6 +38,7 @@ name = "devicon"
 url = "https://devicon.dev/"
 license = "MIT"
 note = "C#・Azure・VS Code・Playwright のアイコンに使っています。"
+text = "devicon"
 icons = ["csharp", "azure", "vscode", "playwright"]
 
 [[license]]
@@ -41,6 +47,7 @@ name = "Lean のロゴ"
 url = "https://github.com/leanprover-community/leanprover-community.github.io"
 license = "MIT"
 note = "Lean prover Community のサイトにあるロゴです。"
+text = "lean-community"
 icons = ["lean"]
 
 [[license]]
@@ -49,6 +56,7 @@ name = "Rocq のロゴ"
 url = "https://github.com/rocq-prover/rocq-prover.org"
 license = "Unlicense"
 note = "rocq-prover.org のロゴです。"
+text = "unlicense"
 icons = ["rocq"]
 
 [[license]]
@@ -57,6 +65,7 @@ name = "Agda のロゴ"
 url = "https://github.com/agda/agda"
 license = "Agda のライセンス（MIT 系）"
 note = "Agda のリポジトリにあるロゴです。白い背景だけ外して使っています。"
+text = "agda"
 icons = ["agda"]
 
 [[license]]
@@ -65,6 +74,7 @@ name = "eBPF のロゴ"
 url = "https://github.com/ebpf-io/ebpf.io-website"
 license = "CC BY 4.0"
 note = "ebpf.io のサイトにあるロゴです。"
+text = "cc-by-4"
 icons = ["ebpf"]
 
 [[license]]
@@ -73,6 +83,7 @@ name = "Tauri のロゴ"
 url = "https://tauri.app/"
 license = "CC BY-NC-ND 4.0"
 note = "The Tauri Programme のロゴです。非営利のこのサイトで、変えずに使っています。"
+text = "cc-by-nc-nd-4"
 
 [[license]]
 group = "fonts"
@@ -80,6 +91,7 @@ name = "Geist"
 url = "https://fonts.google.com/specimen/Geist"
 license = "SIL OFL 1.1"
 note = "英字の本文と見出しに使っています。"
+text = "geist"
 
 [[license]]
 group = "fonts"
@@ -87,18 +99,19 @@ name = "LINE Seed JP"
 url = "https://fonts.google.com/specimen/LINE+Seed+JP"
 license = "SIL OFL 1.1"
 note = "日本語の本文と見出しに使っています。"
+text = "line-seed-jp"
 
 [[license]]
 group = "site"
 name = "猫の写真"
-license = "© 小峯圭也"
-note = "サイト内の写真は、すべて本人が用意した猫の写真です。"
+license = "© 2026 Keiya Komine. All Rights Reserved."
+note = "トップのモザイクを含め、サイト内の写真は、すべて本人が用意した猫の写真です。無断転載禁止(非商用も含みます)。"
 
 [[license]]
 group = "site"
 name = "ドット絵の猫・デザイン・文章"
-license = "© 2026 小峯圭也"
-note = "このサイトのために作ったオリジナルです。"
+license = "© 2026 Keiya Komine. All Rights Reserved."
+note = "ロゴや見出しの横の猫、幕を走る黒猫、足あと、隠れている猫など、ドット絵の猫はこのサイトのために作ったオリジナルです。デザイン・文章も同じです。無断転載禁止(非商用も含みます)。"
 
 [[license]]
 group = "others"

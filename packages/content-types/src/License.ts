@@ -11,4 +11,8 @@ export type License = {
    * このライセンスで使っている`local:`のアイコン
    */
   icons: Array<string>;
+  /**
+   * 原文(`content/licenses/<text>.txt`)
+   */
+  text: string | null;
 };

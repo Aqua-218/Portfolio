@@ -1,4 +1,5 @@
 import type { LicenseGroup } from "@portfolio/content-types";
+import Link from "next/link";
 import * as a from "@/components/affiliations/affiliations.css";
 import { Reveal } from "@/components/reveal/Reveal";
 import * as r from "@/components/rows/rows.css";
@@ -44,7 +45,19 @@ export function Licenses() {
                     ) : (
                       <span className={a.name}>{l.name}</span>
                     )}
-                    {l.license && <span className={r.tag}>{l.license}</span>}
+                    {l.license &&
+                      (l.text ? (
+                        // ライセンスの名前から、原文のページへ
+                        <Link
+                          className={`${r.tag} ${s.textLink}`}
+                          href={`/license/${l.text}/`}
+                          aria-label={`${l.license} の原文`}
+                        >
+                          {l.license}
+                        </Link>
+                      ) : (
+                        <span className={r.tag}>{l.license}</span>
+                      ))}
                   </div>
                   <p>{l.note}</p>
                 </Reveal>
