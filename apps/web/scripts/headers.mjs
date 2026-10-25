@@ -97,6 +97,11 @@ ${ERRORS.map((code) => `ErrorDocument ${code} /errors/${code}/`).join("\n")}
 # HTTPSにする。Cloudflareを前に置いたときは、Cloudflareとの間がHTTPでも転送しない(X-Forwarded-Proto)
 <IfModule mod_rewrite.c>
   RewriteEngine On
+  # エラーのページ(ErrorDocument)を出すときは、転送しない。しないと、ないページが https://…/404.html への転送になる
+  RewriteCond %{ENV:REDIRECT_STATUS} !^$
+  RewriteRule ^ - [L]
+  # Let's Encrypt(ロリポップの独自SSL)の確認は、HTTPのまま、wwwのままで答える。転送すると更新が失敗することがある
+  RewriteRule ^\\.well-known/acme-challenge/ - [L]
   # www.komineko.jp は komineko.jp へ(どちらでも開けるが、URLは1つにする)
   RewriteCond %{HTTP_HOST} ^www\\.komineko\\.jp$ [NC]
   RewriteRule ^ https://komineko.jp%{REQUEST_URI} [R=301,L]
