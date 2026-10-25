@@ -1,0 +1,21 @@
+{
+  "name": "@portfolio/content-wasm",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "cargo build -p content-wasm --target wasm32-unknown-unknown --release --locked && wasm-bindgen --target web --out-dir dist ../../target/wasm32-unknown-unknown/release/content_wasm.wasm",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@portfolio/content-types": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.2",
+    "typescript": "6.0.3",
+    "vitest": "5.0.5"
+  }
+}
