@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.8.0](https://github.com/Aqua-218/Portfolio/compare/v0.7.0...v0.8.0) (2026-10-25)
+
+
+### 新しいこと
+
+* **admin:** プレビューを出す ([#223](https://github.com/Aqua-218/Portfolio/issues/223)) ([91635f3](https://github.com/Aqua-218/Portfolio/commit/91635f3502c0868886ab246f90bbfd5191c6e090)), closes [#84](https://github.com/Aqua-218/Portfolio/issues/84)
+* **admin:** 下書きをブランチに保存する ([#233](https://github.com/Aqua-218/Portfolio/issues/233)) ([9e59c6f](https://github.com/Aqua-218/Portfolio/commit/9e59c6f63179ef9cd3149433cb0432d6a8f5ec5c)), closes [#86](https://github.com/Aqua-218/Portfolio/issues/86)
+* **admin:** 書いている途中で検証する ([#216](https://github.com/Aqua-218/Portfolio/issues/216)) ([0fda63b](https://github.com/Aqua-218/Portfolio/commit/0fda63b1b3fa2cae8082b6db8a6aff1e11d86af1)), closes [#83](https://github.com/Aqua-218/Portfolio/issues/83)
+* **admin:** 画像をアップロードする ([#237](https://github.com/Aqua-218/Portfolio/issues/237)) ([b6797fc](https://github.com/Aqua-218/Portfolio/commit/b6797fc933442be0a495897cd9eedda17ef98155)), closes [#85](https://github.com/Aqua-218/Portfolio/issues/85)
+* **admin:** 確認してコミットし、公開の進み具合を出す ([#236](https://github.com/Aqua-218/Portfolio/issues/236)) ([40399c5](https://github.com/Aqua-218/Portfolio/commit/40399c567aa1d347e987a93927a32c782e63bf99)), closes [#87](https://github.com/Aqua-218/Portfolio/issues/87)
+* **ci:** Lighthouseの点と速さの予算をCIで守る ([#224](https://github.com/Aqua-218/Portfolio/issues/224)) ([15faa09](https://github.com/Aqua-218/Portfolio/commit/15faa09086a4be43967697f4d4c544677d2e55f8)), closes [#211](https://github.com/Aqua-218/Portfolio/issues/211)
+* **markdown:** 管理画面から足した図とリンクカードをActionsで作る ([#235](https://github.com/Aqua-218/Portfolio/issues/235)) ([75cec8c](https://github.com/Aqua-218/Portfolio/commit/75cec8c3a6afdbe5eb355a1a77c29dc373b2a9c8)), closes [#199](https://github.com/Aqua-218/Portfolio/issues/199)
+* **web:** security.txtを置く ([#220](https://github.com/Aqua-218/Portfolio/issues/220)) ([a2a4566](https://github.com/Aqua-218/Portfolio/commit/a2a4566a53ef0dd7ae3f69d391d985a306fa8f98)), closes [#210](https://github.com/Aqua-218/Portfolio/issues/210)
+* **web:** サイト全体にCSPと守りのヘッダーをつける ([#215](https://github.com/Aqua-218/Portfolio/issues/215)) ([d498e4d](https://github.com/Aqua-218/Portfolio/commit/d498e4db4fbec378c20ccd236ef7a5bb2792b668)), closes [#206](https://github.com/Aqua-218/Portfolio/issues/206)
+* **web:** 最初に見える写真とフォントを早く読む ([#227](https://github.com/Aqua-218/Portfolio/issues/227)) ([07d80b5](https://github.com/Aqua-218/Portfolio/commit/07d80b54ca3d67cb7e4efeebb0ffa3f45771082e)), closes [#213](https://github.com/Aqua-218/Portfolio/issues/213)
+* **web:** 長く持たせるキャッシュのヘッダーをつける ([#229](https://github.com/Aqua-218/Portfolio/issues/229)) ([8b8a80f](https://github.com/Aqua-218/Portfolio/commit/8b8a80fdab4093b9ca438e37c7a0b07a2b0ae897)), closes [#212](https://github.com/Aqua-218/Portfolio/issues/212)
+
+
+### 直したこと
+
+* **admin:** Wasmを読み込むのを待つe2eテストに余裕をもたせる ([#228](https://github.com/Aqua-218/Portfolio/issues/228)) ([b392c45](https://github.com/Aqua-218/Portfolio/commit/b392c45263a649d96f91b11eb611a9c53b2a9b0a))
+* **admin:** Workerのテストがたまに落ちるのを直す ([#222](https://github.com/Aqua-218/Portfolio/issues/222)) ([4d9a048](https://github.com/Aqua-218/Portfolio/commit/4d9a048fc3949c49503830096823f481bd02bc45))
+* **web:** favicon.icoを置く ([#231](https://github.com/Aqua-218/Portfolio/issues/231)) ([5e7fe93](https://github.com/Aqua-218/Portfolio/commit/5e7fe93d8bd034ec04863e7e08e2b5feebf7b086)), closes [#225](https://github.com/Aqua-218/Portfolio/issues/225)
+
 ## [0.7.0](https://github.com/Aqua-218/Portfolio/compare/v0.6.0...v0.7.0) (2026-10-25)
 
 
