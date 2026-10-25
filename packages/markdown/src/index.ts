@@ -9,6 +9,9 @@ import remarkRehype from "remark-rehype";
 import { unified } from "unified";
 import { rehypeAlerts } from "./alerts";
 import { getHighlighter, rehypeShikiFromHighlighter } from "./highlight";
+import { type OgpCache, rehypeLinkCards } from "./ogp";
+
+export { OgpCache, fetchOgp, parseOgp, type Fetcher, type Ogp } from "./ogp";
 
 /**
  * MarkdownをHTMLにする。本番のページと管理画面のプレビューで同じものを使う。
@@ -25,6 +28,8 @@ async function processor() {
       .use(remarkRehype)
       // 数式はビルド時にMathMLにする。ブラウザが描くので、KaTeXのCSSとフォントはいらない
       .use(rehypeKatex, { output: "mathml" })
+      // URLだけの行をリンクカードにする
+      .use(rehypeLinkCards)
       // GitHubのアラートを、猫のついた注意書きにする
       .use(rehypeAlerts)
       // 見出しにidをつけ、見出しそのものをそのidへのリンクにする
@@ -41,8 +46,22 @@ async function processor() {
 
 let cached: ReturnType<typeof processor> | undefined;
 
-/** MarkdownをHTMLの文字列にする。色づけの道具を読むので非同期 */
-export async function render(markdown: string): Promise<string> {
+export interface RenderOptions {
+  /** リンクカードのOGPのキャッシュ。なければリンクカードにしない */
+  ogp?: OgpCache;
+}
+
+/** MarkdownをHTMLの文字列にする。色づけの道具を読んだりOGPを取ったりするので非同期 */
+export async function render(
+  markdown: string,
+  options: RenderOptions = {},
+): Promise<string> {
   cached ??= processor();
-  return String(await (await cached).process(markdown));
+  const file = await (
+    await cached
+  ).process({
+    value: markdown,
+    data: options.ogp ? { ogp: options.ogp } : {},
+  });
+  return String(file);
 }
