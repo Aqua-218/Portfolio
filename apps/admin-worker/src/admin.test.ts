@@ -9,6 +9,7 @@ import {
   SESSION_COOKIE,
   type Store,
   allowed,
+  writable,
   importKey,
 } from "./admin";
 
@@ -320,6 +321,8 @@ describe("中継", () => {
       ["POST", `${repo}/git/trees`],
       ["POST", `${repo}/pulls`],
       ["GET", `${repo}/actions/runs?branch=main`],
+      ["GET", `${repo}/contents/content/events/x.md?ref=draft/events/x.md`],
+      ["GET", `${repo}/git/matching-refs/heads/draft/`],
     ];
     const no: [string, string][] = [
       ["GET", "/repos/someone/else/contents/x"],
@@ -334,11 +337,66 @@ describe("中継", () => {
       ["GET", `/repos/${REPO}x/contents/a`],
       ["GET", `https://evil.example/repos/${REPO}/contents`],
       ["GET", `${repo}/hooks`],
+      ["GET", `${repo}/contents/a?ref=draft/../../x`],
     ];
     for (const [m, p] of yes)
       expect(allowed(m, p, REPO), `${m} ${p}`).toBe(true);
     for (const [m, p] of no)
       expect(allowed(m, p, REPO), `${m} ${p}`).toBe(false);
+  });
+
+  it("書き込みは、下書きのブランチとcontent/の中だけ", () => {
+    const repo = `/repos/${REPO}`;
+    const put = (branch: unknown) => JSON.stringify({ message: "m", branch });
+    const yes: [string, string, string][] = [
+      ["PUT", `${repo}/contents/content/events/x.md`, put("draft/events/x.md")],
+      ["POST", `${repo}/git/blobs`, '{"content":"x"}'],
+      ["POST", `${repo}/git/trees`, '{"tree":[]}'],
+      ["POST", `${repo}/git/commits`, '{"message":"m"}'],
+      ["POST", `${repo}/git/refs`, '{"ref":"refs/heads/draft/x","sha":"1"}'],
+      ["PATCH", `${repo}/git/refs/heads/draft/x`, '{"sha":"1"}'],
+      ["POST", `${repo}/pulls`, '{"head":"draft/x","base":"main"}'],
+      ["PATCH", `${repo}/pulls/3`, '{"state":"closed"}'],
+      ["PUT", `${repo}/pulls/3/merge`, '{"merge_method":"squash"}'],
+    ];
+    const no: [string, string, string][] = [
+      // mainやほかのブランチには書かない
+      ["PUT", `${repo}/contents/content/x.md`, put("main")],
+      ["PUT", `${repo}/contents/content/x.md`, put(undefined)],
+      ["PUT", `${repo}/contents/content/x.md`, put("draft/")],
+      ["PUT", `${repo}/contents/content/x.md`, put("feature/draft/x")],
+      ["PUT", `${repo}/contents/content/x.md`, put(["draft/x"])],
+      // content/の外には書かない
+      ["PUT", `${repo}/contents/.github/workflows/ci.yml`, put("draft/x")],
+      ["PUT", `${repo}/contents/apps/web/x.ts`, put("draft/x")],
+      ["POST", `${repo}/git/refs`, '{"ref":"refs/heads/main","sha":"1"}'],
+      ["POST", `${repo}/git/refs`, '{"ref":"refs/tags/v9","sha":"1"}'],
+      ["PATCH", `${repo}/git/refs/heads/main`, '{"sha":"1","force":true}'],
+      ["PATCH", `${repo}/git/refs/heads/draft/`, '{"sha":"1"}'],
+      ["POST", `${repo}/git/tags`, '{"tag":"v9"}'],
+      ["POST", `${repo}/pulls`, '{"head":"feature","base":"main"}'],
+      ["POST", `${repo}/pulls`, '{"head":"draft/x","base":"release"}'],
+      ["POST", `${repo}/commits/abc/comments`, '{"body":"x"}'],
+      ["PUT", `${repo}/branches/main/protection`, "{}"],
+      // JSONでないもの
+      ["PUT", `${repo}/contents/content/x.md`, "branch=draft/x"],
+      ["POST", `${repo}/pulls`, "[]"],
+    ];
+    for (const [m, p, b] of yes)
+      expect(writable(m, p, b, REPO), `${m} ${p} ${b}`).toBe(true);
+    for (const [m, p, b] of no)
+      expect(writable(m, p, b, REPO), `${m} ${p} ${b}`).toBe(false);
+  });
+
+  it("下書きでないブランチへの書き込みは、トークンを使う前に断る", async () => {
+    await w.login();
+    const r = await w.api(
+      "PUT",
+      `/repos/${REPO}/contents/content/a.md`,
+      '{"message":"m","branch":"main"}',
+    );
+    expect(r.status).toBe(403);
+    expect(w.to("/contents")).toEqual([]);
   });
 
   it("独自ヘッダーがなければ拒む", async () => {
@@ -374,18 +432,15 @@ describe("中継", () => {
 
   it("セッションのトークンをつけて中継する", async () => {
     await w.login();
-    const r = await w.api(
-      "PUT",
-      `/repos/${REPO}/contents/content/a.md`,
-      '{"message":"m"}',
-    );
+    const body = '{"message":"m","branch":"draft/a.md"}';
+    const r = await w.api("PUT", `/repos/${REPO}/contents/content/a.md`, body);
     expect(r.status).toBe(200);
     const call = w.to("/contents/content/a.md")[0];
     expect(call?.url).toBe(
       `https://api.github.com/repos/${REPO}/contents/content/a.md`,
     );
     expect(call?.headers.authorization).toBe("Bearer ghu_access1");
-    expect(call?.body).toBe('{"message":"m"}');
+    expect(call?.body).toBe(body);
   });
 
   it("ログインしていなければ中継しない", async () => {
