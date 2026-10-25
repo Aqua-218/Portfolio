@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.10.0](https://github.com/Aqua-218/Portfolio/compare/v0.9.0...v0.10.0) (2026-10-25)
+
+
+### 新しいこと
+
+* **web:** コードで使っているライブラリのライセンスを載せる ([#272](https://github.com/Aqua-218/Portfolio/issues/272)) ([ff7a2eb](https://github.com/Aqua-218/Portfolio/commit/ff7a2ebd0b4b4483a6dab3de2f6da772525959b7)), closes [#270](https://github.com/Aqua-218/Portfolio/issues/270)
+* **web:** ページのあちこちで猫を遊ばせる ([#277](https://github.com/Aqua-218/Portfolio/issues/277)) ([e033199](https://github.com/Aqua-218/Portfolio/commit/e033199945de9b114c967f863d2a6caaea322f22)), closes [#274](https://github.com/Aqua-218/Portfolio/issues/274)
+* **web:** ライセンス名を押すと原文を見られるようにする ([#271](https://github.com/Aqua-218/Portfolio/issues/271)) ([77fccf7](https://github.com/Aqua-218/Portfolio/commit/77fccf7b258b51c95672926173cd2ff92fba7406)), closes [#269](https://github.com/Aqua-218/Portfolio/issues/269)
+
+
+### 直したこと
+
+* **web:** 足あとの位置をページごとに変える ([#275](https://github.com/Aqua-218/Portfolio/issues/275)) ([79d0298](https://github.com/Aqua-218/Portfolio/commit/79d02985a539adc5b25abdc9bbf0a9a896fcec81)), closes [#273](https://github.com/Aqua-218/Portfolio/issues/273)
+
 ## [0.9.0](https://github.com/Aqua-218/Portfolio/compare/v0.8.0...v0.9.0) (2026-10-25)
 
 
