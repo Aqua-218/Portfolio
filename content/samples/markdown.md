@@ -89,7 +89,11 @@ https://simpleicons.org/
 ```mermaid
 flowchart LR
   A[猫の写真] --> B[imgpipe] --> C[WebP・AVIF]
+  B --> D[Cats]
+  click D "/cats/"
 ```
+
+図のノードに乗ると、つながりが光ります。「Cats」を押すと猫のページへ行きます。右上のボタンで拡大でき、ドラッグで動かせます。
 
 ```mermaid
 sequenceDiagram
