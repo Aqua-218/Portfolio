@@ -6,6 +6,7 @@ import * as s from "./admin.css";
 import { type EventDoc, parse, serialize } from "./frontmatter";
 import { readLatest, saveDraft } from "./github";
 import { Preview } from "./Preview";
+import { Publish } from "./Publish";
 import { byField, type Field } from "./validate";
 
 type State =
@@ -44,6 +45,8 @@ export function Editor({ path, onBack }: { path: string; onBack: () => void }) {
   const [state, setState] = useState<State>({ kind: "loading" });
   /** 下書きのブランチにあるものを開いているか */
   const [draft, setDraft] = useState(false);
+  /** 公開した(マージした)か。下書きのブランチは消えるが、公開の進み具合は出し続ける */
+  const [merged, setMerged] = useState(false);
   const [saving, setSaving] = useState<Saving>({ kind: "idle" });
   /** プレビューを出しているか */
   const [previewing, setPreviewing] = useState(false);
@@ -152,7 +155,7 @@ export function Editor({ path, onBack }: { path: string; onBack: () => void }) {
           一覧へ戻る
         </button>
         <code className={s.path}>{path}</code>
-        {draft && <span className={s.draft}>下書き</span>}
+        {draft && !merged && <span className={s.draft}>下書き</span>}
         {dirty && <span className={s.dirty}>変更あり</span>}
         {text !== null && (
           <button
@@ -349,6 +352,24 @@ export function Editor({ path, onBack }: { path: string; onBack: () => void }) {
             </ul>
           )}
         </>
+      )}
+
+      {draft && dirty && (
+        <p className={s.note}>公開するには、先に下書きに保存してください。</p>
+      )}
+      {(draft || merged) && !dirty && text !== null && (
+        <Publish
+          path={path}
+          text={text}
+          defaultTitle={
+            state.kind === "event"
+              ? `content: イベント「${state.doc.meta.title}」を更新する`
+              : `content: ${path.replace(/^content\//, "")}を更新する`
+          }
+          onMerged={() => {
+            setMerged(true);
+          }}
+        />
       )}
     </section>
   );
