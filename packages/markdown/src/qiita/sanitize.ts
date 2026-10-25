@@ -5,7 +5,8 @@ import { visit } from "unist-util-visit";
 /**
  * 記事の中の生のHTMLに許すもの。qiita-markdownのUserInputSanitizer(strict)と同じ範囲。
  * Markdownから作ったもの(コードの言語・脚注・チェックリスト・数式)に要るものだけ足す。
- * 埋め込み(scriptとiframe)は #241 で扱うので、いまは通さない
+ * 埋め込み(iframe・script・Xの引用・CodePen)は、embeds.tsが読む属性だけ通す。
+ * embeds.tsが、許すものをiframeに組み立て直し、ほかは消す
  */
 export const qiitaSchema: Schema = {
   // 脚注などのidに「user-content-」をつけない(Qiitaと同じidにする)
@@ -20,6 +21,9 @@ export const qiitaSchema: Schema = {
     ...["table", "tbody", "td", "tfoot", "th", "thead", "tr", "ul", "var"],
     // チェックリスト(Markdownから作る)
     "input",
+    // 埋め込み(embeds.tsがiframeに組み立て直すか、消す)
+    "iframe",
+    "script",
   ],
   attributes: {
     a: [
@@ -34,7 +38,17 @@ export const qiitaSchema: Schema = {
       "ariaDescribedBy",
       "ariaLabel",
     ],
-    blockquote: ["cite"],
+    blockquote: ["cite", ["className", "twitter-tweet"]],
+    p: [
+      ["className", "codepen"],
+      ...["dataHeight", "dataDefaultTab", "dataSlugHash", "dataUser"],
+    ],
+    iframe: ["src", "width", "height"],
+    script: [
+      "src",
+      ["className", "speakerdeck-embed", "docswell-embed"],
+      ...["dataId", "dataRatio", "dataSrc", "dataAspect"],
+    ],
     // 言語(language-*)と数式(math-*)。Markdownから作る
     // 言語とファイル名はremarkQiitaCodeがつける
     code: [
@@ -74,8 +88,8 @@ export const qiitaSchema: Schema = {
   },
   // 中身ごと消すもの(Ruby の Sanitize と同じ)
   strip: [
-    ...["iframe", "math", "noembed", "noframes", "noscript", "plaintext"],
-    ...["script", "style", "svg", "xmp"],
+    ...["math", "noembed", "noframes", "noscript", "plaintext"],
+    ...["style", "svg", "xmp"],
   ],
 };
 
