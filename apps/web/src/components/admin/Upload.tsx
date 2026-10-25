@@ -38,7 +38,14 @@ function dataUrl(jpeg: Uint8Array): Promise<string> {
  * 写真を足す。ドロップか選んだ写真を、位置情報などのメタデータを消したJPEGにして、
  * cats.tomlに載せたうえで下書きのブランチにコミットする。WebPやAVIFへの変換はビルドでやる(imgpipe)
  */
-export function Upload({ ids }: { ids: ReadonlySet<string> }) {
+export function Upload({
+  ids,
+  onOpen,
+}: {
+  ids: ReadonlySet<string>;
+  /** 保存した下書きを開く(公開へ進む) */
+  onOpen: (path: string) => void;
+}) {
   const [state, setState] = useState<State>({ kind: "empty" });
   const [id, setId] = useState("");
   const [alt, setAlt] = useState("");
@@ -204,9 +211,20 @@ export function Upload({ ids }: { ids: ReadonlySet<string> }) {
       )}
 
       {state.kind === "saved" && (
-        <p className={s.note} role="status">
-          写真「{state.id}」を下書きに保存しました。まだ公開していません。
-        </p>
+        <>
+          <p className={s.note} role="status">
+            写真「{state.id}」を下書きに保存しました。まだ公開していません。
+          </p>
+          <button
+            type="button"
+            className={s.button}
+            onClick={() => {
+              onOpen(`content/cats/${state.id}.jpg`);
+            }}
+          >
+            公開へ進む
+          </button>
+        </>
       )}
     </details>
   );
