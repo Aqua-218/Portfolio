@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { Trail } from "@/components/paw/Trail";
+import { plan, Trail } from "@/components/paw/Trail";
 import { Photo } from "@/components/photo/Photo";
 import { Reveal } from "@/components/reveal/Reveal";
 import { site } from "@/lib/content";
@@ -70,10 +70,35 @@ export function Section({
             <Photo id={photo} sizes="(max-width: 860px) 7.5rem, 17rem" />
           </Reveal>
         )}
-        {page && <Trail className={s.trail} seed={name} angle={75} steps={7} />}
+        {page && <PageTrail seed={name} />}
       </div>
       <div className={s.body}>{children}</div>
     </InViewSection>
+  );
+}
+
+/** 見出しの下の足跡。向き・歩数・置く場所をページごとに変える */
+function PageTrail({ seed }: { seed: string }) {
+  const p = plan(seed, {
+    // 下へ向かって、右寄りから左寄りまで
+    angle: [35, 145],
+    steps: [5, 9],
+    wobble: [8, 26],
+    x: [0, 8],
+    y: [1.25, 4.5],
+  });
+  return (
+    <Trail
+      className={s.trail}
+      seed={seed}
+      angle={p.angle}
+      steps={p.steps}
+      wobble={p.wobble}
+      style={{
+        marginLeft: `${String(p.x)}rem`,
+        marginTop: `${String(p.y)}rem`,
+      }}
+    />
   );
 }
 
