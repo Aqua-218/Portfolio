@@ -11,6 +11,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Curtain } from "@/components/curtain/Curtain";
 import { CardImages } from "@/components/markdown/CardImages";
+import { Diagrams } from "@/components/markdown/Diagrams";
 import { Footer } from "@/components/footer/Footer";
 import { Header } from "@/components/header/Header";
 import { Paws } from "@/components/paw/Paws";
@@ -43,6 +44,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <Curtain />
         <Paws />
         <CardImages />
+        <Diagrams />
       </body>
     </html>
   );

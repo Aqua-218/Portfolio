@@ -135,7 +135,8 @@ export const drawWithChromium: Drawer = async (source, id) => {
           theme: "base",
           look: "classic",
           themeVariables,
-          securityLevel: "strict",
+          // clickでリンクを張れるようにする。スクリプトは取り除く
+          securityLevel: "antiscript",
         });
         return (await mermaid.render(id, source)).svg;
       },
