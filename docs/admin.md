@@ -52,6 +52,8 @@ Workerには手を入れていない。ログインを飛ばす道は、手元�
 | ログアウトしたのに使える     | ログアウトでGitHubのトークン・セッション・端末の記憶を取り消す                                                                                                                                                                             |
 | 公開を壊される               | mainには直接コミットしない。PRを作り、必須チェック(証明・検査・VRTを含む)が通ってからマージする。mainはルールセットで守り(PR必須・例外なし)、Workerも`draft/`にしか書かせない                                                              |
 
+Qiitaへの中継(`/admin/qiita`)も、GitHubへの中継と同じく、このサイトの画面からの呼び出しで、持ち主がログインしているときだけ通す。通すのは自分の記事を読む・投稿する・更新することだけ(消す・ほかの人の記事・設定は通さない)で、送る項目も記事のもの(タイトル・本文・タグ・限定公開・スライド・organization)だけ。Qiitaのトークンは Worker の秘密にだけ置く。
+
 前提: GitHubのアカウントで2段階認証を有効にしておく。管理画面の安全はここに乗っている。
 
 ## 用意すること
@@ -79,6 +81,7 @@ Workerには手を入れていない。ログインを飛ばす道は、手元�
 5. 秘密の値を入れる。リポジトリには書かない
    - `pnpm dlx wrangler secret put GITHUB_CLIENT_SECRET`
    - `openssl rand -base64 32 | pnpm dlx wrangler secret put KEY`
+   - `pnpm dlx wrangler secret put QIITA_TOKEN`(管理画面からQiitaに出す・取り込むとき。Qiitaの個人用アクセストークン、`read_qiita`・`write_qiita`。なくてもよい)
 6. デプロイ: `pnpm dlx wrangler deploy`(`apps/admin-worker`で)
 
 鍵(`KEY`)を変えると、いまのセッションと覚えた端末はすべて使えなくなる。漏れた疑いがあるときは、鍵とClient secretの両方を作り直す。
