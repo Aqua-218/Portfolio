@@ -124,3 +124,31 @@ test("www.komineko.jpはkomineko.jpへ移す", async () => {
   assert.equal(res.statusCode, 301);
   assert.equal(res.headers.location, "https://komineko.jp/about/?x=1");
 });
+
+test("Let's Encryptの確認のパスは、HTTPでもwwwでも転送しない", async () => {
+  const res = await new Promise((resolve, reject) => {
+    const u = new URL(base);
+    request(
+      {
+        host: u.hostname,
+        port: u.port,
+        path: "/.well-known/acme-challenge/test-token",
+        headers: { host: "www.komineko.jp" },
+      },
+      resolve,
+    )
+      .on("error", reject)
+      .end();
+  });
+  res.resume();
+  // ロリポップが置くファイルがないので404。転送(301)にならないこと
+  assert.equal(res.statusCode, 404);
+});
+
+test("HTTPでないページを開いても、404のページのURLへは移さない", async () => {
+  const res = await get("/nai/", {});
+  // HTTPSへ移すのは、頼まれたURLのまま
+  if (res.status === 301)
+    assert.match(res.headers.get("location") ?? "", /\/nai\/$/);
+  else assert.equal(res.status, 404);
+});
