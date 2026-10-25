@@ -65,3 +65,27 @@ Qiitaの解析はcmark-gfm 0.29、このサイトはmicromark(CommonMark 0.31)�
 
 - 句読点(`。`など)で終わる強調のあとに、別の強調が続くとき。`a**太字。**です。b**c**`は、Qiitaでは`太字。です。bc`が1つの太字になり、サイトでは入れ子の太字になる。`**太字。**です`だけなら、どちらも太字にならない(CommonMarkの決まり)
 - 空白を含む`<https://example.com/a b>`。QiitaはHTMLのタグとみなして消し、サイトでは`https://example.com/a`だけがリンクになる
+
+## Qiitaに出す
+
+記事をmainに入れる(管理画面から公開する、またはPRをマージする)と、Actions(`.github/workflows/qiita.yml`)がQiitaに出す(`apps/web/scripts/qiita.mjs`)。
+
+| 記事                                                    | すること                                                                                                    |
+| ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `ignorePublish: true`                                   | 何もしない(サイトだけ)                                                                                      |
+| `id`がない                                              | 投稿する。ただし、同じタイトルの記事が自分のQiitaにもうあれば、それを自分の記事として扱う(二重に投稿しない) |
+| `id`があり、中身が変わった                              | 更新する                                                                                                    |
+| Qiitaの記事と中身が同じ                                 | 何もしない                                                                                                  |
+| Qiitaのほうが、前に書き戻した日時よりあとで直されている | 上書きしない(警告を出す)。Qiitaで直したものを消さないため                                                   |
+
+- 送るのはタイトル・本文・タグ・限定公開(`private`)・スライド(`slide`)・organization
+- もらった`id`と`updated_at`は、記事のfrontmatterに書き戻す(Qiita CLIと同じ)。mainには直接書けないので、書き戻しをPR(`content: Qiitaのidと日時を書き戻す`)にして、チェックが通ったら自動でマージする。そのマージでもう一度走るが、Qiitaと中身が同じなので何もしない
+- 記事のファイルを消しても、Qiitaの記事は消さない
+
+### 用意すること
+
+1. Qiitaの 設定 → アプリケーション → 個人用アクセストークン で、`read_qiita`と`write_qiita`のトークンを作る
+2. リポジトリの Settings → Secrets and variables → Actions に、`QIITA_TOKEN`として入れる
+3. 書き戻しのPRには`CONTENT_CACHE_TOKEN`([admin.md](admin.md))を使う。Contentsに加えて、Pull requests も Read and write にする
+
+`QIITA_TOKEN`を渡すのはQiitaに出すステップだけ、`CONTENT_CACHE_TOKEN`を渡すのは書き戻しのPRを作るステップ(gitとghだけ)だけ。`QIITA_TOKEN`がなければ、Qiitaには出さずに終わる。
