@@ -20,6 +20,14 @@ pub fn parse_frame(name: &str) -> Option<FrameName> {
         "tailB" => Some(FrameName::TailB),
         "peek" => Some(FrameName::Peek),
         "peekBlink" => Some(FrameName::PeekBlink),
+        "groomA" => Some(FrameName::GroomA),
+        "groomB" => Some(FrameName::GroomB),
+        "loaf" => Some(FrameName::Loaf),
+        "stretch" => Some(FrameName::Stretch),
+        "rollA" => Some(FrameName::RollA),
+        "rollB" => Some(FrameName::RollB),
+        "pounceA" => Some(FrameName::PounceA),
+        "pounceB" => Some(FrameName::PounceB),
         _ => None,
     }
 }
@@ -31,6 +39,8 @@ pub fn parse_coat(name: &str) -> Option<Coat> {
         "kuro" => Some(Coat::Kuro),
         "kiji" => Some(Coat::Kiji),
         "mike" => Some(Coat::Mike),
+        "chatora" => Some(Coat::Chatora),
+        "shiro" => Some(Coat::Shiro),
         _ => None,
     }
 }
