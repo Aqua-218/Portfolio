@@ -140,6 +140,16 @@ pub fn check_file(path: &str, text: &str) -> Result<String, JsError> {
     serde_json::to_string(&check_one(path, text)).map_err(|e| JsError::new(&e.to_string()))
 }
 
+/// JPEGに残っているメタデータ(EXIF・XMP・IPTC)の種類。なければ空の文字。
+/// ビルドの検証(`content::cats`)と同じ関数で、管理画面で写真をコミットする前に確かめる
+#[wasm_bindgen]
+#[must_use]
+pub fn jpeg_metadata(bytes: &[u8]) -> String {
+    content::cats::metadata_in_jpeg(bytes)
+        .unwrap_or_default()
+        .to_owned()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -193,5 +203,20 @@ mod tests {
                 .problems
                 .contains(&"content/profile.toml: ファイルがありません".to_owned())
         );
+    }
+
+    #[test]
+    fn jpegのメタデータをビルドと同じく見つける() {
+        // SOI、APP1(EXIF)、SOS
+        let exif = [
+            0xFF, 0xD8, 0xFF, 0xE1, 0x00, 0x08, b'E', b'x', b'i', b'f', 0, 0, 0xFF, 0xDA,
+        ];
+        assert_eq!(jpeg_metadata(&exif), "EXIF");
+        // SOI、APP0(JFIF)、SOS
+        let clean = [
+            0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x07, b'J', b'F', b'I', b'F', 0, 0xFF, 0xDA,
+        ];
+        assert_eq!(jpeg_metadata(&clean), "");
+        assert_eq!(jpeg_metadata(b"\x89PNG"), "JPEGではないデータ");
     }
 }

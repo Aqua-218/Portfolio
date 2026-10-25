@@ -3,6 +3,7 @@ import init, {
   check as checkWasm,
   check_file as checkFileWasm,
   initSync,
+  jpeg_metadata as jpegMetadataWasm,
 } from "../dist/content_wasm.js";
 
 /** 検証の結果。間違いがなければsiteに中身が入る */
@@ -68,4 +69,13 @@ export async function checkFile(
 ): Promise<FileChecked> {
   await load();
   return JSON.parse(checkFileWasm(path, text)) as FileChecked;
+}
+
+/**
+ * JPEGに残っているメタデータ(EXIF・XMP・IPTC)の種類。なければnull。
+ * ビルドの検証と同じ関数。写真をコミットする前に、位置情報などが残っていないか確かめる
+ */
+export async function jpegMetadata(bytes: Uint8Array): Promise<string | null> {
+  await load();
+  return jpegMetadataWasm(bytes) || null;
 }

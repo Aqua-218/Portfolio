@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import * as s from "./admin.css";
 import { Contents } from "./Contents";
 import { Editor } from "./Editor";
+import { PhotoDraft } from "./PhotoDraft";
 
 /**
  * ログインに失敗したときの文。Workerからは記号(?error=owner など)だけが来る。
@@ -79,6 +80,14 @@ export function Login() {
         </div>
         {open === undefined ? (
           <Contents onOpen={setOpen} />
+        ) : open.endsWith(".jpg") ? (
+          // 写真は、足した下書きだけ開ける
+          <PhotoDraft
+            path={open}
+            onBack={() => {
+              setOpen(undefined);
+            }}
+          />
         ) : (
           <Editor
             path={open}

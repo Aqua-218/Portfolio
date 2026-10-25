@@ -94,25 +94,31 @@ export async function readLatest(
   return { text, draft: false };
 }
 
+/** 下書きのブランチの先頭のコミット。ブランチがなければmainの先頭から作る */
+export async function ensureDraftBranch(branch: string): Promise<string> {
+  const ref = await api("GET", `/repos/${REPO}/git/ref/heads/${branch}`);
+  if (ref.ok) {
+    return ((await ref.json()) as { object: { sha: string } }).object.sha;
+  }
+  if (ref.status !== 404) throw new Error(String(ref.status));
+  const main = await api("GET", `/repos/${REPO}/git/ref/heads/main`);
+  if (!main.ok) throw new Error(String(main.status));
+  const { object } = (await main.json()) as { object: { sha: string } };
+  const made = await api("POST", `/repos/${REPO}/git/refs`, {
+    ref: `refs/heads/${branch}`,
+    sha: object.sha,
+  });
+  if (!made.ok) throw new Error(String(made.status));
+  return object.sha;
+}
+
 /**
  * 下書きのブランチに保存する。ブランチがなければmainから作る。
  * mainには書かない(PRを作って公開するのは #87)
  */
 export async function saveDraft(path: string, text: string): Promise<void> {
   const branch = draftBranch(path);
-  const ref = await api("GET", `/repos/${REPO}/git/ref/heads/${branch}`);
-  if (ref.status === 404) {
-    const main = await api("GET", `/repos/${REPO}/git/ref/heads/main`);
-    if (!main.ok) throw new Error(String(main.status));
-    const { object } = (await main.json()) as { object: { sha: string } };
-    const made = await api("POST", `/repos/${REPO}/git/refs`, {
-      ref: `refs/heads/${branch}`,
-      sha: object.sha,
-    });
-    if (!made.ok) throw new Error(String(made.status));
-  } else if (!ref.ok) {
-    throw new Error(String(ref.status));
-  }
+  await ensureDraftBranch(branch);
   // 下書きのブランチにあるファイルを書き換えるには、そのshaが要る
   const current = await api(
     "GET",
