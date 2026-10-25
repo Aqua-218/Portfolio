@@ -169,6 +169,21 @@ export const pair = style({
   },
 });
 
+/** オンとオフの項目を横に並べる。狭ければ折り返す */
+export const options = style({
+  display: "flex",
+  flexWrap: "wrap",
+  gap: "0.5rem 1.25rem",
+});
+
+export const option = style({
+  display: "inline-flex",
+  alignItems: "center",
+  gap: "0.45rem",
+  fontFamily: vars.font.jp,
+  fontSize: "0.875rem",
+});
+
 export const field = style({
   display: "grid",
   gap: "0.35rem",
