@@ -27,7 +27,25 @@
 
 ## 守り
 
-生のHTMLは、qiita-markdownと同じ範囲(UserInputSanitizer)だけを許し、ほかは消す。スクリプト・イベントの属性・`javascript:`・`style`の要素は残らない(`src/qiita/security.test.ts`)。表のセルの`style`は`text-align`と`border`だけ残す。埋め込みは #241 で扱う。
+生のHTMLは、qiita-markdownと同じ範囲(UserInputSanitizer)だけを許し、ほかは消す。スクリプト・イベントの属性・`javascript:`・`style`の要素は残らない(`src/qiita/security.test.ts`)。表のセルの`style`は`text-align`と`border`だけ残す。
+
+## 埋め込み
+
+Qiitaで使える埋め込みは、サイトでも出る。ただし、Qiitaのように各サービスのスクリプトを動かすことはせず、どれもそのサービスの埋め込み用のiframeに組み立て直す(`src/qiita/embeds.ts`)。ページで動くのは、このサイトのスクリプトだけ。
+
+| 埋め込み                                                                                              | Qiitaに書くもの                                    | サイトで出すiframe                                      |
+| ----------------------------------------------------------------------------------------------------- | -------------------------------------------------- | ------------------------------------------------------- |
+| YouTube・SlideShare・Googleスライド・Googleドライブ・Figma・StackBlitz・Docswell・BlueprintUE・Claude | 各サービスの`<iframe>`                             | そのまま(出どころがQiitaと同じ許可リストにあるものだけ) |
+| X(Twitter)                                                                                            | `<blockquote class="twitter-tweet">`と`widgets.js` | `platform.twitter.com/embed/Tweet.html`                 |
+| CodePen                                                                                               | `<p class="codepen">`と`ei.js`                     | `codepen.io/<ユーザー>/embed/<id>`                      |
+| SpeakerDeck                                                                                           | `<script class="speakerdeck-embed">`               | `speakerdeck.com/player/<id>`                           |
+| Docswell                                                                                              | `<script class="docswell-embed">`                  | `data-src`のURL(Docswellのものだけ)                     |
+| asciinema                                                                                             | `<script src="https://asciinema.org/a/<id>.js">`   | `asciinema.org/a/<id>/iframe`                           |
+
+- iframeの属性は、書かれたもの(`sandbox`・`allow`・`srcdoc`など)を使わず、決めたものだけにする: `sandbox`(スクリプトと、そのサービス自身への通信と、別のタブを開くこと・全画面だけ許す。ページを移したり、このページを動かしたりはできない)、`referrerpolicy="strict-origin-when-cross-origin"`(YouTubeは送らないと再生しない)、`loading="lazy"`
+- わからないiframeとscriptは消す(`src/qiita/embeds.test.ts`)
+- CSPの`frame-src`には、サイトのどこかで使っている埋め込みの出どころだけを入れる(`apps/web/scripts/headers.mjs`)
+- Xの投稿の高さは、iframeから届くメッセージ(`platform.twitter.com`からのものだけ)で合わせる(`apps/web/src/components/markdown/Embeds.tsx`)
 
 ## 互換を確かめる
 
