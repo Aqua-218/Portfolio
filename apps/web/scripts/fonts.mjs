@@ -122,7 +122,19 @@ function collect() {
     const c = style.content;
     return c.startsWith('"') ? c.slice(1, -1) : "";
   };
+  // 画面に出ないもの(Next.jsのデータのscriptなど)の字は拾わない
+  const hidden = new Set([
+    "SCRIPT",
+    "STYLE",
+    "NOSCRIPT",
+    "TEMPLATE",
+    "HEAD",
+    "TITLE",
+    "META",
+    "LINK",
+  ]);
   for (const el of document.querySelectorAll("*")) {
+    if (hidden.has(el.tagName)) continue;
     const style = getComputedStyle(el);
     for (const node of el.childNodes)
       if (node.nodeType === Node.TEXT_NODE) add(style, node.data);
@@ -161,7 +173,15 @@ async function usedChars() {
     await waitForServer();
     const page = await browser.newPage();
     for (const url of pages(out)) {
-      await page.goto(BASE + url);
+      // ブラウザで後から描くもの(図のボタンなど)も拾うよう、読み込みと描画が落ち着くまで待つ。
+      // 待たないと、ビルドのたびに拾う字が変わり、フォントの中身がゆれる
+      await page.goto(BASE + url, { waitUntil: "networkidle" });
+      await page.evaluate(
+        () =>
+          new Promise((resolve) =>
+            requestAnimationFrame(() => requestAnimationFrame(resolve)),
+          ),
+      );
       for (const { family, weight, text } of await page.evaluate(collect)) {
         // 並びの中の書体を前から見る。Geistにない字(日本語)は次のLINE Seed JPで出るので、両方に入れる
         for (const name of family
