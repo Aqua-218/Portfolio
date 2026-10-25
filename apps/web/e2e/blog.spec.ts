@@ -95,3 +95,29 @@ test.describe("記事(記法の見本)", () => {
     await expect(page.locator('script[src*="twitter"]')).toHaveCount(0);
   });
 });
+
+test("フィード(Atom)に、サイトに出す記事が全部ある", async ({
+  page,
+  request,
+}) => {
+  const res = await request.get("/blog/feed.xml");
+  expect(res.ok()).toBe(true);
+  const xml = await res.text();
+  expect(xml).toMatch(
+    /^<\?xml version="1.0" encoding="utf-8"\?>\n<feed xmlns="http:\/\/www.w3.org\/2005\/Atom"/,
+  );
+  expect(xml).toContain(
+    '<link rel="self" href="https://komineko.jp/blog/feed.xml"/>',
+  );
+  const list = posts();
+  expect(xml.match(/<entry>/g)?.length ?? 0).toBe(list.length);
+  for (const p of list)
+    expect(xml).toContain(`https://komineko.jp/blog/${p.slug}/`);
+  // 記法の見本は入れない
+  expect(xml).not.toContain("/blog/sample/");
+  // ブログのページに、フィードのありかを書く
+  await page.goto("/blog/");
+  await expect(
+    page.locator('link[rel="alternate"][type="application/atom+xml"]'),
+  ).toHaveAttribute("href", /\/blog\/feed\.xml$/);
+});
