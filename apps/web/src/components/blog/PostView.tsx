@@ -1,8 +1,13 @@
 import type { Post } from "@portfolio/content-types";
-import { type Dates, qiitaUrl, type TocItem } from "@/lib/blog";
+import type { Dates, TocItem } from "@/lib/blog";
 import { md } from "@/styles/markdown.css";
 import * as s from "./blog.css";
 import { day, Tags } from "./Posts";
+
+/** Qiitaの記事のURL。Qiitaが記事の持ち主のURLへ移してくれる */
+export function qiitaUrl(id: string): string {
+  return `https://qiita.com/items/${id}`;
+}
 
 function TocList({ toc }: { toc: TocItem[] }) {
   return (
@@ -23,7 +28,7 @@ function TocList({ toc }: { toc: TocItem[] }) {
 
 /**
  * 記事1つの見た目。本文はHTMLにしたものを受け取る。
- * サイト(ビルド)と、管理画面のプレビュー(#245)で同じものを使う
+ * サイト(ビルド)と、管理画面のプレビューで同じものを使う。ブラウザでも動くよう、node:の入るものは読み込まない
  */
 export function PostView({
   post,
