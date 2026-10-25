@@ -9,8 +9,10 @@ import remarkRehype from "remark-rehype";
 import { unified } from "unified";
 import { rehypeAlerts } from "./alerts";
 import { getHighlighter, rehypeShikiFromHighlighter } from "./highlight";
+import { type MermaidCache, rehypeMermaid } from "./mermaid";
 import { type OgpCache, rehypeLinkCards } from "./ogp";
 
+export { MermaidCache, drawWithChromium, toVars, type Drawer } from "./mermaid";
 export { OgpCache, fetchOgp, parseOgp, type Fetcher, type Ogp } from "./ogp";
 
 /**
@@ -35,6 +37,8 @@ async function processor() {
       // 見出しにidをつけ、見出しそのものをそのidへのリンクにする
       .use(rehypeSlug)
       .use(rehypeAutolinkHeadings, { behavior: "wrap" })
+      // Mermaidの図を描く。コードの色づけより先にやる
+      .use(rehypeMermaid)
       // コードに猫のテーマで色をつける。知らない言語は色なし
       .use(rehypeShikiFromHighlighter, highlighter, {
         theme: "cat",
@@ -49,6 +53,8 @@ let cached: ReturnType<typeof processor> | undefined;
 export interface RenderOptions {
   /** リンクカードのOGPのキャッシュ。なければリンクカードにしない */
   ogp?: OgpCache;
+  /** 描いたMermaidの図のキャッシュ。なければMermaidはコードのまま */
+  mermaid?: MermaidCache;
 }
 
 /** MarkdownをHTMLの文字列にする。色づけの道具を読んだりOGPを取ったりするので非同期 */
@@ -61,7 +67,10 @@ export async function render(
     await cached
   ).process({
     value: markdown,
-    data: options.ogp ? { ogp: options.ogp } : {},
+    data: {
+      ...(options.ogp ? { ogp: options.ogp } : {}),
+      ...(options.mermaid ? { mermaidCache: options.mermaid } : {}),
+    },
   });
   return String(file);
 }
