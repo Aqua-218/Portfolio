@@ -232,3 +232,95 @@ test.describe("content/の一覧", () => {
     );
   });
 });
+
+test.describe("編集", () => {
+  const EVENT = `---
+title: セキュリティ・キャンプ全国大会
+date: 2026-08-10
+end: 2026-08-15
+venue: 多摩 LINK FOREST
+tags: [Z1ゼミ]
+---
+
+いやぁ〜〜楽しかったですよ、ほんとに。
+`;
+  const TOML = 'name = "小峯 圭也"\n';
+  const b64 = (t: string) => Buffer.from(t, "utf8").toString("base64");
+
+  test.beforeEach(async ({ page }) => {
+    await page.route("**/admin/auth/me", (r) =>
+      r.fulfill({ status: 200, json: { login: "neko" } }),
+    );
+    await page.route("**/admin/api?*", (r) => {
+      const path = new URL(r.request().url()).searchParams.get("path") ?? "";
+      if (path.includes("/git/trees/")) {
+        return r.fulfill({
+          json: {
+            tree: [
+              { path: "content/events/2026-08-10-seccamp.md", type: "blob" },
+              { path: "content/profile.toml", type: "blob" },
+              { path: "content/cats/kuro.jpg", type: "blob" },
+            ],
+          },
+        });
+      }
+      if (path.includes("seccamp.md?ref=main")) {
+        return r.fulfill({ json: { content: b64(EVENT), sha: "a1" } });
+      }
+      if (path.includes("profile.toml?ref=main")) {
+        return r.fulfill({ json: { content: b64(TOML), sha: "b2" } });
+      }
+      return r.fulfill({ status: 404 });
+    });
+    await page.goto("/admin/");
+  });
+
+  test("イベントを開くと、項目がフォームに、本文がMarkdownで入る", async ({
+    page,
+  }) => {
+    await page.getByRole("button", { name: "2026-08-10-seccamp.md" }).click();
+    const editor = page.getByRole("region", {
+      name: "content/events/2026-08-10-seccamp.md の編集",
+    });
+    await expect(editor.getByLabel("タイトル")).toHaveValue(
+      "セキュリティ・キャンプ全国大会",
+    );
+    await expect(editor.getByLabel("開始日")).toHaveValue("2026-08-10");
+    await expect(editor.getByLabel(/^最終日/)).toHaveValue("2026-08-15");
+    await expect(editor.getByLabel(/^会場/)).toHaveValue("多摩 LINK FOREST");
+    await expect(editor.getByLabel(/^タグ/)).toHaveValue("Z1ゼミ");
+    await expect(editor.getByLabel("本文(Markdown)")).toHaveValue(
+      "いやぁ〜〜楽しかったですよ、ほんとに。\n",
+    );
+    await expect(editor.getByText("変更あり")).toHaveCount(0);
+  });
+
+  test("書き換えると「変更あり」になり、戻るときに確かめる", async ({
+    page,
+  }) => {
+    await page.getByRole("button", { name: "2026-08-10-seccamp.md" }).click();
+    await page.getByLabel("タイトル").fill("セキュキャン");
+    await expect(page.getByText("変更あり")).toBeVisible();
+    // 「やめる」を選ぶと、編集を続ける
+    page.once("dialog", (d) => void d.dismiss());
+    await page.getByRole("button", { name: "一覧へ戻る" }).click();
+    await expect(page.getByLabel("タイトル")).toHaveValue("セキュキャン");
+    // 元に戻すと「変更あり」は消える
+    await page.getByLabel("タイトル").fill("セキュリティ・キャンプ全国大会");
+    await expect(page.getByText("変更あり")).toHaveCount(0);
+    await page.getByRole("button", { name: "一覧へ戻る" }).click();
+    await expect(
+      page.getByRole("searchbox", { name: "名前で絞り込む" }),
+    ).toBeVisible();
+  });
+
+  test("TOMLはそのままの文字で編集する", async ({ page }) => {
+    await page.getByRole("button", { name: "プロフィール" }).click();
+    await expect(page.getByLabel("中身")).toHaveValue(TOML);
+  });
+
+  test("写真は開けない(アップロードで扱う)", async ({ page }) => {
+    await expect(page.getByText("kuro.jpg")).toBeVisible();
+    await expect(page.getByRole("button", { name: "kuro.jpg" })).toHaveCount(0);
+  });
+});
