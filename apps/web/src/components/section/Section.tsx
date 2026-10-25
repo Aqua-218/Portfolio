@@ -17,7 +17,8 @@ export type SectionName =
   | "shelf"
   | "stack"
   | "license"
-  | "admin";
+  | "admin"
+  | "markdown";
 
 export interface SectionProps {
   name: SectionName;
