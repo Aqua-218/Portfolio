@@ -1,12 +1,3 @@
-// フォントはリポジトリに入れたものを使い、ビルドで外へ取りに行かない(SIL OFL 1.1)
-import "@fontsource/geist/400.css";
-import "@fontsource/geist/500.css";
-import "@fontsource/geist/600.css";
-import "@fontsource/geist/700.css";
-import "@fontsource/geist/800.css";
-import "@fontsource/line-seed-jp/400.css";
-import "@fontsource/line-seed-jp/700.css";
-import "@fontsource/line-seed-jp/800.css";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Curtain } from "@/components/curtain/Curtain";
@@ -20,6 +11,11 @@ import "@/styles/code.css";
 import "@/styles/markdown.css";
 import "@/styles/global.css";
 import { wrap } from "@/styles/layout.css";
+
+// フォントは、ビルドではscripts/fonts.mjsがページに書き込む。開発中はFontsourceのものを読む
+if (process.env.NODE_ENV === "development") {
+  void import("./dev-fonts");
+}
 
 const DESCRIPTION =
   "高校1年生のソフトウェアエンジニア、小峯圭也のポートフォリオ。写真はぜんぶ猫。";
