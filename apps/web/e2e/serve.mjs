@@ -29,27 +29,38 @@ function resolve(pathname) {
 }
 
 /**
- * そのファイルのディレクトリの.htaccessに書いたヘッダー(Header always set 名前 "値")。
- * 本番(ロリポップ)と同じヘッダーで、e2eを走らせる
+ * そのファイルに効く.htaccessのヘッダー(Header always set 名前 "値")。
+ * Apacheと同じく、out/から順に下のディレクトリのもので上書きする。本番(ロリポップ)と同じヘッダーでe2eを走らせる
  */
 function htaccessHeaders(file) {
-  try {
-    const text = readFileSync(join(dirname(file), ".htaccess"), "utf8");
-    return Object.fromEntries(
-      [...text.matchAll(/^\s*Header always set (\S+) "(.*)"\s*$/gm)].map(
-        ([, k, v]) => [k, v],
-      ),
-    );
-  } catch {
-    return {};
+  const headers = {};
+  const rel = dirname(file).slice(root.length).split("/").filter(Boolean);
+  for (let i = 0; i <= rel.length; i++) {
+    try {
+      const text = readFileSync(
+        join(root, ...rel.slice(0, i), ".htaccess"),
+        "utf8",
+      );
+      for (const [, k, v] of text.matchAll(
+        /^\s*Header always set (\S+) "(.*)"\s*$/gm,
+      )) {
+        headers[k] = v;
+      }
+    } catch {
+      // このディレクトリにはない
+    }
   }
+  return headers;
 }
 
 createServer((req, res) => {
   const { pathname } = new URL(req.url ?? "/", "http://localhost");
   const file = resolve(pathname);
   if (!file) {
-    res.writeHead(404, { "content-type": types[".html"] });
+    res.writeHead(404, {
+      ...htaccessHeaders(join(root, "404.html")),
+      "content-type": types[".html"],
+    });
     createReadStream(join(root, "404.html")).pipe(res);
     return;
   }
