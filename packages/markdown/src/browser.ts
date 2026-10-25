@@ -1,5 +1,5 @@
 import { render as drawCat } from "@portfolio/pxcat";
-import { renderWith } from "./pipeline";
+import { type Flavor, renderWith } from "./pipeline";
 
 /** プレビューの図の代わり。Mermaidの図はビルドでChromiumを使って描くので、ブラウザでは描かない */
 const LATER =
@@ -11,10 +11,17 @@ const LATER =
  * - Mermaidの図は描かず、「保存したあとに描きます」と出す
  * - アラートの猫は、WebAssemblyのドット猫で描く
  */
-export function renderPreview(markdown: string): Promise<string> {
-  return renderWith(markdown, {
-    ogp: { get: () => Promise.resolve(undefined) },
-    mermaidCache: { get: () => Promise.resolve(LATER) },
-    cat: (frame, coat) => drawCat([frame], coat, 2),
-  });
+export function renderPreview(
+  markdown: string,
+  flavor: Flavor = "site",
+): Promise<string> {
+  return renderWith(
+    markdown,
+    {
+      ogp: { get: () => Promise.resolve(undefined) },
+      mermaidCache: { get: () => Promise.resolve(LATER) },
+      cat: (frame, coat) => drawCat([frame], coat, 2),
+    },
+    flavor,
+  );
 }

@@ -46,14 +46,29 @@ async function cat(
 
 /**
  * GitHubのアラート(`> [!NOTE]`など)を、猫のついた注意書きにする。
+ * blockquotes: falseなら引用はそのまま(Qiitaの記法では`[!NOTE]`は文字のまま)で、ほかで作った注意書きの猫だけ描く。
  * `<div class="callout callout-note">猫<div><b>NOTE</b>本文</div></div>`
  */
-export function rehypeAlerts() {
+export function rehypeAlerts(options: { blockquotes?: boolean } = {}) {
+  const blockquotes = options.blockquotes ?? true;
   return async (tree: Root, file: VFile) => {
     // 猫を描くのは非同期なので、見つけたあとでまとめて描く
     const cats: { span: Element; kind: Kind }[] = [];
+    // ほかで作った注意書き(Qiitaの:::note)の猫。data-kindに種類がある
+    visit(tree, "element", (node: Element) => {
+      const kind = node.properties.dataKind;
+      if (node.tagName === "span" && typeof kind === "string" && isKind(kind)) {
+        delete node.properties.dataKind;
+        cats.push({ span: node, kind });
+      }
+    });
     visit(tree, "element", (node: Element, index, parent) => {
-      if (node.tagName !== "blockquote" || !parent || index === undefined)
+      if (
+        !blockquotes ||
+        node.tagName !== "blockquote" ||
+        !parent ||
+        index === undefined
+      )
         return;
       const first = node.children.find(
         (c): c is Element => c.type === "element",

@@ -1,0 +1,4 @@
+# 互換テストの正解を作るための、本物のQiitaのMarkdown(qiita-markdown)。golden.shから使う
+source "https://rubygems.org"
+
+gem "qiita-markdown", "1.8.0"
