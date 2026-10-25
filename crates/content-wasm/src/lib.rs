@@ -4,7 +4,7 @@ use std::collections::BTreeMap;
 
 use content::problem::Problem;
 use content::site::{Memory, Site, load_from};
-use content::{affiliations, event_years, events, licenses, profile, shelf, skills, work};
+use content::{affiliations, blog, event_years, events, licenses, profile, shelf, skills, work};
 use serde::Serialize;
 use wasm_bindgen::prelude::*;
 
@@ -92,6 +92,11 @@ pub fn check_one(path: &str, text: &str) -> FileChecked {
         .and_then(|n| n.strip_suffix(".md"))
     {
         Some(problems(events::parse(slug, text)))
+    } else if let Some(slug) = path
+        .strip_prefix("blog/")
+        .and_then(|n| n.strip_suffix(".md"))
+    {
+        Some(problems(blog::parse(slug, text)))
     } else {
         match path {
             "profile.toml" => Some(problems(profile::parse(text))),
@@ -218,5 +223,13 @@ mod tests {
         ];
         assert_eq!(jpeg_metadata(&clean), "");
         assert_eq!(jpeg_metadata(b"\x89PNG"), "JPEGではないデータ");
+    }
+
+    #[test]
+    fn ブログの記事もビルドと同じく検証する() {
+        let checked = check_one("blog/a.md", "---\ntitle: t\ntags: []\n---\n本文\n");
+        assert!(checked.supported);
+        assert_eq!(checked.problems.len(), 1, "{checked:?}");
+        assert!(checked.problems[0].text.starts_with("content/blog/a.md:"));
     }
 }
