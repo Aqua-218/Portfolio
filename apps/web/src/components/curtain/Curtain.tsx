@@ -19,6 +19,7 @@ const LABEL: Readonly<Record<string, string>> = {
   "/cats": "Cats",
   "/stack": "Stack",
   "/license": "License",
+  "/blog": "Blog",
 };
 
 /** 末尾の/をそろえる。usePathnameとlocation.pathnameで付き方が違うため。 */
