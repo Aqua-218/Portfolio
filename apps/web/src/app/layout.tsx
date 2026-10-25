@@ -10,6 +10,7 @@ import "@fontsource/line-seed-jp/800.css";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Curtain } from "@/components/curtain/Curtain";
+import { CardImages } from "@/components/markdown/CardImages";
 import { Footer } from "@/components/footer/Footer";
 import { Header } from "@/components/header/Header";
 import { Paws } from "@/components/paw/Paws";
@@ -41,6 +42,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         </div>
         <Curtain />
         <Paws />
+        <CardImages />
       </body>
     </html>
   );
