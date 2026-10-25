@@ -19,6 +19,9 @@ globalStyle("pre.shiki", {
     "--shiki-token-parameter": vars.color.ink,
     "--shiki-token-punctuation": vars.color.ink,
     "--shiki-token-link": vars.color.mike,
+    // 差分の足した行と消した行の文字。行の背景に色をつけるので、文字は墨のまま
+    "--shiki-token-inserted": vars.color.ink,
+    "--shiki-token-deleted": vars.color.ink,
   },
   margin: "0 0 1rem",
   padding: "1rem 1.15rem",
@@ -31,4 +34,17 @@ globalStyle("pre.shiki", {
 globalStyle("pre.shiki code", {
   fontFamily: vars.font.mono,
   whiteSpace: "pre",
+});
+
+/** ブログの記事の差分(```diff_rubyなど)の、足した行と消した行 */
+globalStyle("pre.shiki .line.diff-add", {
+  display: "inline-block",
+  minWidth: "100%",
+  background: `color-mix(in srgb, ${vars.color.leaf} 18%, transparent)`,
+});
+
+globalStyle("pre.shiki .line.diff-del", {
+  display: "inline-block",
+  minWidth: "100%",
+  background: `color-mix(in srgb, ${vars.color.mike} 18%, transparent)`,
 });
