@@ -183,3 +183,17 @@ export const item = style({
   cursor: "pointer",
   ":hover": { color: vars.color.mike },
 });
+
+export const fieldError = style({
+  color: vars.color.mike,
+  fontSize: "0.8125rem",
+  fontWeight: 700,
+});
+
+export const problems = style({
+  margin: 0,
+  paddingLeft: "1.2em",
+  fontFamily: vars.font.jp,
+  fontSize: "0.875rem",
+  color: vars.color.mike,
+});
