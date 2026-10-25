@@ -1,9 +1,10 @@
 import { globalStyle, style } from "@vanilla-extract/css";
 import { vars } from "@/styles/theme.css";
 
+// 左下にはNext.jsの開発用のバッジが出て、ボタンにかぶさって押せなくなるので、右下に置く
 export const menu = style({
   position: "fixed",
-  left: "1rem",
+  right: "1rem",
   bottom: "1rem",
   zIndex: 1000,
   fontFamily: vars.font.jp,
@@ -23,7 +24,7 @@ export const toggle = style({
 
 export const panel = style({
   position: "absolute",
-  left: 0,
+  right: 0,
   bottom: "calc(100% + 0.5rem)",
   width: "16rem",
   maxHeight: "70vh",
