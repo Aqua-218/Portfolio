@@ -125,6 +125,107 @@ export async function recentRuns(count = 6): Promise<Run[]> {
   }));
 }
 
+/** content/ を変えたコミット */
+export interface Commit {
+  sha: string;
+  message: string;
+  at: string;
+  url: string;
+}
+
+/** `since`の日からあとに content/ を変えたコミット(新しい順、300件まで) */
+export async function contentCommits(since: Date): Promise<Commit[]> {
+  const day = since.toISOString().slice(0, 10);
+  const out: Commit[] = [];
+  for (let page = 1; page <= 3; page++) {
+    const res = await api(
+      "GET",
+      `/repos/${REPO}/commits?path=content&since=${day}&per_page=100&page=${String(page)}`,
+    );
+    if (!res.ok) throw new Error(String(res.status));
+    const list = (await res.json()) as {
+      sha: string;
+      html_url?: string;
+      commit: { message: string; author?: { date?: string } | null };
+    }[];
+    out.push(
+      ...list.map((c) => ({
+        sha: c.sha,
+        // 1行目だけ
+        message: c.commit.message.split("\n")[0] ?? "",
+        at: c.commit.author?.date ?? "",
+        url: c.html_url ?? "",
+      })),
+    );
+    if (list.length < 100) break;
+  }
+  return out;
+}
+
+/** 週のはじめ(月曜の0時、手元の時刻)。`now`の週を最後に、`count`週ぶん古い順 */
+export function weekStarts(now: Date, count: number): Date[] {
+  const monday = new Date(now);
+  monday.setHours(0, 0, 0, 0);
+  monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
+  return Array.from({ length: count }, (_, i) => {
+    const d = new Date(monday);
+    d.setDate(d.getDate() - 7 * (count - 1 - i));
+    return d;
+  });
+}
+
+/** 週ごとに分ける。どの週にも入らない(古すぎる・日時がない)ものは捨てる */
+export function perWeek<T>(
+  items: readonly T[],
+  at: (item: T) => string,
+  starts: readonly Date[],
+): T[][] {
+  const out = starts.map((): T[] => []);
+  for (const item of items) {
+    const t = Date.parse(at(item));
+    if (Number.isNaN(t)) continue;
+    for (let i = starts.length - 1; i >= 0; i--) {
+      const start = starts[i];
+      if (start && t >= start.getTime()) {
+        out[i]?.push(item);
+        break;
+      }
+    }
+  }
+  return out;
+}
+
+/** 最近の動き。コミットと公開(Actions)を、新しい順に混ぜる */
+export interface Activity {
+  kind: "commit" | "run";
+  title: string;
+  at: string;
+  summary?: Summary;
+}
+
+export function activity(
+  commits: readonly Commit[],
+  runs: readonly Run[],
+  count = 8,
+): Activity[] {
+  return [
+    ...commits.map((c): Activity => ({
+      kind: "commit",
+      title: c.message,
+      at: c.at,
+    })),
+    ...runs.map((r): Activity => ({
+      kind: "run",
+      title: r.name,
+      at: r.at,
+      summary: summarize([r]),
+    })),
+  ]
+    .filter((a) => a.at !== "")
+    .sort((a, b) => Date.parse(b.at) - Date.parse(a.at))
+    .slice(0, count);
+}
+
 /** mainのブログの記事と、そのQiitaへの出し具合 */
 export async function postStates(
   paths: readonly string[],

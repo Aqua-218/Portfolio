@@ -16,6 +16,8 @@ export const colorNames = [
   "pxline",
   "note",
   "leaf",
+  "sora",
+  "kaki",
 ] as const;
 
 export type ColorName = (typeof colorNames)[number];
@@ -32,6 +34,9 @@ export const light: Palette = {
   pxline: { l: 0.24, c: 0.015, h: 70 }, // ドット猫の輪郭
   note: { l: 0.915, c: 0.038, h: 75 }, // 図のメモ(モックの #f2e0c8)
   leaf: { l: 0.5, c: 0.06, h: 140 }, // コードの型名
+  // 管理画面のグラフの成功と失敗。色の見分けにくい人でも分かれる組(青と茶)
+  sora: { l: 0.573, c: 0.125, h: 252 },
+  kaki: { l: 0.66, c: 0.145, h: 55 },
 };
 
 export const dark: Palette = {
@@ -44,6 +49,9 @@ export const dark: Palette = {
   pxline: { l: 0.82, c: 0.012, h: 95 },
   note: { l: 0.361, c: 0.034, h: 66 }, // モックの #4a3a2a
   leaf: { l: 0.5, c: 0.06, h: 140 },
+  // 暗い地では、グラフの線や棒の明るさの範囲に入るよう、青を少し明るく、茶は明るい地と同じ
+  sora: { l: 0.643, c: 0.119, h: 256 },
+  kaki: { l: 0.66, c: 0.145, h: 55 },
 };
 
 export function toCss({ l, c, h }: Oklch): string {

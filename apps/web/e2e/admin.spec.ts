@@ -1,6 +1,15 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { expect, type Page, test } from "@playwright/test";
 
+/** 左のメニューから画面を選ぶ */
+async function menu(page: Page, name: string) {
+  await page
+    .getByRole("navigation", { name: "管理画面のメニュー" })
+    .getByRole("button", { name, exact: false })
+    .first()
+    .click();
+}
+
 /** Wasmや大きなモジュールを初めて読み込むのを待つ時間。e2eを並べて走らせると、読み込みが遅くなる */
 const WASM = 15_000;
 
@@ -200,6 +209,7 @@ test.describe("content/の一覧", () => {
       });
     });
     await page.goto("/admin/");
+    await menu(page, "ファイル");
     const list = page.getByRole("region", { name: "content/ の一覧" });
     await expect(
       list.getByRole("heading", { name: /^イベント/ }),
@@ -233,6 +243,7 @@ test.describe("content/の一覧", () => {
       }),
     );
     await page.goto("/admin/");
+    await menu(page, "ファイル");
     const list = page.getByRole("region", { name: "content/ の一覧" });
     await list
       .getByRole("searchbox", { name: "名前で絞り込む" })
@@ -254,6 +265,7 @@ test.describe("content/の一覧", () => {
       }),
     );
     await page.goto("/admin/");
+    await menu(page, "ファイル");
     const list = page.getByRole("region", { name: "content/ の一覧" });
     await expect(
       list.getByRole("listitem").filter({ hasText: "2026-08-10-seccamp.md" }),
@@ -313,6 +325,7 @@ tags: [Z1ゼミ]
       return r.fulfill({ status: 404 });
     });
     await page.goto("/admin/");
+    await menu(page, "ファイル");
   });
 
   test("イベントを開くと、項目がフォームに、本文がMarkdownで入る", async ({
@@ -451,7 +464,9 @@ tags: [Z1ゼミ]
     );
     await expect(page.getByText("変更あり")).toHaveCount(0);
     await expect(
-      page.locator("main").getByText("下書き", { exact: true }),
+      page
+        .getByRole("region", { name: /の編集$/ })
+        .getByText("下書き", { exact: true }),
     ).toBeVisible();
 
     const repo = "/repos/Aqua-218/Portfolio";
@@ -755,6 +770,7 @@ test.describe("写真を足す", () => {
       return r.fulfill({ status: 404 });
     });
     await page.goto("/admin/");
+    await menu(page, "写真");
     await page.locator("summary", { hasText: "写真を足す" }).click();
 
     const gps = withGps();
@@ -873,7 +889,8 @@ test.describe("写真を足す", () => {
       return r.fulfill({ status: 404 });
     });
     await page.goto("/admin/");
-    const list = page.getByRole("region", { name: "content/ の一覧" });
+    await menu(page, "写真");
+    const list = page.getByRole("region", { name: "写真の画面" });
     await expect(
       list.getByRole("heading", { name: /^足した写真の下書き/ }),
     ).toBeVisible();
@@ -914,6 +931,7 @@ test.describe("写真を足す", () => {
       }),
     );
     await page.goto("/admin/");
+    await menu(page, "写真");
     await page.locator("summary", { hasText: "写真を足す" }).click();
     await page.getByLabel("写真を選ぶ").setInputFiles({
       name: "a.jpg",
@@ -977,6 +995,7 @@ ignorePublish: false
       return r.fulfill({ status: 404 });
     });
     await page.goto("/admin/");
+    await menu(page, "ブログ");
   });
 
   /** Qiitaの代わり。itemsは自分の記事 */
@@ -1017,7 +1036,7 @@ ignorePublish: false
   test("記事の項目がフォームに、本文がMarkdownで入る。プレビューはQiitaの記法で、本番の記事と同じ見た目", async ({
     page,
   }) => {
-    await page.getByRole("button", { name: "cat.md" }).click();
+    await page.getByRole("button", { name: "Rustで猫を描く" }).click();
     await expect(page.getByLabel("タイトル")).toHaveValue("Rustで猫を描く");
     await expect(page.getByLabel(/^タグ/)).toHaveValue("Rust");
     await expect(page.getByLabel("Qiitaには出さない")).not.toBeChecked();
@@ -1061,7 +1080,7 @@ ignorePublish: false
     page,
   }) => {
     await fakeQiita(page, []);
-    await page.getByRole("button", { name: "cat.md" }).click();
+    await page.getByRole("button", { name: "Rustで猫を描く" }).click();
     await page.getByRole("button", { name: "Qiitaに出す" }).click();
     // 押しただけでは出さない。Qiitaの様子を見てから、もう一度確かめる
     await expect(
@@ -1101,7 +1120,7 @@ ignorePublish: false
         updated_at: "2026-10-20T10:00:00+09:00",
       },
     ]);
-    await page.getByRole("button", { name: "cat.md" }).click();
+    await page.getByRole("button", { name: "Rustで猫を描く" }).click();
     await page.getByRole("button", { name: "Qiitaに出す" }).click();
     await expect(
       page.getByText("同じタイトルの記事がもうQiitaにあります", {
@@ -1114,7 +1133,7 @@ ignorePublish: false
   });
 
   test("保存していない変更があれば、Qiitaには出さない", async ({ page }) => {
-    await page.getByRole("button", { name: "cat.md" }).click();
+    await page.getByRole("button", { name: "Rustで猫を描く" }).click();
     await page.getByLabel("タイトル").fill("書きかけ");
     await expect(
       page.getByText("Qiitaに出すには、先に下書きに保存してください。"),
@@ -1270,10 +1289,29 @@ test.describe("ダッシュボード", () => {
                 display_title: "公開",
                 status: "completed",
                 conclusion: "success",
-                created_at: "2026-10-25T05:00:00Z",
+                created_at: new Date().toISOString(),
+              },
+              {
+                name: "qiita",
+                display_title: "Qiita",
+                status: "completed",
+                conclusion: "failure",
+                created_at: new Date(Date.now() - 60_000).toISOString(),
               },
             ],
           },
+        });
+      if (path.includes("/commits?path=content"))
+        return r.fulfill({
+          json: [
+            {
+              sha: "c1",
+              commit: {
+                message: "content: 猫を足す\n\n本文",
+                author: { date: new Date(Date.now() - 120_000).toISOString() },
+              },
+            },
+          ],
         });
       if (path.includes("blog/cat.md?ref=main"))
         return r.fulfill({
@@ -1292,44 +1330,78 @@ test.describe("ダッシュボード", () => {
       }),
     );
     await page.goto("/admin/");
+    const home = page.getByRole("region", { name: "ホームの画面" });
 
-    const drafts = page.getByRole("region", { name: "下書き" });
-    await expect(drafts.getByRole("heading")).toContainText("1");
-    await drafts
-      .getByRole("button", { name: "events/2026-08-10-seccamp.md" })
-      .isVisible();
-    const pulls = page.getByRole("region", { name: "公開待ち" });
+    // 数のカード。押すとその画面へ
     await expect(
-      pulls.getByRole("button", {
-        name: "content: イベント「セキュキャン」を更新する",
+      home.getByRole("button", { name: /^ブログの記事 1/ }),
+    ).toBeVisible();
+    await expect(home.getByRole("button", { name: /^下書き 1/ })).toBeVisible();
+    await expect(
+      home.getByRole("button", {
+        name: /^公開待ち 1 1件のチェックが落ちました/,
       }),
     ).toBeVisible();
-    await expect(pulls.getByText("落ちました")).toBeVisible();
-    const runs = page.getByRole("region", { name: "最近の公開" });
-    await expect(runs.getByText("deploy")).toBeVisible();
-    await expect(runs.getByText("通りました")).toBeVisible();
-    const blog = page.getByRole("region", { name: "ブログとQiita" });
-    await expect(blog.getByText("Qiitaのほうが新しい")).toBeVisible();
-    await expect(
-      blog.getByText("「猫」はQiitaのほうが新しく直されています。"),
-    ).toBeVisible();
-    const content = page.getByRole("region", { name: "中身" });
-    await expect(content.getByRole("heading")).toContainText("3");
+    await expect(home.getByText(/^今週の変更/).locator("..")).toContainText(
+      "1",
+    );
 
-    // 「新しい記事を書く」で、記事のファイル名の欄へ
-    await page.getByRole("button", { name: "新しい記事を書く" }).click();
-    await expect(page.getByLabel(/^新しい記事のファイル名/)).toBeFocused();
-    // 「写真を足す」で、写真の入口を開く
-    await page.getByRole("button", { name: "写真を足す" }).click();
-    await expect(page.locator("#admin-upload")).toHaveAttribute("open", "");
-    // 下書きを押すと開く
-    await drafts
+    // グラフ。数は表でも見られる
+    const changes = home.getByRole("region", {
+      name: "content/ の変更(週ごと)",
+    });
+    await expect(changes.getByRole("img")).toHaveAttribute("aria-label", /件$/);
+    const publishes = home.getByRole("region", { name: "公開(週ごと)" });
+    await expect(
+      publishes.getByRole("listitem").filter({ hasText: "成功" }),
+    ).toBeVisible();
+    await publishes.getByText("表で見る").click();
+    await expect(publishes.getByRole("row").last()).toContainText("11");
+
+    // Qiitaへの出し具合と、Qiitaのほうが新しい記事
+    const qiita = home.getByRole("region", { name: "Qiitaへの出し具合" });
+    await expect(
+      qiita.getByRole("meter", { name: "Qiitaのほうが新しい" }),
+    ).toHaveAttribute("aria-valuenow", "1");
+    await expect(
+      qiita.getByText("「猫」はQiitaのほうが新しく直されています。"),
+    ).toBeVisible();
+
+    // 最近の動きは、コミットと公開を新しい順に
+    const feed = home.getByRole("region", { name: "最近の動き" });
+    await expect(feed.getByRole("listitem").nth(0)).toContainText("deploy");
+    await expect(feed.getByRole("listitem").nth(1)).toContainText("落ちました");
+    await expect(feed.getByRole("listitem").nth(2)).toContainText(
+      "content: 猫を足す",
+    );
+
+    // 数のカードとメニューから、その画面へ
+    await home.getByRole("button", { name: /^下書き 1/ }).click();
+    await expect(
+      page.getByRole("region", { name: "下書きの画面" }),
+    ).toBeVisible();
+    await page
+      .getByRole("region", { name: "下書きの画面" })
       .getByRole("button", { name: "events/2026-08-10-seccamp.md" })
       .click();
     await expect(
       page.getByRole("region", {
         name: "content/events/2026-08-10-seccamp.md の編集",
       }),
+    ).toBeVisible();
+    // 戻ると、もとの画面
+    await page.getByRole("button", { name: "一覧へ戻る" }).click();
+    await expect(
+      page.getByRole("region", { name: "下書きの画面" }),
+    ).toBeVisible();
+    // 上の検索で、ファイルの画面へ
+    await page
+      .getByRole("searchbox", { name: "ファイルを探す" })
+      .fill("seccamp");
+    await expect(
+      page
+        .getByRole("region", { name: "content/ の一覧" })
+        .getByRole("button", { name: "2026-08-10-seccamp.md" }),
     ).toBeVisible();
   });
 });
@@ -1412,6 +1484,7 @@ test.describe("Qiitaから取り込む", () => {
       }),
     );
     await page.goto("/admin/");
+    await menu(page, "ブログ");
     await page.locator("summary", { hasText: "Qiitaから取り込む" }).click();
     await expect(page.getByLabel(/^前の記事/)).toBeDisabled();
     await expect(page.getByText("取り込み済み")).toBeVisible();

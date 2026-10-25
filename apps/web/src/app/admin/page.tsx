@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Login } from "@/components/admin/Login";
-import { Lead, Section } from "@/components/section/Section";
+import { page } from "@/components/admin/admin.css";
 import { SITE_NAME } from "@/lib/meta";
 
 export const metadata: Metadata = {
@@ -9,19 +9,14 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-/** 管理画面。content/をブラウザから編集して、GitHubにコミットする */
+/**
+ * 管理画面。content/をブラウザから編集して、GitHubにコミットする。
+ * ほかのページと違い、見出しの列を置かず、横いっぱいを管理画面に使う
+ */
 export default function Admin() {
   return (
-    <Section
-      name="admin"
-      id="p-admin"
-      title="Admin"
-      subtitle="管理画面"
-      page
-      wide
-    >
-      <Lead>content/ をここから編集して、GitHub にコミットします。</Lead>
+    <div className={page}>
       <Login />
-    </Section>
+    </div>
   );
 }
