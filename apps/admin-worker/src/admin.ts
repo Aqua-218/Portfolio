@@ -17,6 +17,8 @@ export interface Config {
   origin: string;
   /** セッションと端末の記憶を暗号化する鍵(AES-GCM、32バイト) */
   key: CryptoKey;
+  /** Qiitaのトークン(read_qiita・write_qiita)。なければQiitaへは中継しない */
+  qiitaToken?: string;
 }
 
 /** KV のうち使うところだけ */
@@ -258,6 +260,63 @@ export function writable(
   return false;
 }
 
+/** Qiitaの記事のid(16進の20字) */
+const QIITA_ID = /^[0-9a-f]{20}$/;
+
+/**
+ * Qiitaへ中継してよいか。自分の記事を読む・投稿する・更新することだけ。
+ * 消す・ほかの人の記事・ユーザーの設定などは通さない
+ */
+export function qiitaAllowed(method: string, path: string): boolean {
+  const [route = "", query] = path.split("?");
+  if (
+    query !== undefined &&
+    !/^[a-z_]+=\d{1,3}(&[a-z_]+=\d{1,3})*$/.test(query)
+  )
+    return false;
+  const item = /^\/api\/v2\/items\/([^/]+)$/.exec(route)?.[1];
+  if (method === "GET" && route === "/api/v2/authenticated_user/items")
+    return true;
+  if (method === "GET" && item !== undefined)
+    return QIITA_ID.test(item) && query === undefined;
+  if (method === "POST" && route === "/api/v2/items")
+    return query === undefined;
+  if (method === "PATCH" && item !== undefined)
+    return QIITA_ID.test(item) && query === undefined;
+  return false;
+}
+
+/** Qiitaに送る記事の項目。ほかの項目(共同編集・ツイートなど)は通さない */
+const QIITA_FIELDS = new Set([
+  "title",
+  "body",
+  "tags",
+  "private",
+  "slide",
+  "organization_url_name",
+]);
+
+/** Qiitaへの書き込みの中身が、記事の項目だけか */
+export function qiitaWritable(method: string, body: string): boolean {
+  if (method === "GET") return true;
+  let data: unknown;
+  try {
+    data = JSON.parse(body);
+  } catch {
+    return false;
+  }
+  if (typeof data !== "object" || data === null || Array.isArray(data))
+    return false;
+  const d = data as Record<string, unknown>;
+  return (
+    Object.keys(d).every((k) => QIITA_FIELDS.has(k)) &&
+    typeof d.title === "string" &&
+    typeof d.body === "string" &&
+    Array.isArray(d.tags) &&
+    (d.private === undefined || typeof d.private === "boolean")
+  );
+}
+
 /**
  * このサイトの画面からの呼び出しか。独自ヘッダー X-Admin(別のサイトからはつけられない)があり、
  * Origin がこのサイトか、Origin がないとき(同じサイトへの GET)は Sec-Fetch-Site が same-origin
@@ -304,6 +363,8 @@ export class Admin {
           : json(405, { error: "POST で呼んでください" });
       case "/admin/api":
         return this.api(req, url.searchParams.get("path") ?? "");
+      case "/admin/qiita":
+        return this.qiita(req, url.searchParams.get("path") ?? "");
       default:
         return json(404, { error: "見つかりません" });
     }
@@ -655,6 +716,40 @@ export class Admin {
     if (!res.ok) return null;
     const user = await res.json<{ id?: number; login?: string }>();
     return user.id === this.d.config.ownerId ? (user.login ?? "") : null;
+  }
+
+  /**
+   * Qiitaへの中継。管理画面にログインしている持ち主だけ。Qiitaのトークンは Worker の秘密にだけ置き、ブラウザには渡さない
+   */
+  private async qiita(req: Request, path: string): Promise<Response> {
+    if (!sameSite(req, this.d.config.origin))
+      return json(403, { error: "別のサイトからは操作できません" });
+    if (!qiitaAllowed(req.method, path))
+      return json(403, { error: "その操作はできません" });
+    const body = req.method === "GET" ? null : await req.text();
+    if (!qiitaWritable(req.method, body ?? ""))
+      return json(403, { error: "その操作はできません" });
+    const set: string[] = [];
+    const session =
+      (await this.session(req, set)) ?? (await this.resume(req, set));
+    if (session === null)
+      return json(401, { error: "ログインしていません" }, set);
+    const token = this.d.config.qiitaToken;
+    if (!token) return json(503, { error: "Qiitaのトークンがありません" }, set);
+    const res = await this.d.fetch(`https://qiita.com${path}`, {
+      method: req.method,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "User-Agent": "portfolio-admin",
+        ...(body === null ? {} : { "Content-Type": "application/json" }),
+      },
+      body,
+    });
+    const headers = new Headers({
+      "Content-Type": "application/json; charset=utf-8",
+    });
+    for (const c of set) headers.append("Set-Cookie", c);
+    return new Response(await res.text(), { status: res.status, headers });
   }
 
   private github(
