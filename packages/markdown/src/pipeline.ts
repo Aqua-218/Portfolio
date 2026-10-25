@@ -15,6 +15,7 @@ import { type OgpSource, rehypeLinkCards } from "./cards";
 import { type MermaidSource, rehypeMermaid } from "./diagrams";
 import { getHighlighter, rehypeShikiFromHighlighter } from "./highlight";
 import { customBlocks } from "./qiita/blocks";
+import { rehypeQiitaEmbeds } from "./qiita/embeds";
 import { remarkQiitaCode } from "./qiita/code";
 import {
   rehypeQiitaCode,
@@ -87,6 +88,8 @@ async function qiitaProcessor() {
       .use(rehypeRaw)
       .use(rehypeSanitize, qiitaSchema)
       .use(rehypeQiitaStyle)
+      // 埋め込みは、各サービスのiframeに組み立て直す。外のスクリプトは動かさない
+      .use(rehypeQiitaEmbeds)
       .use(rehypeQiitaHeadings)
       .use(rehypeQiitaNotes)
       .use(rehypeQiitaEmoji)
