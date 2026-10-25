@@ -78,6 +78,31 @@ function one(node: ElementContent, side: Side): string {
     return `math${p.dataDisplay === "block" ? "[display]" : ""}{${textContent(node)}}`;
   if (tag === "br") return "⏎";
 
+  // 埋め込み。Qiitaはそのまま、このサイトはiframe(data-embedに種類と鍵)
+  if (side === "site" && tag === "div" && hasClass(node, "embed")) {
+    const frame = findTag(node, "iframe");
+    return `embed[${String(frame?.properties.dataEmbed)}]`;
+  }
+  if (side === "qiita") {
+    if (tag === "iframe") return `embed[iframe:${String(p.src)}]`;
+    if (tag === "blockquote" && hasClass(node, "twitter-tweet")) {
+      const href = findTag(node, "a")?.properties.href;
+      const id = /\/status\/(\d+)/.exec(String(href))?.[1];
+      return `embed[tweet:${String(id)}]`;
+    }
+    if (tag === "p" && hasClass(node, "codepen"))
+      return `embed[codepen:${String(p.dataUser)}/${String(p.dataSlugHash)}]`;
+    if (tag === "script") {
+      if (hasClass(node, "speakerdeck-embed"))
+        return `embed[speakerdeck:${String(p.dataId)}]`;
+      if (hasClass(node, "docswell-embed"))
+        return `embed[docswell:${String(p.dataSrc)}]`;
+      const cast = /asciinema\.org\/a\/([\w-]+)\.js$/.exec(String(p.src))?.[1];
+      // Xやcodepenのスクリプトは、上の引用やpといっしょに1つの埋め込み
+      return cast ? `embed[asciinema:${cast}]` : "";
+    }
+  }
+
   // 注意書き
   if (side === "qiita" && tag === "div" && hasClass(node, "note")) {
     const type = (p.className as string[]).find((c) => c !== "note") ?? "info";
