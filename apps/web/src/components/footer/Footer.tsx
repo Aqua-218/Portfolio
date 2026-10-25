@@ -109,15 +109,17 @@ export function footerSeed(pathname: string): string {
 function FooterTrail({ pathname }: { pathname: string }) {
   const seed = footerSeed(pathname);
   const p = plan(seed, {
-    // 右へ、ときどき左へ。ほぼ横に歩く
-    angle: [-12, 12],
-    steps: [6, 10],
-    wobble: [4, 12],
-    x: [2, 40],
-    y: [0, 1],
+    // 横に歩くのを基本に、斜めに上り下りするページもある
+    angle: [-32, 32],
+    steps: [5, 11],
+    wobble: [4, 18],
+    // 左の端・まんなか・右の端のどこにでも置く。足跡の幅は60%までなので、40%までずらせる
+    x: [0, 40],
+    y: [0, 1.5],
   });
-  // 半分ほどのページでは、左へ歩く
+  // 半分ほどのページでは左へ歩き、右の端から数えて置く
   const left = (p.steps + Math.round(p.x)) % 2 === 1;
+  const offset = `${String(p.x)}%`;
   return (
     <Trail
       className={s.trail}
@@ -125,7 +127,11 @@ function FooterTrail({ pathname }: { pathname: string }) {
       angle={left ? 180 + p.angle : p.angle}
       steps={p.steps}
       wobble={p.wobble}
-      style={{ marginRight: `${String(p.x)}%`, marginTop: `${String(p.y)}rem` }}
+      style={{
+        marginLeft: left ? "auto" : offset,
+        marginRight: left ? offset : "auto",
+        marginTop: `${String(p.y)}rem`,
+      }}
     />
   );
 }
