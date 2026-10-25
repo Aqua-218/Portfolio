@@ -822,6 +822,84 @@ test.describe("写真を足す", () => {
     });
   });
 
+  test("足した写真の下書きを開き、cats.tomlの違いを確かめて公開する", async ({
+    page,
+  }) => {
+    const DRAFT_TOML = `${TOML}\n[[photo]]\nid = "tama"\nalt = "寝ている三毛猫"\ncoats = ["mike"]\n`;
+    const photo = readFileSync(
+      new URL("../../../content/cats/futari.jpg", import.meta.url),
+    );
+    const calls: { method: string; path: string; body: unknown }[] = [];
+    await page.route("**/admin/auth/me", (r) =>
+      r.fulfill({ status: 200, json: { login: "neko" } }),
+    );
+    await page.route("**/admin/api?*", (r) => {
+      const req = r.request();
+      const path = new URL(req.url()).searchParams.get("path") ?? "";
+      const body: unknown = req.postData() ? req.postDataJSON() : null;
+      calls.push({ method: req.method(), path, body });
+      const b64 = (t: string | Buffer) => Buffer.from(t).toString("base64");
+      if (path.includes("/git/matching-refs/"))
+        return r.fulfill({ json: [{ ref: "refs/heads/draft/cats/tama.jpg" }] });
+      if (path.includes("/git/trees/main"))
+        return r.fulfill({
+          json: { tree: [{ path: "content/cats/kuro.jpg", type: "blob" }] },
+        });
+      if (path.includes("tama.jpg?ref=draft/cats/tama.jpg"))
+        return r.fulfill({ json: { sha: "p1" } });
+      if (path.endsWith("/git/blobs/p1"))
+        return r.fulfill({ json: { content: b64(photo) } });
+      if (path.includes("cats.toml?ref=draft/cats/tama.jpg"))
+        return r.fulfill({ json: { content: b64(DRAFT_TOML), sha: "d" } });
+      if (path.includes("cats.toml?ref=main"))
+        return r.fulfill({ json: { content: b64(TOML), sha: "m" } });
+      if (path.startsWith(`${repo}/pulls?`)) return r.fulfill({ json: [] });
+      if (req.method() === "POST" && path === `${repo}/pulls`)
+        return r.fulfill({
+          status: 201,
+          json: {
+            number: 20,
+            title: (body as { title: string }).title,
+            html_url: "https://github.com/Aqua-218/Portfolio/pull/20",
+            head: { sha: "h20" },
+          },
+        });
+      if (path.includes("/check-runs"))
+        return r.fulfill({ json: { check_runs: [] } });
+      return r.fulfill({ status: 404 });
+    });
+    await page.goto("/admin/");
+    const list = page.getByRole("region", { name: "content/ の一覧" });
+    await expect(
+      list.getByRole("heading", { name: /^足した写真の下書き/ }),
+    ).toBeVisible();
+    await list.getByRole("button", { name: "tama.jpg" }).click();
+
+    const view = page.getByRole("region", { name: "写真「tama」の下書き" });
+    await expect(view.getByRole("img", { name: "写真「tama」" })).toBeVisible();
+    const publish = view.getByRole("region", { name: "公開" });
+    await publish.getByRole("button", { name: "この下書きを公開する" }).click();
+    await expect(publish).toContainText("足すファイル: content/cats/tama.jpg");
+    const diff = publish.getByRole("list", { name: "変わるところ" });
+    await expect(diff).toContainText('+ id = "tama"');
+    await expect(diff).not.toContainText("- ");
+    await expect(publish.getByLabel(/^PRのタイトル/)).toHaveValue(
+      "content: 写真「tama」を足す",
+    );
+    await publish.getByRole("button", { name: "PRを作る" }).click();
+    await expect(publish).toContainText("PR #20");
+    expect(calls).toContainEqual(
+      expect.objectContaining({
+        method: "POST",
+        path: `${repo}/pulls`,
+        body: expect.objectContaining({
+          head: "draft/cats/tama.jpg",
+          base: "main",
+        }),
+      }),
+    );
+  });
+
   test("読めない写真は、そう出す", async ({ page }) => {
     await page.route("**/admin/auth/me", (r) =>
       r.fulfill({ status: 200, json: { login: "neko" } }),
