@@ -90,7 +90,7 @@ export const more = style({
   textDecorationThickness: "2px",
   textUnderlineOffset: "5px",
   ":hover": {
-    color: vars.color.mike,
+    color: vars.color.mikeText,
   },
 });
 

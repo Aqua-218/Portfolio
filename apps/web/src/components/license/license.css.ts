@@ -12,7 +12,7 @@ export const foot = style({
 export const textLink = style({
   textDecoration: "underline",
   textUnderlineOffset: "0.2em",
-  ":hover": { color: vars.color.mike },
+  ":hover": { color: vars.color.mikeText },
 });
 
 export const textTitle = style({
@@ -81,7 +81,7 @@ export const libName = style({
   textOverflow: "ellipsis",
   whiteSpace: "nowrap",
   color: vars.color.ink,
-  ":hover": { color: vars.color.mike },
+  ":hover": { color: vars.color.mikeText },
 });
 
 export const libVersion = style({

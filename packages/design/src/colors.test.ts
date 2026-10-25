@@ -18,6 +18,12 @@ describe.each([
     );
   });
 
+  it("差し色の文字(mikeText)と背景(paper)のコントラスト比が4.5:1以上", () => {
+    expect(
+      contrastRatio(palette.mikeText, palette.paper),
+    ).toBeGreaterThanOrEqual(4.5);
+  });
+
   it("タグの文字(ink)とタグ地(tatami)のコントラスト比が4.5:1以上", () => {
     expect(contrastRatio(palette.ink, palette.tatami)).toBeGreaterThanOrEqual(
       4.5,

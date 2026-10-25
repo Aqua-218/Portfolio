@@ -26,7 +26,7 @@ export const item = style({
 globalStyle(`${item} time`, {
   fontWeight: 700,
   fontVariantNumeric: "tabular-nums",
-  color: vars.color.mike,
+  color: vars.color.mikeText,
   lineHeight: 1.6,
 });
 
@@ -69,7 +69,7 @@ export const tag = style({
   borderRadius: vars.radius.md,
   textDecoration: "none",
   whiteSpace: "nowrap",
-  ":hover": { color: vars.color.mike },
+  ":hover": { color: vars.color.mikeText },
   selectors: {
     '&[aria-current="page"]': {
       background: vars.color.ink,
@@ -130,7 +130,7 @@ export const qiita = style({
   textDecorationColor: vars.color.mike,
   textDecorationThickness: "2px",
   textUnderlineOffset: "4px",
-  ":hover": { color: vars.color.mike },
+  ":hover": { color: vars.color.mikeText },
 });
 
 /** 目次。広い画面では本文の横についてくる */
@@ -186,7 +186,7 @@ globalStyle(`${tocList} a`, {
   lineHeight: 1.5,
 });
 
-globalStyle(`${tocList} a:hover`, { color: vars.color.mike });
+globalStyle(`${tocList} a:hover`, { color: vars.color.mikeText });
 
 /** タグで絞り込んでいるとき */
 export const filter = style({

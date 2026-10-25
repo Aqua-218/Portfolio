@@ -52,4 +52,4 @@ export const list = style({
   listStyle: "none",
 });
 
-globalStyle(`${list} a:hover`, { color: vars.color.mike });
+globalStyle(`${list} a:hover`, { color: vars.color.mikeText });

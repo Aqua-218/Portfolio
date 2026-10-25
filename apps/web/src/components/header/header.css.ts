@@ -32,7 +32,7 @@ export const logoTxt = style({
   transition: "color 0.25s",
   selectors: {
     [`${logo}:hover &, ${logo}:focus-visible &`]: {
-      color: vars.color.mike,
+      color: vars.color.mikeText,
     },
   },
 });

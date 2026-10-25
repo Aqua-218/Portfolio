@@ -52,7 +52,7 @@ export const item = style({
 globalStyle(`${item} time`, {
   fontWeight: 700,
   fontVariantNumeric: "tabular-nums",
-  color: vars.color.mike,
+  color: vars.color.mikeText,
   lineHeight: 1.6,
 });
 

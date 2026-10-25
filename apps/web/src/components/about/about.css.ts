@@ -65,7 +65,7 @@ globalStyle(`${item} time`, {
   fontFamily: vars.font.sans,
   fontWeight: 700,
   fontVariantNumeric: "tabular-nums",
-  color: vars.color.mike,
+  color: vars.color.mikeText,
 });
 
 globalStyle(`${item} b`, {
