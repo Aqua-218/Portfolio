@@ -15,6 +15,7 @@ const PAGES = [
   { name: "license", path: "/license/" },
   { name: "cats", path: "/cats/" },
   { name: "404", path: "/nai/" },
+  { name: "markdown", path: "/markdown/" },
   ...Object.keys(ERRORS).map((code) => ({
     name: code,
     path: `/errors/${code}/`,

@@ -1,4 +1,4 @@
-import { globalStyle } from "@vanilla-extract/css";
+import { globalStyle, style } from "@vanilla-extract/css";
 import { vars } from "./theme.css";
 
 /** Markdownのアラート(注意書き)。Stackの見本と同じ見た目 */
@@ -114,4 +114,57 @@ globalStyle("figure.mmd > svg", {
   marginInline: "auto",
   maxWidth: "100%",
   height: "auto",
+});
+
+/** Markdownの本文の入れ物。見出し・リスト・表・引用の見た目 */
+export const md = style({
+  fontFamily: vars.font.jp,
+  fontSize: "0.9375rem",
+});
+
+globalStyle(`${md} > :first-child`, { marginTop: 0 });
+
+globalStyle(`${md} h2`, {
+  margin: "2.5rem 0 1rem",
+  fontSize: "1.125rem",
+  fontWeight: 700,
+});
+
+globalStyle(`${md} h3`, {
+  margin: "1.75rem 0 0.75rem",
+  fontSize: "1rem",
+  fontWeight: 700,
+});
+
+globalStyle(`${md} :is(h2, h3) a`, { textDecoration: "none" });
+
+globalStyle(`${md} p, ${md} ul, ${md} ol, ${md} table`, {
+  margin: "0 0 1rem",
+});
+
+globalStyle(`${md} :is(ul, ol)`, { paddingLeft: "1.5em" });
+
+globalStyle(`${md} :not(pre) > code`, {
+  padding: "0.1em 0.35em",
+  fontFamily: vars.font.mono,
+  fontSize: "0.875em",
+  background: vars.color.tatami,
+  borderRadius: vars.radius.sm,
+});
+
+globalStyle(`${md} table`, { borderCollapse: "collapse" });
+
+globalStyle(`${md} :is(th, td)`, {
+  padding: "0.4rem 0.9rem",
+  borderBottom: `1px solid ${vars.color.line}`,
+  textAlign: "left",
+});
+
+globalStyle(`${md} th`, { borderBottom: `2px solid ${vars.color.ink}` });
+
+globalStyle(`${md} blockquote`, {
+  margin: "0 0 1rem",
+  paddingLeft: "1rem",
+  borderLeft: `3px solid ${vars.color.line}`,
+  color: vars.color.muted,
 });
