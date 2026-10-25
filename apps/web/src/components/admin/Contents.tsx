@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import * as s from "./admin.css";
 import { contentFiles, drafts } from "./github";
 import { group } from "./groups";
+import { Upload } from "./Upload";
 
 type State =
   | { kind: "loading" }
@@ -53,8 +54,15 @@ export function Contents({ onOpen }: { onOpen: (path: string) => void }) {
   }
 
   const groups = group(state.paths, query);
+  /** もうある写真のid。mainと下書きの両方 */
+  const photoIds = new Set(
+    [...state.paths, ...state.drafts]
+      .map((p) => /^content\/cats\/(.+)\.jpg$/.exec(p)?.[1])
+      .filter((id) => id !== undefined),
+  );
   return (
     <section className={s.contents} aria-label="content/ の一覧">
+      <Upload ids={photoIds} />
       <input
         className={s.search}
         type="search"
