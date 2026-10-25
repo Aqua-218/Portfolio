@@ -16,7 +16,8 @@ const hashes = [
 
 export const csp = [
   "default-src 'none'",
-  `script-src 'self' ${[...new Set(hashes)].join(" ")}`,
+  // ドット猫と検証はWebAssemblyなので、Wasmの読み込みだけ許す(evalは許さない)
+  `script-src 'self' 'wasm-unsafe-eval' ${[...new Set(hashes)].join(" ")}`,
   // 見た目はCSSのファイル。要素のstyle属性(ドット猫の大きさなど)だけインラインを許す
   "style-src 'self'",
   "style-src-attr 'unsafe-inline'",
