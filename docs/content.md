@@ -359,6 +359,12 @@ note = "Skills ページの言語・技術のアイコンの多くに使って�
 
 原文(`content/licenses/*.txt`)は、SPDXの原文([license-list-data](https://github.com/spdx/license-list-data) v3.29.0の`text/`)か、その作品のLICENSEそのものを、手を入れずに置く。同じ原文を使う項目は1つのページにまとめる。content-checkは、`text`の指すファイルがあるか確かめる。
 
+コードが使っているライブラリは`licenses.toml`に書かない。ビルドの前に`apps/web/scripts/oss.mjs`が集めて`.content/oss.json`に書き、ライセンスのページの「ライブラリ」に出す。
+
+- npm: `@portfolio/web`と、それが使うワークスペースのパッケージの本番の依存(`pnpm licenses list --prod`)
+- Rust: WebAssemblyにするクレート(`pxcat-wasm`・`content-wasm`)のふつうの依存(`cargo metadata`)
+- 原文は各パッケージに入っているLICENSE・COPYING・NOTICEを使い、同じ原文は1つにまとめる(`/license/oss-<ハッシュ>/`)。入っていなければ、SPDXの原文(`content/licenses/mit.txt`など)を指す
+
 自分の写真・文章などは、`license = "© 2026 Keiya Komine. All Rights Reserved."`とし、原文はつけない(ライセンスを与えていないため)。
 
 ## エラーの出し方

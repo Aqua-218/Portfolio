@@ -41,7 +41,9 @@ export default async function LicenseText({ params }: Props) {
       page
     >
       <h3 className={l.textTitle}>{t.name}</h3>
-      <p className={l.users}>使っているもの: {t.users.join("・")}</p>
+      <p className={l.users}>
+        使っているもの({t.users.length}): {t.users.join("・")}
+      </p>
       <pre className={l.text}>{licenseBody(t.id)}</pre>
       <Link className={s.more} href="/license/">
         ライセンス・クレジットへ
