@@ -36,3 +36,22 @@ export async function contentFiles(): Promise<string[]> {
     )
     .map((e) => e.path);
 }
+
+/** base64(GitHubのcontentsの中身)をUTF-8の文字にする */
+function decode(base64: string): string {
+  const bin = atob(base64.replace(/\s/g, ""));
+  return new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0)));
+}
+
+/** mainのファイルを読む。shaは、あとで書き換えるときに要る */
+export async function readFile(
+  path: string,
+): Promise<{ text: string; sha: string }> {
+  const res = await api("GET", `/repos/${REPO}/contents/${path}?ref=main`);
+  if (!res.ok) throw new Error(String(res.status));
+  const { content, sha } = (await res.json()) as {
+    content: string;
+    sha: string;
+  };
+  return { text: decode(content), sha };
+}
