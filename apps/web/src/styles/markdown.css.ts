@@ -168,3 +168,24 @@ globalStyle(`${md} blockquote`, {
   borderLeft: `3px solid ${vars.color.line}`,
   color: vars.color.muted,
 });
+
+/** ブログの記事の埋め込み(YouTube・Xなど)。高さか縦横の比は、要素のstyleで決まる */
+globalStyle(".embed", {
+  width: "100%",
+  maxWidth: "100%",
+  margin: "0 0 1rem",
+  borderRadius: vars.radius.md,
+  overflow: "hidden",
+});
+
+globalStyle(".embed > iframe", {
+  display: "block",
+  width: "100%",
+  height: "100%",
+  border: 0,
+});
+
+/** Xの投稿は、横に広げすぎない */
+globalStyle(".embed-tweet", {
+  maxWidth: "550px",
+});
