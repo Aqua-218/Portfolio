@@ -16,6 +16,7 @@
 | `content/cats/*.jpg`        | 猫の写真                       |
 | `content/cats.toml`         | 写真の説明文と、どこに置くか   |
 | `content/licenses.toml`     | ライセンス・クレジット         |
+| `content/blog/*.md`         | ブログの記事(1件1ファイル)     |
 
 共通の決まり:
 
@@ -219,7 +220,7 @@ tags: [Z1ゼミ]
 - リンクカード: URLだけの行はカードになる。OGPは`content/.cache/ogp.json`にためる
 - Mermaid: ` ```mermaid `の図は、ビルド時に描いてSVGにする。描いた図は`content/.cache/mermaid/`にためる
 
-`content/.cache/`は、手元でビルドしたときにできたものをコミットする。CIのビルドはOGPを取りに行かず、Chromiumもないので、新しいリンクカードや図を足したら、手元で一度ビルドしてから`content/.cache/`ごとコミットする。
+`content/.cache/`は、ビルドしたときにできたものをコミットする。新しいリンクカードや図を足したら、手元で一度ビルドしてから`content/.cache/`ごとコミットする。管理画面から足したものは、下書きのPRでActionsが作ってコミットする([admin.md](admin.md))。
 
 並び: 年度(4月〜3月)ごとにまとめ、年度の中は`date`の古い順。同じ日はファイル名の順。Homeには新しい順に3件だけ出す。
 
@@ -239,6 +240,50 @@ note = "中学生のころ（N中等部ではなかったです）"
 | `note` | 文字列 | ○    | 見出しの横に小さく出す |
 
 検証: その年度のイベントがあること。
+
+## blog/*.md
+
+技術ブログの記事。frontmatterは[Qiita CLI](https://github.com/increments/qiita-cli)と同じ形にする。同じファイルを`npx qiita publish`にもそのまま使える。ファイル名(拡張子なし)がURL(`/blog/<ファイル名>/`)になる。
+
+```markdown
+---
+title: Rustで猫を描く
+tags:
+  - Rust
+  - WebAssembly
+private: false
+updated_at: ""
+id: null
+organization_url_name: null
+slide: false
+ignorePublish: false
+---
+
+# はじめに
+```
+
+| 項目                    | 型             | 必須 | 説明                                                                 |
+| ----------------------- | -------------- | ---- | -------------------------------------------------------------------- |
+| `title`                 | 文字列         | ○    | 記事のタイトル                                                       |
+| `tags`                  | 文字列の配列   | ○    | Qiitaのタグ。1〜5個                                                  |
+| `private`               | 真偽           |      | Qiitaの限定公開。サイトには出さない                                  |
+| `updated_at`            | 日時か`''`     |      | Qiitaで最後に更新した日時。Qiitaに出したときに書き戻す。まだなら`''` |
+| `id`                    | 文字列か`null` |      | Qiitaの記事のid。Qiitaに出したときに書き戻す。まだなら`null`         |
+| `organization_url_name` | 文字列か`null` |      | Qiitaのorganization                                                  |
+| `slide`                 | 真偽           |      | Qiitaのスライドモード                                                |
+| `ignorePublish`         | 真偽           |      | `true`ならQiitaには出さない(サイトだけ)                              |
+| 本文                    | Markdown       | ○    | Qiitaの記法で書く                                                    |
+
+Qiita CLIが書き出す形なので、知らない項目はほかと同じくエラーにする(書いた日などを足すと、Qiita CLIで出し直したときに消えてしまう)。
+
+検証:
+
+- ファイル名が英数字・ハイフン・アンダースコアだけであること
+- `tags`が1〜5個で、空のもの・空白を含むもの・(大文字と小文字を区別せず)同じものがないこと
+- `updated_at`が`2024-01-02T03:04:05+09:00`の形、`id`が16進の20字であること
+- 本文が空でないこと
+
+記事がまだ1つもなければ、`content/blog/`はなくてよい。
 
 ## shelf.toml
 
