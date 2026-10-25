@@ -11,6 +11,7 @@ export default defineConfig([
     "**/next-env.d.ts",
     "target/",
     "packages/pxcat/dist/",
+    "packages/content-wasm/dist/",
   ]),
   js.configs.recommended,
   tseslint.configs.strictTypeChecked,
