@@ -152,7 +152,7 @@ globalStyle(`${tile} > svg, ${tile} > img`, {
 
 /** Simple Icons にないものは肉球で代わりにする */
 export const paw = style({
-  color: vars.color.mike,
+  color: vars.color.mikeText,
 });
 
 export const tName = style({
@@ -256,7 +256,7 @@ globalStyle(`${callout} b`, {
   fontFamily: vars.font.sans,
   fontSize: "0.75rem",
   letterSpacing: "0.04em",
-  color: vars.color.mike,
+  color: vars.color.mikeText,
 });
 
 globalStyle(`${callout} p`, {
@@ -265,7 +265,7 @@ globalStyle(`${callout} p`, {
 });
 
 /** 猫テーマのコードの色。キーワード・関数・型・コメント */
-export const k = style({ color: vars.color.mike, fontWeight: 600 });
+export const k = style({ color: vars.color.mikeText, fontWeight: 600 });
 export const f = style({ color: vars.color.ink, fontWeight: 700 });
 export const t = style({ color: vars.color.leaf });
 export const c = style({ color: vars.color.muted, fontStyle: "italic" });
