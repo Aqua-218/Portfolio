@@ -5,6 +5,7 @@ import { Reveal } from "@/components/reveal/Reveal";
 import * as r from "@/components/rows/rows.css";
 import { groupHeading } from "@/components/section/section.css";
 import { site } from "@/lib/content";
+import { type Library, oss } from "@/lib/licenses";
 import * as s from "./license.css";
 
 const GROUPS: readonly { group: LicenseGroup; id: string; label: string }[] = [
@@ -14,8 +15,58 @@ const GROUPS: readonly { group: LicenseGroup; id: string; label: string }[] = [
   { group: "others", id: "lic-others", label: "そのほか" },
 ];
 
-/** 使っているロゴ・フォントなどのライセンスと出典。 */
+/** コードが使っているライブラリ。数が多いので、たたんでおく */
+function Libraries({
+  id,
+  label,
+  items,
+}: {
+  id: string;
+  label: string;
+  items: Library[];
+}) {
+  return (
+    <div id={id}>
+      <h3 className={groupHeading}>{label}</h3>
+      <details className={s.libs}>
+        <summary className={s.libsSummary}>
+          {/* 数は依存の更新のたびに変わるので、たたんだところには出さない(見た目テストを揺らさない) */}
+          一覧を見る
+        </summary>
+        <ul className={s.libList}>
+          {items.map((p) => (
+            <li key={`${p.name}@${p.version}`}>
+              <a
+                className={s.libName}
+                href={p.url}
+                target="_blank"
+                rel="noopener"
+              >
+                {p.name}
+              </a>
+              <span className={s.libVersion}>{p.version}</span>
+              {p.text ? (
+                <Link
+                  className={`${r.tag} ${s.textLink}`}
+                  href={`/license/${p.text}/`}
+                  aria-label={`${p.name} の ${p.license} の原文`}
+                >
+                  {p.license}
+                </Link>
+              ) : (
+                <span className={r.tag}>{p.license}</span>
+              )}
+            </li>
+          ))}
+        </ul>
+      </details>
+    </div>
+  );
+}
+
+/** 使っているロゴ・フォント・ライブラリなどのライセンスと出典。 */
 export function Licenses() {
+  const { npm, cargo } = oss();
   return (
     <div className={a.groups}>
       {GROUPS.map(({ group, id, label }) => (
@@ -70,6 +121,12 @@ export function Licenses() {
           )}
         </div>
       ))}
+      <Libraries id="lic-npm" label="ライブラリ(JavaScript)" items={npm} />
+      <Libraries
+        id="lic-cargo"
+        label="ライブラリ(Rust・WebAssembly)"
+        items={cargo}
+      />
     </div>
   );
 }
