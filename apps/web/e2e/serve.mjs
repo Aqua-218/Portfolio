@@ -1,7 +1,7 @@
 // out/を配信する小さな静的サーバー。e2eテストで使う。
-import { createReadStream, statSync } from "node:fs";
+import { createReadStream, readFileSync, statSync } from "node:fs";
 import { createServer } from "node:http";
-import { extname, join, normalize } from "node:path";
+import { dirname, extname, join, normalize } from "node:path";
 
 const root = new URL("../out/", import.meta.url).pathname;
 const port = Number(process.env.PORT ?? 4173);
@@ -28,6 +28,23 @@ function resolve(pathname) {
   return undefined;
 }
 
+/**
+ * そのファイルのディレクトリの.htaccessに書いたヘッダー(Header always set 名前 "値")。
+ * 本番(ロリポップ)と同じヘッダーで、e2eを走らせる
+ */
+function htaccessHeaders(file) {
+  try {
+    const text = readFileSync(join(dirname(file), ".htaccess"), "utf8");
+    return Object.fromEntries(
+      [...text.matchAll(/^\s*Header always set (\S+) "(.*)"\s*$/gm)].map(
+        ([, k, v]) => [k, v],
+      ),
+    );
+  } catch {
+    return {};
+  }
+}
+
 createServer((req, res) => {
   const { pathname } = new URL(req.url ?? "/", "http://localhost");
   const file = resolve(pathname);
@@ -37,6 +54,7 @@ createServer((req, res) => {
     return;
   }
   res.writeHead(200, {
+    ...htaccessHeaders(file),
     "content-type": types[extname(file)] ?? "application/octet-stream",
   });
   createReadStream(file).pipe(res);
