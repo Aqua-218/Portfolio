@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { HiddenCatHint } from "@/components/hidden-cat/HiddenCat";
-import { Trail } from "@/components/paw/Trail";
+import { plan, Trail } from "@/components/paw/Trail";
 import * as s from "./footer.css";
 
 const SITEMAP = [
@@ -93,12 +93,48 @@ function current(pathname: string, href: string): "page" | undefined {
   return here ? "page" : undefined;
 }
 
+/**
+ * 足跡の種。サイトマップにあるページ(の下)ごとに変える。
+ * 知らないパスはまとめて1つにする。ないページ(404)は、書き出すときと開いたときでパスが違い、
+ * 種が変わると描き直しの食い違いになるため
+ */
+export function footerSeed(pathname: string): string {
+  const top = pathname.split("/")[1] ?? "";
+  const known = top === "" || SITEMAP.some((p) => p.href === `/${top}/`);
+  return `footer:${known ? top : "?"}`;
+}
+
+/** サイトマップの上の足跡。ページごとに、歩く向きと場所を変える */
+function FooterTrail({ pathname }: { pathname: string }) {
+  const seed = footerSeed(pathname);
+  const p = plan(seed, {
+    // 右へ、ときどき左へ。ほぼ横に歩く
+    angle: [-12, 12],
+    steps: [6, 10],
+    wobble: [4, 12],
+    x: [2, 40],
+    y: [0, 1],
+  });
+  // 半分ほどのページでは、左へ歩く
+  const left = (p.steps + Math.round(p.x)) % 2 === 1;
+  return (
+    <Trail
+      className={s.trail}
+      seed={seed}
+      angle={left ? 180 + p.angle : p.angle}
+      steps={p.steps}
+      wobble={p.wobble}
+      style={{ marginRight: `${String(p.x)}%`, marginTop: `${String(p.y)}rem` }}
+    />
+  );
+}
+
 export function Footer() {
   const pathname = usePathname();
 
   return (
     <>
-      <Trail className={s.trail} seed="footer" angle={0} steps={8} wobble={6} />
+      <FooterTrail pathname={pathname} />
       <nav className={s.sitemap} aria-labelledby="sm-h">
         <h2 className={s.heading} id="sm-h">
           サイトマップ
