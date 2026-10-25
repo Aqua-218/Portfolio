@@ -65,9 +65,62 @@ export function csp({ hashes, styles, images, admin }) {
   ].join("; ");
 }
 
-function htaccess(policy, admin) {
+/** エラーのページがある番号(src/app/errors/[code]) */
+const ERRORS = [
+  "400",
+  "401",
+  "403",
+  "408",
+  "410",
+  "429",
+  "500",
+  "502",
+  "503",
+  "504",
+];
+
+/** サイトのいちばん上(out/)の.htaccessにだけ書くもの。下のディレクトリにも効く */
+const ROOT = `# 見つからないページと、エラーのページ
+ErrorDocument 404 /404.html
+${ERRORS.map((code) => `ErrorDocument ${code} /errors/${code}/`).join("\n")}
+
+# HTTPSにする。Cloudflareを前に置いたときは、Cloudflareとの間がHTTPでも転送しない(X-Forwarded-Proto)
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTPS} off
+  RewriteCond %{HTTP:X-Forwarded-Proto} !^https$ [NC]
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+  # ディレクトリの最後の/は、ここでHTTPSのまま足す。Apacheに任せる(DirectorySlash)と、Cloudflareの後ろでは http:// で返す
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^(.*[^/])$ https://%{HTTP_HOST}/$1/ [R=301,L]
+</IfModule>
+# ファイルの一覧は出さない
+Options -Indexes
+
+# 古いApacheが知らない種類
+<IfModule mod_mime.c>
+  AddType application/wasm .wasm
+  AddType font/woff2 .woff2
+  AddType image/avif .avif
+  AddType image/webp .webp
+  AddCharset utf-8 .html .txt .css .js .json .svg .xml
+</IfModule>
+
+# OGPの画像は拡張子がない(Next.jsのopengraph-image)
+<FilesMatch "^opengraph-image$">
+  ForceType image/png
+</FilesMatch>
+
+# 文字のファイルは縮めて送る
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/javascript application/javascript application/json application/wasm application/xml image/svg+xml
+</IfModule>
+
+`;
+
+function htaccess(policy, admin, root) {
   return `# scripts/headers.mjsが書き出す。手で直さない
-<IfModule mod_headers.c>
+${root ? ROOT : ""}<IfModule mod_headers.c>
   Header always set Content-Security-Policy "${policy}"
   Header always set X-Frame-Options "DENY"
   Header always set X-Content-Type-Options "nosniff"
@@ -127,7 +180,10 @@ for (const { dir, htmls } of dirs) {
     images,
     admin,
   });
-  writeFileSync(path.join(dir, ".htaccess"), htaccess(policy, admin));
+  writeFileSync(
+    path.join(dir, ".htaccess"),
+    htaccess(policy, admin, dir === out),
+  );
 }
 for (const rel of IMMUTABLE) {
   const dir = path.join(out, rel);
