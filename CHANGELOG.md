@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.7.0](https://github.com/Aqua-218/Portfolio/compare/v0.6.0...v0.7.0) (2026-10-25)
+
+
+### 新しいこと
+
+* **admin:** /admin/を作る ([#197](https://github.com/Aqua-218/Portfolio/issues/197)) ([5e992e8](https://github.com/Aqua-218/Portfolio/commit/5e992e87842731997134a7016531418f37a57614)), closes [#78](https://github.com/Aqua-218/Portfolio/issues/78)
+* **admin:** GitHubでログインする ([#200](https://github.com/Aqua-218/Portfolio/issues/200)) ([aed5476](https://github.com/Aqua-218/Portfolio/commit/aed547641f5c9682e3542c4e3905e84a00730a93)), closes [#79](https://github.com/Aqua-218/Portfolio/issues/79)
+* **admin:** コンテンツの一覧を出す ([#202](https://github.com/Aqua-218/Portfolio/issues/202)) ([115cc06](https://github.com/Aqua-218/Portfolio/commit/115cc06c8a67b2fea7439be6107175170c2a6fb0)), closes [#80](https://github.com/Aqua-218/Portfolio/issues/80)
+* **admin:** フォームとMarkdownで編集する ([#204](https://github.com/Aqua-218/Portfolio/issues/204)) ([5aef40a](https://github.com/Aqua-218/Portfolio/commit/5aef40a7593d4bddb38d7782faf350783d9eee0a)), closes [#81](https://github.com/Aqua-218/Portfolio/issues/81)
+* **content:** 検証のクレートをWasmにする ([#196](https://github.com/Aqua-218/Portfolio/issues/196)) ([38066dc](https://github.com/Aqua-218/Portfolio/commit/38066dcd446e2ee2db0d40d792e43e07d6fd2323)), closes [#82](https://github.com/Aqua-218/Portfolio/issues/82)
+* **markdown:** GitHubのアラートを猫アイコンで出す ([#193](https://github.com/Aqua-218/Portfolio/issues/193)) ([87bd5fc](https://github.com/Aqua-218/Portfolio/commit/87bd5fc18ce26e5342506cfa0c9ccfda8a4349ad)), closes [#74](https://github.com/Aqua-218/Portfolio/issues/74)
+* **markdown:** KaTeXで数式を出す ([#192](https://github.com/Aqua-218/Portfolio/issues/192)) ([c7a8d1d](https://github.com/Aqua-218/Portfolio/commit/c7a8d1ddd5294da3e04e8623be3c980aba6bd360)), closes [#73](https://github.com/Aqua-218/Portfolio/issues/73)
+* **markdown:** Mermaidの図を触れるようにする ([#205](https://github.com/Aqua-218/Portfolio/issues/205)) ([b62fda9](https://github.com/Aqua-218/Portfolio/commit/b62fda9b793fb727b01b6389d5fee41a073065b7)), closes [#71](https://github.com/Aqua-218/Portfolio/issues/71)
+* **markdown:** Mermaidをビルド時に猫テーマのSVGにする ([#201](https://github.com/Aqua-218/Portfolio/issues/201)) ([37a3872](https://github.com/Aqua-218/Portfolio/commit/37a3872d532bdcb85b71c8567368d664262516e3)), closes [#70](https://github.com/Aqua-218/Portfolio/issues/70)
+* **markdown:** Shikiに猫のテーマを作る ([#190](https://github.com/Aqua-218/Portfolio/issues/190)) ([41c9cd8](https://github.com/Aqua-218/Portfolio/commit/41c9cd87858b2a2d6561b5d2a739dad9dbcf4cca)), closes [#72](https://github.com/Aqua-218/Portfolio/issues/72)
+* **markdown:** unifiedのパイプラインを作る ([#189](https://github.com/Aqua-218/Portfolio/issues/189)) ([23ffe3a](https://github.com/Aqua-218/Portfolio/commit/23ffe3a394c9e1b16e29315aa7c4ce339db0e318)), closes [#69](https://github.com/Aqua-218/Portfolio/issues/69)
+* **markdown:** リンクカードの画像がないときの表示を作る ([#198](https://github.com/Aqua-218/Portfolio/issues/198)) ([d4f2def](https://github.com/Aqua-218/Portfolio/commit/d4f2def08b4eec01c2b6f7bd914d6a8e81635b22)), closes [#76](https://github.com/Aqua-218/Portfolio/issues/76)
+* **markdown:** リンクカードを作る ([#194](https://github.com/Aqua-218/Portfolio/issues/194)) ([74d4a1e](https://github.com/Aqua-218/Portfolio/commit/74d4a1e06faf9a32d3161fdc7756317246b1da5e)), closes [#75](https://github.com/Aqua-218/Portfolio/issues/75)
+
 ## [0.6.0](https://github.com/Aqua-218/Portfolio/compare/v0.5.0...v0.6.0) (2026-10-24)
 
 
