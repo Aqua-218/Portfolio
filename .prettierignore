@@ -5,3 +5,5 @@ pnpm-lock.yaml
 CHANGELOG.md
 # Lakeが書き出す
 proofs/lake-manifest.json
+# Qiitaの互換テストの見本。正解(本物のqiita-markdown)と同じ文字でなければならない
+packages/markdown/src/qiita/fixtures/
