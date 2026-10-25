@@ -319,6 +319,31 @@ tags: [Z1ゼミ]
     await expect(page.getByLabel("中身")).toHaveValue(TOML);
   });
 
+  test("書いている途中で、ビルドと同じ検証をして、間違いのある欄に理由を出す", async ({
+    page,
+  }) => {
+    await page.getByRole("button", { name: "2026-08-10-seccamp.md" }).click();
+    await expect(
+      page.getByText("ビルドと同じ検証で、間違いはありません。"),
+    ).toBeVisible();
+    await page.getByLabel("タイトル").fill("");
+    await expect(page.getByText("間違いが 1 件あります。")).toBeVisible();
+    // タイトルの欄の中に、理由が出る
+    await expect(
+      page.locator("label", { hasText: "タイトル" }).getByRole("alert"),
+    ).toContainText("title");
+    await page.getByLabel("タイトル").fill("セキュキャン");
+    await expect(
+      page.getByText("ビルドと同じ検証で、間違いはありません。"),
+    ).toBeVisible();
+  });
+
+  test("TOMLの間違いは、行番号つきで出す", async ({ page }) => {
+    await page.getByRole("button", { name: "プロフィール" }).click();
+    await page.getByLabel("中身").fill('name = "小峯 圭也"\nname = 2\n');
+    await expect(page.locator("main ul[role=alert]")).toContainText("行目");
+  });
+
   test("写真は開けない(アップロードで扱う)", async ({ page }) => {
     await expect(page.getByText("kuro.jpg")).toBeVisible();
     await expect(page.getByRole("button", { name: "kuro.jpg" })).toHaveCount(0);
