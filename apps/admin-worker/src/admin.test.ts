@@ -9,6 +9,8 @@ import {
   SESSION_COOKIE,
   type Store,
   allowed,
+  qiitaAllowed,
+  qiitaWritable,
   writable,
   importKey,
 } from "./admin";
@@ -54,6 +56,8 @@ class World {
   jar = new Map<string, string>();
   ip = "203.0.113.7";
   key!: CryptoKey;
+  /** Qiitaのトークン。undefinedなら入れていない */
+  qiita: string | undefined = "qiita_secret_token";
 
   async init() {
     this.key = await importKey(
@@ -71,6 +75,7 @@ class World {
         repo: REPO,
         origin: ORIGIN,
         key: this.key,
+        ...(this.qiita === undefined ? {} : { qiitaToken: this.qiita }),
       },
       store: this.kv,
       now: () => this.now,
@@ -141,6 +146,20 @@ class World {
   /** 同じサイトの画面からの呼び出し */
   api(method: string, path: string, body?: string) {
     return this.send(`/admin/api?path=${encodeURIComponent(path)}`, {
+      method,
+      ...(body === undefined ? {} : { body }),
+      headers: {
+        "x-admin": "1",
+        ...(method === "GET"
+          ? { "sec-fetch-site": "same-origin" }
+          : { origin: ORIGIN }),
+      },
+    });
+  }
+
+  /** 同じサイトの画面から、Qiitaへの中継を呼ぶ */
+  qiitaApi(method: string, path: string, body?: string) {
+    return this.send(`/admin/qiita?path=${encodeURIComponent(path)}`, {
       method,
       ...(body === undefined ? {} : { body }),
       headers: {
@@ -575,5 +594,98 @@ describe("返事", () => {
     expect(r.headers.get("cache-control")).toBe("no-store");
     expect(r.headers.get("referrer-policy")).toBe("no-referrer");
     expect(r.headers.get("x-content-type-options")).toBe("nosniff");
+  });
+});
+
+describe("Qiitaへの中継", () => {
+  const ID = "0123456789abcdef0123";
+  const post = JSON.stringify({
+    title: "t",
+    body: "b",
+    tags: [{ name: "Rust", versions: [] }],
+    private: false,
+  });
+
+  it("自分の記事を読む・投稿する・更新することだけ通す", () => {
+    const yes: [string, string][] = [
+      ["GET", "/api/v2/authenticated_user/items?page=1&per_page=100"],
+      ["GET", `/api/v2/items/${ID}`],
+      ["POST", "/api/v2/items"],
+      ["PATCH", `/api/v2/items/${ID}`],
+    ];
+    const no: [string, string][] = [
+      ["DELETE", `/api/v2/items/${ID}`],
+      ["GET", "/api/v2/users/someone/items"],
+      ["GET", "/api/v2/authenticated_user"],
+      ["PUT", `/api/v2/items/${ID}/stock`],
+      ["PATCH", "/api/v2/items/../users"],
+      ["GET", `/api/v2/items/${ID}?x=y`],
+      ["GET", "/api/v2/authenticated_user/items?page=1&q=evil%20x"],
+      ["POST", "/api/v2/access_tokens"],
+      ["GET", "https://evil.example/api/v2/items"],
+    ];
+    for (const [m, p] of yes)
+      expect(qiitaAllowed(m, p), `${m} ${p}`).toBe(true);
+    for (const [m, p] of no)
+      expect(qiitaAllowed(m, p), `${m} ${p}`).toBe(false);
+  });
+
+  it("書き込みは記事の項目だけ", () => {
+    expect(qiitaWritable("POST", post)).toBe(true);
+    expect(
+      qiitaWritable(
+        "POST",
+        JSON.stringify({ ...JSON.parse(post), tweet: true }),
+      ),
+    ).toBe(false);
+    expect(
+      qiitaWritable(
+        "POST",
+        JSON.stringify({ ...JSON.parse(post), coediting: true }),
+      ),
+    ).toBe(false);
+    expect(qiitaWritable("PATCH", "not json")).toBe(false);
+    expect(qiitaWritable("PATCH", "[]")).toBe(false);
+  });
+
+  it("Workerの秘密のQiitaのトークンで中継し、GitHubのトークンやCookieは送らない", async () => {
+    await w.login();
+    const r = await w.qiitaApi("POST", "/api/v2/items", post);
+    expect(r.status).toBe(200);
+    const call = w.to("qiita.com")[0];
+    expect(call?.url).toBe("https://qiita.com/api/v2/items");
+    expect(call?.headers.authorization).toBe("Bearer qiita_secret_token");
+    expect(call?.headers.cookie).toBeUndefined();
+    expect(call?.body).toBe(post);
+    // トークンはブラウザに返さない
+    expect(await r.text()).not.toContain("qiita_secret_token");
+  });
+
+  it("ログインしていなければ、Qiitaを呼ばない", async () => {
+    const r = await w.qiitaApi("GET", `/api/v2/items/${ID}`);
+    expect(r.status).toBe(401);
+    expect(w.to("qiita.com")).toEqual([]);
+  });
+
+  it("ほかのサイトからは拒む", async () => {
+    await w.login();
+    const r = await w.send(
+      `/admin/qiita?path=${encodeURIComponent("/api/v2/items")}`,
+      {
+        method: "POST",
+        body: post,
+        headers: { "x-admin": "1", origin: "https://evil.example" },
+      },
+    );
+    expect(r.status).toBe(403);
+    expect(w.to("qiita.com")).toEqual([]);
+  });
+
+  it("トークンを入れていなければ、そう返す", async () => {
+    w.qiita = undefined;
+    await w.login();
+    const r = await w.qiitaApi("GET", `/api/v2/items/${ID}`);
+    expect(r.status).toBe(503);
+    expect(w.to("qiita.com")).toEqual([]);
   });
 });
