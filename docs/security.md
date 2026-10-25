@@ -28,6 +28,15 @@
 
 本物のApache(Docker、`.htaccess`を読む設定)で`out/`を出して確かめる: `pnpm --filter @portfolio/web apache`(`apps/web/apache/`)。CIの`apache`のジョブでも走る。
 
+### Cloudflareとロリポップの証明書
+
+訪問者に見える証明書はCloudflareのもの。Cloudflareからロリポップへの間は、ロリポップの独自SSL(無料、Let's Encrypt)で暗号化し、CloudflareのSSL/TLSは**Full (strict)**にする(ロリポップには外の証明書を入れられない)。
+
+- 発行するとき: Cloudflareで`komineko.jp`と`www`をいったんDNS only(グレーの雲)にし、ロリポップで独自SSL(無料)を発行してから、プロキシをオンに戻す
+- 更新: ロリポップが自動でする。確認のパス(`/.well-known/acme-challenge/`)は、`.htaccess`でHTTPSや`komineko.jp`への転送をしない
+- 見張り: 毎日、Actions(`.github/workflows/origin-cert.yml`)がロリポップ側の証明書の期限を見て、残りが14日を切ったらIssueを立てる。つなぎ先は、Actionsの変数`ORIGIN_HOST`(ロリポップの初期ドメイン)に入れる
+- 更新がうまくいかないことが続くなら、SSL/TLSをFullにする(切れてもサイトは止まらないが、相手の確かめはしない)
+
 ### キャッシュ
 
 同じ`.htaccess`で`Cache-Control`もつける。
