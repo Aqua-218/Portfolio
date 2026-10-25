@@ -292,6 +292,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "content-wasm"
+version = "0.1.0"
+dependencies = [
+ "content",
+ "serde",
+ "serde_json",
+ "wasm-bindgen",
+]
+
+[[package]]
 name = "core_detect"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
