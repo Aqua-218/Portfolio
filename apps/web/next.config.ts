@@ -9,6 +9,8 @@ const config: NextConfig = {
   output: "export",
   trailingSlash: true,
   transpilePackages: ["@portfolio/design", "@portfolio/pxcat"],
+  // Mermaidの図をビルド時に描くChromiumの操作は、バンドルせずにそのまま読む
+  serverExternalPackages: ["playwright-core"],
 };
 
 export default withVanillaExtract(config);
