@@ -16,7 +16,8 @@ export type SectionName =
   | "events"
   | "shelf"
   | "stack"
-  | "license";
+  | "license"
+  | "admin";
 
 export interface SectionProps {
   name: SectionName;
