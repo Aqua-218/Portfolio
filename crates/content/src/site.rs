@@ -1,6 +1,7 @@
 //! `content/`を丸ごと読んで検証する。
 
 use crate::affiliations::{self, Affiliation};
+use crate::blog::{self, Post};
 use crate::cats::{self, Cats};
 use crate::event_years::{self, YearNote};
 use crate::events::{self, Event};
@@ -106,6 +107,8 @@ pub struct Site {
     pub shelf: Vec<Work>,
     pub cats: Cats,
     pub licenses: Vec<License>,
+    /// ブログの記事。ファイル名の順
+    pub blog: Vec<Post>,
 }
 
 /// どのファイルの間違いか。`content/events/x.md:3: date がありません`の形で出す。
@@ -196,6 +199,23 @@ impl<S: Source> Loader<'_, S> {
         out
     }
 
+    fn blog(&mut self) -> Vec<Post> {
+        let mut out = Vec::new();
+        // 記事がまだ1つもなければ、フォルダもなくてよい
+        if self.source.list("blog").is_none() {
+            return out;
+        }
+        for slug in self.names("blog", Some("md")) {
+            let rel = format!("blog/{slug}.md");
+            if let Some(text) = self.read(&rel)
+                && let Some(post) = self.take(&rel, blog::parse(&slug, &text))
+            {
+                out.push(post);
+            }
+        }
+        out
+    }
+
     fn cats(&mut self) -> Option<Cats> {
         let text = self.read("cats.toml")?;
         let mut files = Vec::new();
@@ -241,6 +261,7 @@ pub fn load_from(source: &impl Source) -> Result<Site, Vec<FileProblem>> {
     let shelf = l.toml("shelf.toml", shelf::parse);
     let cats = l.cats();
     let licenses = l.toml("licenses.toml", licenses::parse);
+    let blog = l.blog();
 
     // ファイルをまたいで突き合わせる
     // イベントのファイルが読めなかったときは、年度にイベントがないと言っても紛らわしいので見ない
@@ -287,6 +308,7 @@ pub fn load_from(source: &impl Source) -> Result<Site, Vec<FileProblem>> {
             shelf,
             cats,
             licenses,
+            blog,
         }),
         _ => Err(l.problems),
     }
