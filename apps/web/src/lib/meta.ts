@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
-/** 本番のURL。ドメインが決まったら #94 で差し替える */
-export const SITE_URL = "https://example.com";
+/** 本番のURL */
+export const SITE_URL = "https://komineko.jp";
 
 export const SITE_NAME = "小峯 圭也";
 
