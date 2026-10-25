@@ -46,7 +46,7 @@ PHPを使わない理由: 2026-10-21に、PHP本体に認証なしで遠隔か�
    - 「Expire user authorization tokens」: オン(トークンは8時間で切れ、リフレッシュトークンで取り直す)
    - 「Request user authorization (OAuth) during installation」: オフ
    - Webhook: オフ
-   - Repository permissions: Contents は Read and write、Actions は Read-only、Pull requests は Read and write、Metadata は Read-only。ほかはNo access
+   - Repository permissions: Contents は Read and write、Actions は Read-only、Checks は Read-only(公開の前にPRのチェックを見る)、Pull requests は Read and write、Metadata は Read-only。ほかはNo access
    - Where can this GitHub App be installed?: Only on this account
 3. 作ったら、Client IDを控え、Client secretを作る(Generate a new client secret)
 4. Install App から、`Aqua-218/Portfolio`だけに入れる(Only select repositories)
