@@ -30,6 +30,14 @@ export const metadata: Metadata = {
   description: DESCRIPTION,
   openGraph: { ...OPEN_GRAPH, title: SITE_NAME, description: DESCRIPTION },
   twitter: { card: "summary_large_image" },
+  // アイコンはsrc/lib/icon.tsxで、ヘッダーのロゴと同じ猫から作る
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "33x33" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    apple: "/apple-icon.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
