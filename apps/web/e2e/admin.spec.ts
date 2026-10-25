@@ -186,13 +186,14 @@ test.describe("content/の一覧", () => {
   test("ログインすると、Workerを通してmainのファイルを読み、種類ごとに出す", async ({
     page,
   }) => {
-    let asked: { path: string | null; admin: string | undefined } | undefined;
+    const asked: { path: string | null; admin: string | undefined }[] = [];
     await page.route("**/admin/api?*", (r) => {
-      asked = {
-        path: new URL(r.request().url()).searchParams.get("path"),
-        admin: r.request().headers()["x-admin"],
-      };
-      return r.fulfill({ status: 200, json: TREE });
+      const path = new URL(r.request().url()).searchParams.get("path");
+      asked.push({ path, admin: r.request().headers()["x-admin"] });
+      return r.fulfill({
+        status: 200,
+        json: path?.includes("/matching-refs/") ? [] : TREE,
+      });
     });
     await page.goto("/admin/");
     const list = page.getByRole("region", { name: "content/ の一覧" });
@@ -205,15 +206,27 @@ test.describe("content/の一覧", () => {
     // content/の外と.cacheは出さない
     await expect(list.getByText("package.json")).toHaveCount(0);
     await expect(list.getByText("ogp.json")).toHaveCount(0);
-    expect(asked).toEqual({
-      path: "/repos/Aqua-218/Portfolio/git/trees/main?recursive=1",
-      admin: "1",
-    });
+    // mainのファイルと、下書きのブランチを読む
+    expect(asked).toEqual(
+      expect.arrayContaining([
+        {
+          path: "/repos/Aqua-218/Portfolio/git/trees/main?recursive=1",
+          admin: "1",
+        },
+        {
+          path: "/repos/Aqua-218/Portfolio/git/matching-refs/heads/draft/",
+          admin: "1",
+        },
+      ]),
+    );
   });
 
   test("名前で絞り込める", async ({ page }) => {
     await page.route("**/admin/api?*", (r) =>
-      r.fulfill({ status: 200, json: TREE }),
+      r.fulfill({
+        status: 200,
+        json: r.request().url().includes("matching-refs") ? [] : TREE,
+      }),
     );
     await page.goto("/admin/");
     const list = page.getByRole("region", { name: "content/ の一覧" });
@@ -225,6 +238,25 @@ test.describe("content/の一覧", () => {
     await expect(list.getByRole("heading", { name: /^ページ/ })).toHaveCount(0);
     await list.getByRole("searchbox", { name: "名前で絞り込む" }).fill("nyan");
     await expect(list.getByText("見つかりません")).toBeVisible();
+  });
+
+  test("下書きのあるファイルに「下書き」と出す", async ({ page }) => {
+    await page.route("**/admin/api?*", (r) =>
+      r.fulfill({
+        status: 200,
+        json: r.request().url().includes("matching-refs")
+          ? [{ ref: "refs/heads/draft/events/2026-08-10-seccamp.md" }]
+          : TREE,
+      }),
+    );
+    await page.goto("/admin/");
+    const list = page.getByRole("region", { name: "content/ の一覧" });
+    await expect(
+      list.getByRole("listitem").filter({ hasText: "2026-08-10-seccamp.md" }),
+    ).toContainText("下書き");
+    await expect(
+      list.getByRole("listitem").filter({ hasText: "2025-11-30-u22-final.md" }),
+    ).not.toContainText("下書き");
   });
 
   test("ログインが切れていたら、そう出す", async ({ page }) => {
@@ -256,6 +288,7 @@ tags: [Z1ゼミ]
     );
     await page.route("**/admin/api?*", (r) => {
       const path = new URL(r.request().url()).searchParams.get("path") ?? "";
+      if (path.includes("/git/matching-refs/")) return r.fulfill({ json: [] });
       if (path.includes("/git/trees/")) {
         return r.fulfill({
           json: {
@@ -385,6 +418,99 @@ tags: [Z1ゼミ]
     await expect(page.getByRole("button", { name: "プレビュー" })).toHaveCount(
       0,
     );
+  });
+
+  test("下書きに保存すると、mainからdraft/のブランチを作って、そこにコミットする", async ({
+    page,
+  }) => {
+    const calls: { method: string; path: string; body: unknown }[] = [];
+    await page.route("**/admin/api?*", (r) => {
+      const req = r.request();
+      const path = new URL(req.url()).searchParams.get("path") ?? "";
+      const body: unknown = req.postData() ? req.postDataJSON() : null;
+      calls.push({ method: req.method(), path, body });
+      if (path.endsWith("/git/ref/heads/main"))
+        return r.fulfill({ json: { object: { sha: "m1" } } });
+      if (req.method() === "POST" && path.endsWith("/git/refs"))
+        return r.fulfill({ status: 201, json: {} });
+      if (req.method() === "PUT") return r.fulfill({ json: {} });
+      return r.fallback();
+    });
+    await page.getByRole("button", { name: "2026-08-10-seccamp.md" }).click();
+    const save = page.getByRole("button", { name: "下書きに保存" });
+    // 変えていなければ押せない
+    await expect(save).toBeDisabled();
+    await page.getByLabel("タイトル").fill("セキュキャン");
+    await save.click();
+    await expect(page.getByRole("status")).toHaveText(
+      "下書きに保存しました。まだ公開していません。",
+    );
+    await expect(page.getByText("変更あり")).toHaveCount(0);
+    await expect(
+      page.locator("main").getByText("下書き", { exact: true }),
+    ).toBeVisible();
+
+    const repo = "/repos/Aqua-218/Portfolio";
+    const branch = "draft/events/2026-08-10-seccamp.md";
+    expect(calls).toContainEqual({
+      method: "POST",
+      path: `${repo}/git/refs`,
+      body: { ref: `refs/heads/${branch}`, sha: "m1" },
+    });
+    const put = calls.find((c) => c.method === "PUT");
+    expect(put?.path).toBe(
+      `${repo}/contents/content/events/2026-08-10-seccamp.md`,
+    );
+    const sent = put?.body as { branch: string; content: string; sha?: string };
+    expect(sent.branch).toBe(branch);
+    // 下書きのブランチにまだファイルがないので、shaはつけない
+    expect(sent.sha).toBeUndefined();
+    expect(Buffer.from(sent.content, "base64").toString("utf8")).toContain(
+      "title: セキュキャン",
+    );
+    // mainには書かない
+    expect(
+      calls.filter(
+        (c) => c.method !== "GET" && JSON.stringify(c.body).includes('"main"'),
+      ),
+    ).toEqual([]);
+  });
+
+  test("下書きがあれば、下書きを開く", async ({ page }) => {
+    const DRAFT = EVENT.replace(
+      "セキュリティ・キャンプ全国大会",
+      "セキュキャン(下書き)",
+    );
+    await page.route("**/admin/api?*", (r) => {
+      const path = new URL(r.request().url()).searchParams.get("path") ?? "";
+      if (path.includes("seccamp.md?ref=draft/events/2026-08-10-seccamp.md"))
+        return r.fulfill({ json: { content: b64(DRAFT), sha: "d1" } });
+      return r.fallback();
+    });
+    await page.getByRole("button", { name: "2026-08-10-seccamp.md" }).click();
+    await expect(page.getByLabel("タイトル")).toHaveValue(
+      "セキュキャン(下書き)",
+    );
+    await expect(
+      page.getByText("下書きを開いています。まだ公開していません。"),
+    ).toBeVisible();
+  });
+
+  test("保存に失敗したら、理由を出して、変更は残す", async ({ page }) => {
+    await page.route("**/admin/api?*", (r) => {
+      const path = new URL(r.request().url()).searchParams.get("path") ?? "";
+      if (path.endsWith("/git/ref/heads/draft/events/2026-08-10-seccamp.md"))
+        return r.fulfill({ json: { object: { sha: "d0" } } });
+      if (r.request().method() === "PUT") return r.fulfill({ status: 409 });
+      return r.fallback();
+    });
+    await page.getByRole("button", { name: "2026-08-10-seccamp.md" }).click();
+    await page.getByLabel("タイトル").fill("セキュキャン");
+    await page.getByRole("button", { name: "下書きに保存" }).click();
+    await expect(page.locator("main").getByRole("alert").first()).toHaveText(
+      "下書きがほかで書き換えられています。一覧へ戻って開き直してください。",
+    );
+    await expect(page.getByText("変更あり")).toBeVisible();
   });
 
   test("写真は開けない(アップロードで扱う)", async ({ page }) => {
