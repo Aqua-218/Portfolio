@@ -29,9 +29,10 @@ for (const { name, path } of PAGES) {
   test(name, async ({ page }) => {
     // Homeの時計が毎回同じ時刻を出すよう、時計を止めておく
     await page.clock.setFixedTime(new Date("2026-10-24T12:34:56+09:00"));
-    // 埋め込み(YouTube・X)の中身は外のサイトなので読まない。枠は塗りつぶして撮る
+    // 外のサイト(埋め込みのYouTube・X・CodePenなど)は読まない。読むと、撮るたびに中身や高さが揺れる。
+    // 埋め込みの枠は塗りつぶして撮る
     await page.route(
-      (url) => /(^|\.)(youtube\.com|twitter\.com)$/.test(url.hostname),
+      (url) => url.hostname !== "localhost" && url.hostname !== "127.0.0.1",
       (route) => route.abort(),
     );
     await page.goto(path);
