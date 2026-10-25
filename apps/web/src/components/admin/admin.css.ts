@@ -250,3 +250,66 @@ export const tab = style([
     },
   },
 ]);
+
+/** 公開(PRを作ってマージする)のまとまり */
+export const publish = style({
+  display: "grid",
+  justifyItems: "start",
+  gap: "0.9rem",
+  paddingTop: "1.25rem",
+  borderTop: `1.5px solid ${vars.color.ink}`,
+});
+
+export const subTitle = style({
+  margin: 0,
+  fontFamily: vars.font.jp,
+  fontSize: "0.9375rem",
+  fontWeight: 700,
+});
+
+/** 変わるところ。消えた行と増えた行に色をつける */
+export const diff = style({
+  width: "100%",
+  margin: 0,
+  padding: "0.75rem",
+  listStyle: "none",
+  overflowX: "auto",
+  borderRadius: vars.radius.md,
+  background: vars.color.tatami,
+  fontFamily: vars.font.mono,
+  fontSize: "0.8125rem",
+  lineHeight: 1.7,
+  whiteSpace: "pre-wrap",
+  overflowWrap: "anywhere",
+});
+
+export const diffAdd = style({ color: vars.color.leaf, fontWeight: 700 });
+
+export const diffRemove = style({
+  color: vars.color.mike,
+  textDecoration: "line-through",
+});
+
+export const diffGap = style({ color: vars.color.muted });
+
+/** チェックや、mainで走るものの一覧 */
+export const checks = style({
+  width: "100%",
+  margin: 0,
+  padding: 0,
+  listStyle: "none",
+  fontFamily: vars.font.jp,
+  fontSize: "0.875rem",
+});
+
+globalStyle(`${checks} li`, {
+  display: "flex",
+  justifyContent: "space-between",
+  gap: "1rem",
+  padding: "0.35rem 0",
+  borderBottom: `1px solid ${vars.color.line}`,
+});
+
+export const checkState = style({ color: vars.color.muted });
+
+export const checkFailed = style({ color: vars.color.mike, fontWeight: 700 });
