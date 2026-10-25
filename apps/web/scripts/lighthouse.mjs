@@ -1,13 +1,17 @@
 // ビルドしたout/をe2eのサーバー(本番と同じヘッダーと圧縮)で出し、おもなページをLighthouseで測る。
 // 予算を超えたら落とす。レポートは.lighthouse/に書き出す。
 // スマホ(遅い回線と遅いCPU)の条件で測る。Lighthouseの既定で、PCより厳しい。
-import { spawn } from "node:child_process";
-import { mkdirSync, writeFileSync } from "node:fs";
+// 本番(Cloudflare)と同じくHTTPSのHTTP/2で出す。証明書はその場で作る自己署名のもの。
+import { execFileSync, spawn } from "node:child_process";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { connect } from "node:net";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import { chromium } from "@playwright/test";
 import lighthouse from "lighthouse";
 
 const PORT = 4173;
-const BASE = `http://localhost:${String(PORT)}`;
+const BASE = `https://localhost:${String(PORT)}`;
 const PAGES = ["/", "/about/", "/events/", "/cats/", "/stack/"];
 // ゆれを減らすため、3回測って真ん中を使う
 const RUNS = 3;
@@ -63,14 +67,43 @@ function transfer(lhr, type) {
     .reduce((sum, i) => sum + i.transferSize, 0);
 }
 
+/** その場で作る自己署名の証明書。測るChromiumはこの証明書の間違いを見ない */
+function certificate(dir) {
+  const key = path.join(dir, "key.pem");
+  const cert = path.join(dir, "cert.pem");
+  execFileSync(
+    "openssl",
+    [
+      ...[
+        "req",
+        "-x509",
+        "-newkey",
+        "ec",
+        "-pkeyopt",
+        "ec_paramgen_curve:prime256v1",
+      ],
+      ...["-nodes", "-days", "1", "-subj", "/CN=localhost"],
+      ...["-keyout", key, "-out", cert],
+    ],
+    { stdio: "ignore" },
+  );
+  return { key, cert };
+}
+
+/** サーバーがポートを開くまで待つ */
 async function waitForServer() {
   for (let i = 0; i < 50; i++) {
-    try {
-      await fetch(BASE);
-      return;
-    } catch {
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    }
+    const open = await new Promise((resolve) => {
+      const socket = connect(PORT, "localhost", () => {
+        socket.end();
+        resolve(true);
+      });
+      socket.on("error", () => {
+        resolve(false);
+      });
+    });
+    if (open) return;
+    await new Promise((resolve) => setTimeout(resolve, 100));
   }
   throw new Error("e2eのサーバーが立ち上がりません");
 }
@@ -81,7 +114,10 @@ async function measure(url) {
   const browser = await chromium.launch({
     // headless shellではなく、本物のChromiumで測る
     channel: "chromium",
-    args: [`--remote-debugging-port=${String(port)}`],
+    args: [
+      `--remote-debugging-port=${String(port)}`,
+      "--ignore-certificate-errors",
+    ],
   });
   try {
     const result = await lighthouse(url, {
@@ -96,9 +132,11 @@ async function measure(url) {
   }
 }
 
+const tls = mkdtempSync(path.join(tmpdir(), "lighthouse-"));
+const { key, cert } = certificate(tls);
 const server = spawn(process.execPath, ["e2e/serve.mjs"], {
   cwd: new URL("..", import.meta.url).pathname,
-  env: { ...process.env, PORT: String(PORT) },
+  env: { ...process.env, PORT: String(PORT), TLS_KEY: key, TLS_CERT: cert },
   stdio: "inherit",
 });
 
@@ -135,6 +173,7 @@ try {
   }
 } finally {
   server.kill();
+  rmSync(tls, { recursive: true, force: true });
 }
 
 if (failed) {
