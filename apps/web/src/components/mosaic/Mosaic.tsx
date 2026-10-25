@@ -19,8 +19,13 @@ export function Mosaic() {
     <Parallax className={s.mosaic}>
       {ids.map((id, i) => (
         <figure key={id} className={`${s.tile} ${TILES[i] ?? ""}`}>
-          {/* いちばん上に見えるので、遅らせずに読む */}
-          <Photo id={id} sizes={SIZES[i] ?? "50vw"} loading="eager" />
+          {/* いちばん上に見えるので、遅らせずに読む。1枚目はいちばん大きくLCPになるので、ほかより先に読む */}
+          <Photo
+            id={id}
+            sizes={SIZES[i] ?? "50vw"}
+            loading="eager"
+            fetchPriority={i === 0 ? "high" : "low"}
+          />
         </figure>
       ))}
     </Parallax>

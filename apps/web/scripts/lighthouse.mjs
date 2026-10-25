@@ -18,46 +18,54 @@ const RUNS = 3;
 const out = new URL("../.lighthouse/", import.meta.url).pathname;
 
 /**
- * 予算。levelが"error"なら超えたときに落とし、"warn"なら知らせるだけ。
- * 点・LCP・TBT・CSSの大きさは、フォントと写真を直すまで(#213)は警告にしておく。
+ * 予算。目標(goal)に届かなければ知らせ、下限(limit)を超えたら落とす。
+ * CIのマシンによって、CPUの重さで点が少しゆれるので、落とす線は目標より少し緩くしてある。
  */
 const BUDGETS = [
   ...["performance", "accessibility", "best-practices", "seo"].map((id) => ({
     name: `${id}の点`,
-    level: id === "performance" ? "warn" : "error",
     value: (lhr) => lhr.categories[id].score,
-    min: 0.95,
+    higher: true,
+    goal: 0.95,
+    limit: id === "performance" ? 0.9 : 0.95,
   })),
   {
     name: "LCP(ms)",
-    level: "warn",
     value: (lhr) => lhr.audits["largest-contentful-paint"].numericValue,
-    max: 2500,
+    goal: 2500,
+    limit: 3000,
   },
   {
     name: "CLS",
-    level: "error",
     value: (lhr) => lhr.audits["cumulative-layout-shift"].numericValue,
-    max: 0.05,
+    goal: 0.05,
+    limit: 0.05,
   },
   {
     name: "TBT(ms)",
-    level: "warn",
     value: (lhr) => lhr.audits["total-blocking-time"].numericValue,
-    max: 200,
+    goal: 200,
+    limit: 300,
   },
   // 大きさは転送量(バイト)
   {
     name: "JSの大きさ",
-    level: "error",
     value: (lhr) => transfer(lhr, "Script"),
-    max: 250_000,
+    goal: 250_000,
+    limit: 250_000,
   },
   {
     name: "CSSの大きさ",
-    level: "warn",
     value: (lhr) => transfer(lhr, "Stylesheet"),
-    max: 30_000,
+    goal: 30_000,
+    limit: 30_000,
+  },
+  {
+    name: "フォントの大きさ",
+    value: (lhr) => transfer(lhr, "Font"),
+    // 字の多いページ(Stackなど)は、ページの順に分けたフォントをいくつも読むので、下限は広めに
+    goal: 150_000,
+    limit: 300_000,
   },
 ];
 
@@ -161,14 +169,13 @@ try {
     console.log(`\n${page}`);
     for (const b of BUDGETS) {
       const value = b.value(lhr);
-      const ok = b.min !== undefined ? value >= b.min : value <= b.max;
-      const limit =
-        b.min !== undefined ? `>= ${String(b.min)}` : `<= ${String(b.max)}`;
-      const mark = ok ? "ok  " : b.level === "error" ? "NG  " : "warn";
+      const within = (line) => (b.higher ? value >= line : value <= line);
+      const sign = b.higher ? ">=" : "<=";
+      const mark = within(b.goal) ? "ok  " : within(b.limit) ? "warn" : "NG  ";
       console.log(
-        `  ${mark} ${b.name}: ${String(Math.round(value * 1000) / 1000)} (${limit})`,
+        `  ${mark} ${b.name}: ${String(Math.round(value * 1000) / 1000)} (目標 ${sign} ${String(b.goal)}、下限 ${sign} ${String(b.limit)})`,
       );
-      if (!ok && b.level === "error") failed = true;
+      if (!within(b.limit)) failed = true;
     }
   }
 } finally {

@@ -32,6 +32,8 @@ jobs:
           restore-keys: pnpm-${{ runner.os }}-
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
       - run: pnpm install --frozen-lockfile
+      # ビルドのあと、書き出したページをChromiumで開いて、使う字だけのフォントを作る(scripts/fonts.mjs)
+      - run: pnpm --filter @portfolio/web exec playwright install --with-deps chromium
       - run: pnpm build
       # 管理画面のトークンが、コミットしたファイルや書き出したサイトに入っていないか見る
       - run: sh scripts/check-tokens.sh apps/web/out
@@ -91,9 +93,9 @@ jobs:
       - run: pnpm --filter @portfolio/pxcat --filter @portfolio/content-wasm build
       - run: pnpm test
       - run: cargo test --workspace --locked
-      # e2eはビルドしたout/を相手にする
-      - run: pnpm build
+      # e2eはビルドしたout/を相手にする。ビルドでもChromiumを使う
       - run: pnpm --filter @portfolio/web exec playwright install --with-deps chromium
+      - run: pnpm build
       - run: pnpm --filter @portfolio/web e2e
 
   vrt:
