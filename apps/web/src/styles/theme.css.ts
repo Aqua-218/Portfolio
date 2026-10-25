@@ -17,6 +17,8 @@ export const vars = createThemeContract({
     pxline: null,
     note: null,
     leaf: null,
+    sora: null,
+    kaki: null,
   },
   font: {
     sans: null,
@@ -51,6 +53,8 @@ function colors(palette: Palette) {
     pxline: toCss(palette.pxline),
     note: toCss(palette.note),
     leaf: toCss(palette.leaf),
+    sora: toCss(palette.sora),
+    kaki: toCss(palette.kaki),
   };
 }
 
