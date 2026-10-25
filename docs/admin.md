@@ -91,7 +91,7 @@ GitHub Actionsの`GITHUB_TOKEN`で押したコミットでは、ほかのワー�
 
 1. GitHubの Settings → Developer settings → Fine-grained personal access tokens → Generate new token
    - Repository access: Only select repositories → `Aqua-218/Portfolio`
-   - Repository permissions: Contents は Read and write。ほかはNo access
+   - Repository permissions: Contents は Read and write、Pull requests は Read and write(Qiitaのidの書き戻しのPRに使う、[blog.md](blog.md))。ほかはNo access
    - 期限: 1年まで。切れる前に作り直す
 2. リポジトリの Settings → Secrets and variables → Actions に、`CONTENT_CACHE_TOKEN`として入れる
 

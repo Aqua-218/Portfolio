@@ -1,0 +1,77 @@
+name: Qiita
+# ブログの記事がmainに入ったら、Qiitaに投稿・更新する(apps/web/scripts/qiita.mjs)。
+# もらったidと日時は記事のfrontmatterに書き戻す。mainには直接書けないので、書き戻しをPRにして自動でマージする。
+# 書き戻しのマージでもう一度走るが、Qiitaと中身が同じなら何もしないので、続かない
+on:
+  push:
+    branches: [main]
+    paths:
+      - "content/blog/**"
+  workflow_dispatch:
+
+# 既定は何もできない。ジョブで読むだけを足す
+permissions: {}
+
+concurrency:
+  group: qiita
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: jdx/mise-action@8418fedb1110381a0d3ba51a7a415d7c1b884550 # v5.2.2
+        with:
+          install_args: node rust
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+      # ビルドと同じ検証を通った記事を読む
+      - run: cargo run -q -p content --bin content-check -- content --out apps/web/.content/site.json
+      - name: 変わった記事
+        env:
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+        run: |
+          # 手で走らせたとき(workflow_dispatch)と、初めてのときは、全部の記事
+          if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+            git ls-files content/blog > "$RUNNER_TEMP/changed.txt"
+          else
+            git diff --name-only "$BEFORE" "$AFTER" -- content/blog > "$RUNNER_TEMP/changed.txt"
+          fi
+          cat "$RUNNER_TEMP/changed.txt"
+      # Qiitaのトークンを渡すのはここだけ
+      - name: Qiitaに出す
+        env:
+          QIITA_TOKEN: ${{ secrets.QIITA_TOKEN }}
+        run: CHANGED="$(cat "$RUNNER_TEMP/changed.txt")" node apps/web/scripts/qiita.mjs
+      # 書き戻しをPRにする。GitHubのトークンを渡すのはここだけ(gitとghしか動かさない)
+      - name: 書き戻しをPRにする
+        env:
+          TOKEN: ${{ secrets.CONTENT_CACHE_TOKEN }}
+          GH_TOKEN: ${{ secrets.CONTENT_CACHE_TOKEN }}
+          SHA: ${{ github.sha }}
+        run: |
+          if git diff --quiet -- content/blog; then
+            echo "書き戻すものはない"
+            exit 0
+          fi
+          if [ -z "$TOKEN" ]; then
+            echo "::error::CONTENT_CACHE_TOKEN がありません(docs/blog.md)"
+            exit 1
+          fi
+          branch="qiita/sync-${SHA}"
+          git switch -c "$branch"
+          git add content/blog
+          git -c user.name="github-actions[bot]" \
+            -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -m "content: Qiitaのidと日時を書き戻す"
+          git push "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${branch}"
+          gh pr create --repo "$GITHUB_REPOSITORY" --base main --head "$branch" \
+            --title "content: Qiitaのidと日時を書き戻す" \
+            --body "Qiitaに出した記事のidと日時を、記事のfrontmatterに書き戻す(.github/workflows/qiita.yml)。チェックが通れば自動でマージする。"
+          gh pr merge --repo "$GITHUB_REPOSITORY" --auto --squash "$branch"
