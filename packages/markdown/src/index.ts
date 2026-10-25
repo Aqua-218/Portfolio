@@ -7,6 +7,7 @@ import remarkMath from "remark-math";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
+import { rehypeAlerts } from "./alerts";
 import { getHighlighter, rehypeShikiFromHighlighter } from "./highlight";
 
 /**
@@ -24,6 +25,8 @@ async function processor() {
       .use(remarkRehype)
       // 数式はビルド時にMathMLにする。ブラウザが描くので、KaTeXのCSSとフォントはいらない
       .use(rehypeKatex, { output: "mathml" })
+      // GitHubのアラートを、猫のついた注意書きにする
+      .use(rehypeAlerts)
       // 見出しにidをつけ、見出しそのものをそのidへのリンクにする
       .use(rehypeSlug)
       .use(rehypeAutolinkHeadings, { behavior: "wrap" })

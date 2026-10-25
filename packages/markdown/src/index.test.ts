@@ -61,3 +61,26 @@ describe("数式", () => {
     expect(await render("$x$")).not.toContain("katex-html");
   });
 });
+
+describe("アラート", () => {
+  it.each(["NOTE", "TIP", "IMPORTANT", "WARNING", "CAUTION"])(
+    "%sに猫がつく",
+    async (kind) => {
+      const html = await render(`> [!${kind}]\n> 猫は液体です。`);
+      expect(html).toContain(`class="callout callout-${kind.toLowerCase()}"`);
+      expect(html).toContain('<svg class="px-svg"');
+      expect(html).toContain(`<b>${kind}</b>`);
+      expect(html).toContain("<p>猫は液体です。</p>");
+      expect(html).not.toContain("[!");
+      expect(html).not.toContain("<blockquote>");
+    },
+  );
+
+  it("ふつうの引用はそのまま", async () => {
+    expect(await render("> 吾輩は猫である")).toContain("<blockquote>");
+  });
+
+  it("知らない種類はふつうの引用のまま", async () => {
+    expect(await render("> [!NYAN]\n> にゃ")).toContain("<blockquote>");
+  });
+});
