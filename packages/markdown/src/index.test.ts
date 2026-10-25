@@ -43,3 +43,21 @@ describe("コードの色", () => {
     expect(html).not.toContain("var(--shiki-token-");
   });
 });
+
+describe("数式", () => {
+  it("$...$を文中の数式にする", async () => {
+    const html = await render("輪郭は $x + 1$ マス");
+    expect(html).toContain("<math");
+    expect(html).not.toContain('display="block"');
+  });
+
+  it("$$...$$を独立した数式にする", async () => {
+    const html = await render("$$\n\\forall c \\in \\mathrm{Cats}\n$$");
+    expect(html).toContain('display="block"');
+    expect(html).toContain("∀");
+  });
+
+  it("KaTeXのCSSのためのHTMLは出さない", async () => {
+    expect(await render("$x$")).not.toContain("katex-html");
+  });
+});
