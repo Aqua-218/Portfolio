@@ -6,6 +6,7 @@ import { Dashboard } from "./Dashboard";
 import { contentFiles, drafts } from "./github";
 import { group } from "./groups";
 import { NewPost } from "./NewPost";
+import { QiitaImport } from "./QiitaImport";
 import { Upload } from "./Upload";
 
 type State =
@@ -23,6 +24,8 @@ function editable(path: string): boolean {
 export function Contents({ onOpen }: { onOpen: (path: string) => void }) {
   const [state, setState] = useState<State>({ kind: "loading" });
   const [query, setQuery] = useState("");
+  /** 増やすと一覧を読み直す(Qiitaから取り込んだあと) */
+  const [version, setVersion] = useState(0);
 
   useEffect(() => {
     let alive = true;
@@ -43,7 +46,7 @@ export function Contents({ onOpen }: { onOpen: (path: string) => void }) {
     return () => {
       alive = false;
     };
-  }, []);
+  }, [version]);
 
   if (state.kind === "loading")
     return <p className={s.note}>一覧を読んでいます…</p>;
@@ -98,6 +101,14 @@ export function Contents({ onOpen }: { onOpen: (path: string) => void }) {
         <NewPost
           taken={new Set([...state.paths, ...state.drafts])}
           onOpen={onOpen}
+        />
+        <QiitaImport
+          paths={state.paths}
+          drafts={state.drafts}
+          taken={new Set([...state.paths, ...state.drafts])}
+          onImported={() => {
+            setVersion((v) => v + 1);
+          }}
         />
         {newPosts.length > 0 && (
           <div>

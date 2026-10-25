@@ -136,6 +136,10 @@ test.describe("守りのヘッダー", () => {
     );
     expect(headers["x-frame-options"]).toBe("DENY");
     expect(headers["referrer-policy"]).toBe("no-referrer");
+    // 取り込んだQiitaの記事の画像を、プレビューで出せる
+    expect(headers["content-security-policy"]).toMatch(
+      /img-src [^;]*https:\/\/qiita-image-store\.s3\.ap-northeast-1\.amazonaws\.com/,
+    );
     // ハイドレーションして、ログインの状態が出る(インラインのスクリプトがハッシュで許されている)
     await expect(page.getByText("neko でログインしています")).toBeVisible();
     // ロゴのドット猫(WebAssembly)も描ける
@@ -1326,6 +1330,127 @@ test.describe("ダッシュボード", () => {
       page.getByRole("region", {
         name: "content/events/2026-08-10-seccamp.md の編集",
       }),
+    ).toBeVisible();
+  });
+});
+
+test.describe("Qiitaから取り込む", () => {
+  const b64 = (t: string) => Buffer.from(t, "utf8").toString("base64");
+  const MINE = "0123456789abcdef0123";
+  const NEW = "fedcba9876543210fedc";
+  const IMAGE =
+    "https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/1/cat.png";
+
+  test("自分のQiitaの記事を選んで、idつきの下書きにする。取り込み済みのものは選べない", async ({
+    page,
+  }) => {
+    const saved: { path: string; text: string; branch: string }[] = [];
+    let drafted = false;
+    await page.route("**/admin/auth/me", (r) =>
+      r.fulfill({ status: 200, json: { login: "neko" } }),
+    );
+    await page.route("**/admin/api?*", (r) => {
+      const req = r.request();
+      const path = new URL(req.url()).searchParams.get("path") ?? "";
+      if (path.includes("/git/matching-refs/"))
+        return r.fulfill({
+          json: drafted
+            ? [{ ref: "refs/heads/draft/blog/cats-and-wasm.md" }]
+            : [],
+        });
+      if (path.includes("/git/trees/"))
+        return r.fulfill({
+          json: { tree: [{ path: "content/blog/mine.md", type: "blob" }] },
+        });
+      if (path.endsWith("blog/mine.md?ref=main"))
+        return r.fulfill({
+          json: {
+            content: b64(
+              `---\ntitle: 前の記事\ntags:\n  - Rust\nprivate: false\nupdated_at: '2026-10-01T00:00:00+09:00'\nid: ${MINE}\norganization_url_name: null\nslide: false\nignorePublish: false\n---\n本文\n`,
+            ),
+            sha: "m",
+          },
+        });
+      if (path.endsWith("/git/ref/heads/main"))
+        return r.fulfill({ json: { object: { sha: "m1" } } });
+      if (req.method() === "POST" && path.endsWith("/git/refs"))
+        return r.fulfill({ status: 201, json: {} });
+      if (req.method() === "PUT") {
+        const body = req.postDataJSON() as { content: string; branch: string };
+        saved.push({
+          path,
+          branch: body.branch,
+          text: Buffer.from(body.content, "base64").toString("utf8"),
+        });
+        drafted = true;
+        return r.fulfill({ json: {} });
+      }
+      return r.fulfill({ status: 404 });
+    });
+    await page.route("**/admin/qiita?*", (r) =>
+      r.fulfill({
+        json: [
+          {
+            id: MINE,
+            title: "前の記事",
+            body: "本文",
+            private: false,
+            tags: [{ name: "Rust" }],
+            updated_at: "2026-10-01T00:00:00+09:00",
+            url: "",
+          },
+          {
+            id: NEW,
+            title: "Cats and Wasm",
+            body: `![cat.png](${IMAGE})`,
+            private: true,
+            tags: [{ name: "WebAssembly" }],
+            updated_at: "2026-10-20T00:00:00+09:00",
+            url: "",
+          },
+        ],
+      }),
+    );
+    await page.goto("/admin/");
+    await page.locator("summary", { hasText: "Qiitaから取り込む" }).click();
+    await expect(page.getByLabel(/^前の記事/)).toBeDisabled();
+    await expect(page.getByText("取り込み済み")).toBeVisible();
+    await page.getByLabel(/^Cats and Wasm/).check();
+    const slug = page.getByRole("textbox", { name: /^ファイル名/ });
+    await expect(slug).toHaveValue("cats-and-wasm");
+    await slug.fill("mine");
+    await expect(
+      page.getByText("その名前の記事はもうあります。"),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "選んだ 1 件を下書きにする" }),
+    ).toBeDisabled();
+    await slug.fill("cats-and-wasm");
+    await page
+      .getByRole("button", { name: "選んだ 1 件を下書きにする" })
+      .click();
+    await expect(
+      page.getByText("1件を下書きにしました。", { exact: false }),
+    ).toBeVisible();
+    expect(saved).toHaveLength(1);
+    expect(saved[0]?.path).toContain("/contents/content/blog/cats-and-wasm.md");
+    expect(saved[0]?.branch).toBe("draft/blog/cats-and-wasm.md");
+    expect(saved[0]?.text).toBe(`---
+title: Cats and Wasm
+tags:
+  - WebAssembly
+private: true
+updated_at: '2026-10-20T00:00:00+09:00'
+id: ${NEW}
+organization_url_name: null
+slide: false
+ignorePublish: false
+---
+![cat.png](${IMAGE})
+`);
+    // 一覧を読み直し、書きかけの記事に出る
+    await expect(
+      page.getByRole("button", { name: "cats-and-wasm.md" }).first(),
     ).toBeVisible();
   });
 });

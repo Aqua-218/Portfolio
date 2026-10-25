@@ -93,6 +93,15 @@ Qiitaの解析はcmark-gfm 0.29、このサイトはmicromark(CommonMark 0.31)�
 
 ブラウザはWorkerの`/admin/qiita`を呼ぶだけで、Qiitaのトークンは見ない。Workerは、自分の記事を読む・投稿する・更新することと、記事の項目だけを通す([admin.md](admin.md))。
 
+### Qiitaから取り込む
+
+もうQiitaにある記事は、管理画面の一覧の「Qiitaから取り込む」で、選んでブログの記事の下書きにできる(`apps/web/src/components/admin/importer.ts`)。
+
+- 自分のQiitaの記事を一覧にする。もう取り込んだもの(mainか下書きに同じidの記事があるもの)は選べない
+- 選んだ記事ごとにファイル名(URLになる)を決める。はじめの案は、タイトルの英数字の語か、idから作る
+- 1つの記事が1つの下書きになる。先頭はQiita CLIと同じ形で、idと`updated_at`も入れる。公開しても、Qiitaと中身が同じなのでActionsは何もしない
+- 本文はそのまま。画像はダウンロードせず、Qiitaのもの(`qiita-image-store`など)をそのまま参照する。サイトのCSPは、ビルドしたページの画像から出どころを集めるので、そのまま出る。管理画面のプレビューのために、管理画面のCSPにはQiitaの画像の置き場を入れてある
+
 ### 用意すること
 
 1. Qiitaの 設定 → アプリケーション → 個人用アクセストークン で、`read_qiita`と`write_qiita`のトークンを作る

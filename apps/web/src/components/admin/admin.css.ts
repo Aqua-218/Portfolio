@@ -504,3 +504,26 @@ export const tallyNumber = style({
   fontSize: "1.125rem",
   fontWeight: 800,
 });
+
+// ---- Qiitaから取り込む ----
+
+export const importer = style({
+  display: "grid",
+  gap: "0.75rem",
+  marginTop: "0.75rem",
+});
+
+export const importList = style({
+  listStyle: "none",
+  margin: 0,
+  padding: 0,
+  display: "grid",
+  borderTop: `1px solid ${vars.color.line}`,
+});
+
+globalStyle(`${importList} li`, {
+  display: "grid",
+  gap: "0.5rem",
+  padding: "0.6rem 0",
+  borderBottom: `1px solid ${vars.color.line}`,
+});
