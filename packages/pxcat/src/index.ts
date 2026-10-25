@@ -12,10 +12,18 @@ export type FrameName =
   | "tailA"
   | "tailB"
   | "peek"
-  | "peekBlink";
+  | "peekBlink"
+  | "groomA"
+  | "groomB"
+  | "loaf"
+  | "stretch"
+  | "rollA"
+  | "rollB"
+  | "pounceA"
+  | "pounceB";
 
 /** 毛色。crates/pxcat-wasmのparse_coatと同じ。 */
-export type Coat = "kuro" | "kiji" | "mike";
+export type Coat = "kuro" | "kiji" | "mike" | "chatora" | "shiro";
 
 /** コマの幅と高さ(マス)。crates/pxcat-core/src/frames.rsと同じ。 */
 const FRAME_SIZE: Readonly<Record<FrameName, readonly [number, number]>> = {
@@ -28,6 +36,14 @@ const FRAME_SIZE: Readonly<Record<FrameName, readonly [number, number]>> = {
   tailB: [7, 4],
   peek: [7, 6],
   peekBlink: [7, 6],
+  groomA: [14, 12],
+  groomB: [14, 12],
+  loaf: [13, 7],
+  stretch: [20, 10],
+  rollA: [20, 8],
+  rollB: [20, 8],
+  pounceA: [20, 8],
+  pounceB: [20, 8],
 };
 
 /** SVGの幅と高さ(ピクセル)。輪郭の分、上下左右に1マスずつ大きい。Wasmを読まなくてもわかる。 */
