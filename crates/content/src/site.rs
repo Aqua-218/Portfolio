@@ -271,14 +271,17 @@ pub fn load_from(source: &impl Source) -> Result<Site, Vec<FileProblem>> {
         let p = event_years::check_against(years, &events);
         l.report("events.toml", p);
     }
-    if licenses.as_ref().is_some_and(|ls| ls.iter().any(|x| x.text.is_some())) {
+    if licenses
+        .as_ref()
+        .is_some_and(|ls| ls.iter().any(|x| x.text.is_some()))
+    {
         let texts: BTreeSet<String> = l.names("licenses", Some("txt")).into_iter().collect();
         if let Some(src) = l.read("licenses.toml") {
             let p = licenses::check_texts(&src, &texts);
             l.report("licenses.toml", p);
         }
     }
-        if let (Some(skills), Some(licenses)) = (&skills, &licenses) {
+    if let (Some(skills), Some(licenses)) = (&skills, &licenses) {
         let with_license: BTreeSet<String> =
             licenses.iter().flat_map(|x| x.icons.clone()).collect();
         let icon_files: BTreeSet<String> = l.names("icons", Some("svg")).into_iter().collect();
