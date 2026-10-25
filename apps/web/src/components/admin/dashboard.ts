@@ -1,5 +1,6 @@
 /** 管理画面のダッシュボードに出すものを集める。GitHubとQiitaはWorkerを通す */
 import { api, type Check, checks, readFile, REPO } from "./github";
+import { myItems } from "./importer";
 import { parsePost } from "./post";
 import type { Item } from "./qiita";
 
@@ -124,22 +125,6 @@ export async function recentRuns(count = 6): Promise<Run[]> {
   }));
 }
 
-/** 自分のQiitaの記事。Qiitaを見られなければ(トークンがないなど)null */
-async function qiitaItems(): Promise<Item[] | null> {
-  const items: Item[] = [];
-  for (let page = 1; page <= 10; page++) {
-    const res = await fetch(
-      `/admin/qiita?path=${encodeURIComponent(`/api/v2/authenticated_user/items?page=${String(page)}&per_page=100`)}`,
-      { credentials: "same-origin", headers: { "X-Admin": "1" } },
-    );
-    if (!res.ok) return null;
-    const got = (await res.json()) as Item[];
-    items.push(...got);
-    if (got.length < 100) break;
-  }
-  return items;
-}
-
 /** mainのブログの記事と、そのQiitaへの出し具合 */
 export async function postStates(
   paths: readonly string[],
@@ -149,7 +134,8 @@ export async function postStates(
   );
   if (blog.length === 0) return { posts: [], qiita: true };
   const [items, files] = await Promise.all([
-    qiitaItems(),
+    // Qiitaを見られなければ(トークンがないなど)null
+    myItems().catch(() => null),
     Promise.all(blog.map((p) => readFile(p).catch(() => null))),
   ]);
   const posts = blog.map((path, i) => {
