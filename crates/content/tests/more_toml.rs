@@ -159,7 +159,7 @@ fn ライセンスの原文を結びつける() {
     assert_eq!(l[1].text, None);
     // 原文のファイルがあればよい
     let have = BTreeSet::from(["apache-2".to_owned()]);
-    assert!(licenses::check_texts(&src, &have).is_empty());
+    assert_eq!(licenses::check_texts(&src, &have), Vec::<Problem>::new());
     assert_problems(
         &licenses::check_texts(&src, &BTreeSet::new()),
         &[(Some(9), "content/licenses/apache-2.txt")],
