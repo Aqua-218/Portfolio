@@ -90,3 +90,28 @@ globalStyle(".lc-img", {
     "(max-width: 640px)": { gridColumn: 1, gridRow: 1 },
   },
 });
+
+/** Mermaidの図。図の中のvar(--ink)などに、テーマの色を渡す(Stackの図と同じ) */
+globalStyle("figure.mmd", {
+  vars: {
+    "--paper": vars.color.paper,
+    "--ink": vars.color.ink,
+    "--muted": vars.color.muted,
+    "--line": vars.color.line,
+    "--tatami": vars.color.tatami,
+    "--mike": vars.color.mike,
+    "--mm-note": vars.color.note,
+  },
+  margin: "0 0 1rem",
+  padding: "1.25rem",
+  border: `1px solid ${vars.color.line}`,
+  borderRadius: vars.radius.lg,
+  overflowX: "auto",
+});
+
+globalStyle("figure.mmd > svg", {
+  display: "block",
+  marginInline: "auto",
+  maxWidth: "100%",
+  height: "auto",
+});
