@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import * as s from "./admin.css";
 import { Contents } from "./Contents";
+import { Editor } from "./Editor";
 
 /**
  * ログインに失敗したときの文。Workerからは記号(?error=owner など)だけが来る。
@@ -30,6 +31,8 @@ function call(path: string, method = "GET"): Promise<Response> {
 export function Login() {
   const [state, setState] = useState<State>({ kind: "loading" });
   const [error, setError] = useState<string | undefined>();
+  /** 開いているファイル。なければ一覧 */
+  const [open, setOpen] = useState<string | undefined>();
 
   useEffect(() => {
     const code = new URLSearchParams(location.search).get("error");
@@ -74,7 +77,16 @@ export function Login() {
             ログアウト
           </button>
         </div>
-        <Contents />
+        {open === undefined ? (
+          <Contents onOpen={setOpen} />
+        ) : (
+          <Editor
+            path={open}
+            onBack={() => {
+              setOpen(undefined);
+            }}
+          />
+        )}
       </>
     );
   }
