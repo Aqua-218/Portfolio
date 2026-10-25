@@ -1,0 +1,50 @@
+name: Origin certificate
+# ロリポップ側(Cloudflareの裏)の証明書の期限を毎日見る。CloudflareはFull (strict)なので、切れるとサイトが開けなくなる。
+# ロリポップの無料SSL(Let's Encrypt)は自動で更新されるが、Cloudflareを通しているので更新が失敗することがある。
+# 残りが14日を切ったらIssueを立てる。つなぎ先はActionsの変数ORIGIN_HOST(ロリポップの初期ドメイン)
+on:
+  schedule:
+    # 毎日 9:15(日本時間)
+    - cron: "15 0 * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: origin-cert
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write # 期限が近いときにIssueを立てる
+    steps:
+      - name: 期限を見る
+        env:
+          ORIGIN_HOST: ${{ vars.ORIGIN_HOST }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -z "$ORIGIN_HOST" ]; then
+            echo "ORIGIN_HOST がないので見ない(docs/security.md)"
+            exit 0
+          fi
+          end=$(echo | openssl s_client -connect "${ORIGIN_HOST}:443" -servername komineko.jp 2>/dev/null \
+            | openssl x509 -noout -enddate | cut -d= -f2)
+          if [ -z "$end" ]; then
+            days=-1
+          else
+            days=$(( ($(date -d "$end" +%s) - $(date +%s)) / 86400 ))
+          fi
+          echo "komineko.jp の裏側の証明書: 残り ${days} 日(${end:-読めない})"
+          if [ "$days" -ge 14 ]; then exit 0; fi
+          title="ロリポップ側の証明書の期限が近い"
+          if gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "$title in:title" --json number -q '.[0].number' | grep -q .; then
+            echo "Issueはもうある"
+            exit 0
+          fi
+          body="ロリポップ側(Cloudflareの裏)の komineko.jp の証明書が、残り ${days} 日です(${end:-読めませんでした})。"
+          body="${body} ロリポップの独自SSL(無料)の更新が止まっているかもしれません。"
+          body="${body} ユーザー専用ページで更新するか、Cloudflareで一時的にDNS onlyにして発行し直してください。"
+          body="${body} 切れるとCloudflare(Full (strict))からつながらなくなり、サイトが526になります。手順は docs/security.md。"
+          gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --label "type:fix" --body "$body"
