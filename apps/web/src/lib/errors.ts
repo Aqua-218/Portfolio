@@ -35,6 +35,10 @@ export const ERRORS = {
     message: "ここは立ち入り禁止です。猫しか入れません。",
     cat: cat.sitKuro,
   },
+  "405": {
+    message: "その開け方はできません。猫も、ドアは押すか引くかのどちらかです。",
+    cat: cat.peekMike,
+  },
   "408": {
     message: "待ちきれずに、猫が寝てしまいました。もう一度開いてみてください。",
     cat: cat.sleepKuro,

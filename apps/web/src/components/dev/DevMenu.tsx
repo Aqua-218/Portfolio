@@ -20,6 +20,7 @@ const LINKS: { title: string; items: [string, string][] }[] = [
         "400",
         "401",
         "403",
+        "405",
         "408",
         "410",
         "429",

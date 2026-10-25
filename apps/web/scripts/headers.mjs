@@ -90,6 +90,7 @@ const ERRORS = [
   "400",
   "401",
   "403",
+  "405",
   "408",
   "410",
   "429",
@@ -110,6 +111,9 @@ ${ERRORS.map((code) => `ErrorDocument ${code} /errors/${code}/`).join("\n")}
   # エラーのページ(ErrorDocument)を出すときは、転送しない。しないと、ないページが https://…/404.html への転送になる
   RewriteCond %{ENV:REDIRECT_STATUS} !^$
   RewriteRule ^ - [L]
+  # 読むだけのサイトなので、GETとHEADのほか(POST・DELETEなど)は405にする
+  RewriteCond %{REQUEST_METHOD} !^(GET|HEAD)$
+  RewriteRule ^ - [R=405,L]
   # Let's Encrypt(ロリポップの独自SSL)の確認は、HTTPのまま、wwwのままで答える。転送すると更新が失敗することがある
   RewriteRule ^\\.well-known/acme-challenge/ - [L]
   # www.komineko.jp は komineko.jp へ(どちらでも開けるが、URLは1つにする)
@@ -121,6 +125,10 @@ ${ERRORS.map((code) => `ErrorDocument ${code} /errors/${code}/`).join("\n")}
   # ディレクトリの最後の/は、ここでHTTPSのまま足す。Apacheに任せる(DirectorySlash)と、Cloudflareの後ろでは http:// で返す
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^(.*[^/])$ https://%{HTTP_HOST}/$1/ [R=301,L]
+</IfModule>
+# 405のときは、使えるメソッドを書く
+<IfModule mod_headers.c>
+  Header always set Allow "GET, HEAD" "expr=%{REQUEST_STATUS} == 405"
 </IfModule>
 # ファイルの一覧は出さない
 Options -Indexes

@@ -64,6 +64,24 @@ test("ないページは404で、404のページを出す", async () => {
   }
 });
 
+test("GETとHEADのほかは405で、405のページを出す", async () => {
+  for (const method of ["POST", "PUT", "DELETE", "PATCH", "OPTIONS"]) {
+    for (const path of ["/", "/about/", "/nai/"]) {
+      const res = await fetch(base + path, {
+        method,
+        headers: https,
+        redirect: "manual",
+      });
+      assert.equal(res.status, 405, `${method} ${path}`);
+      assert.equal(res.headers.get("allow"), "GET, HEAD", `${method} ${path}`);
+      assert.match(await res.text(), /<title>405 \|/, `${method} ${path}`);
+    }
+  }
+  const head = await fetch(`${base}/`, { method: "HEAD", headers: https });
+  assert.equal(head.status, 200);
+  assert.equal(head.headers.get("allow"), null);
+});
+
 test("ファイルの一覧は出さない(エラーのページになる)", async () => {
   const res = await get("/img/cats/");
   assert.equal(res.status, 403);
