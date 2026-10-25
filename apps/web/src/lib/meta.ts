@@ -33,6 +33,14 @@ export function pageMeta(name: PageName, title?: string): Metadata {
   const page = PAGES[name];
   const full = `${title ?? page.title} | ${SITE_NAME}`;
   return {
+    // ブログのページには、フィードのありかを書く
+    ...(name === "blog"
+      ? {
+          alternates: {
+            types: { "application/atom+xml": "/blog/feed.xml" },
+          },
+        }
+      : {}),
     title: { absolute: full },
     description: page.subtitle,
     openGraph: { ...OPEN_GRAPH, title: full, description: page.subtitle },
