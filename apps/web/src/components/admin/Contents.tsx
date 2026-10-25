@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import * as s from "./admin.css";
+import { Dashboard } from "./Dashboard";
 import { contentFiles, drafts } from "./github";
 import { group } from "./groups";
 import { NewPost } from "./NewPost";
@@ -55,6 +56,7 @@ export function Contents({ onOpen }: { onOpen: (path: string) => void }) {
   }
 
   const groups = group(state.paths, query);
+  const all = group(state.paths);
   /** もうある写真のid。mainと下書きの両方 */
   const photoIds = new Set(
     [...state.paths, ...state.drafts]
@@ -72,101 +74,121 @@ export function Contents({ onOpen }: { onOpen: (path: string) => void }) {
     .filter((p) => !state.paths.includes(p))
     .sort();
   return (
-    <section className={s.contents} aria-label="content/ の一覧">
-      <Upload ids={photoIds} onOpen={onOpen} />
-      <NewPost
-        taken={new Set([...state.paths, ...state.drafts])}
+    <div className={s.contents}>
+      <Dashboard
+        paths={state.paths}
+        drafts={state.drafts}
+        groups={all}
         onOpen={onOpen}
-      />
-      {newPosts.length > 0 && (
-        <div>
-          <h3 className={s.groupTitle}>
-            書きかけの新しい記事
-            <span className={s.count}>{newPosts.length}</span>
-          </h3>
-          <ul className={s.list}>
-            {newPosts.map((p) => (
-              <li key={p} title={p}>
-                <button
-                  type="button"
-                  className={s.item}
-                  onClick={() => {
-                    onOpen(p);
-                  }}
-                >
-                  {p.replace(/^content\/blog\//, "")}
-                </button>
-                <span className={s.draft}>下書き</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-      {newPhotos.length > 0 && (
-        <div>
-          <h3 className={s.groupTitle}>
-            足した写真の下書き
-            <span className={s.count}>{newPhotos.length}</span>
-          </h3>
-          <ul className={s.list}>
-            {newPhotos.map((p) => (
-              <li key={p} title={p}>
-                <button
-                  type="button"
-                  className={s.item}
-                  onClick={() => {
-                    onOpen(p);
-                  }}
-                >
-                  {p.replace(/^content\/cats\//, "")}
-                </button>
-                <span className={s.draft}>下書き</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-      <input
-        className={s.search}
-        type="search"
-        placeholder="名前で絞り込む"
-        aria-label="名前で絞り込む"
-        value={query}
-        onChange={(e) => {
-          setQuery(e.target.value);
+        onNewPost={() => {
+          const input = document.getElementById("admin-new-post");
+          input?.scrollIntoView({ block: "center" });
+          input?.focus();
+        }}
+        onUpload={() => {
+          const box = document.getElementById("admin-upload");
+          if (box instanceof HTMLDetailsElement) box.open = true;
+          box?.scrollIntoView({ block: "start" });
+          box?.querySelector("summary")?.focus();
         }}
       />
-      {groups.length === 0 && <p className={s.note}>見つかりません</p>}
-      {groups.map((g) => (
-        <div key={g.key}>
-          <h3 className={s.groupTitle}>
-            {g.title}
-            <span className={s.count}>{g.items.length}</span>
-          </h3>
-          <ul className={s.list}>
-            {g.items.map((item) => (
-              <li key={item.path} title={item.path}>
-                {editable(item.path) ? (
+      <section className={s.contents} aria-label="content/ の一覧">
+        <h2 className={s.subTitle}>ファイル</h2>
+        <Upload ids={photoIds} onOpen={onOpen} />
+        <NewPost
+          taken={new Set([...state.paths, ...state.drafts])}
+          onOpen={onOpen}
+        />
+        {newPosts.length > 0 && (
+          <div>
+            <h3 className={s.groupTitle}>
+              書きかけの新しい記事
+              <span className={s.count}>{newPosts.length}</span>
+            </h3>
+            <ul className={s.list}>
+              {newPosts.map((p) => (
+                <li key={p} title={p}>
                   <button
                     type="button"
                     className={s.item}
                     onClick={() => {
-                      onOpen(item.path);
+                      onOpen(p);
                     }}
                   >
-                    {item.label}
+                    {p.replace(/^content\/blog\//, "")}
                   </button>
-                ) : (
-                  item.label
-                )}
-                {state.drafts.has(item.path) && (
                   <span className={s.draft}>下書き</span>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
-    </section>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {newPhotos.length > 0 && (
+          <div>
+            <h3 className={s.groupTitle}>
+              足した写真の下書き
+              <span className={s.count}>{newPhotos.length}</span>
+            </h3>
+            <ul className={s.list}>
+              {newPhotos.map((p) => (
+                <li key={p} title={p}>
+                  <button
+                    type="button"
+                    className={s.item}
+                    onClick={() => {
+                      onOpen(p);
+                    }}
+                  >
+                    {p.replace(/^content\/cats\//, "")}
+                  </button>
+                  <span className={s.draft}>下書き</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        <input
+          className={s.search}
+          type="search"
+          placeholder="名前で絞り込む"
+          aria-label="名前で絞り込む"
+          value={query}
+          onChange={(e) => {
+            setQuery(e.target.value);
+          }}
+        />
+        {groups.length === 0 && <p className={s.note}>見つかりません</p>}
+        {groups.map((g) => (
+          <div key={g.key}>
+            <h3 className={s.groupTitle}>
+              {g.title}
+              <span className={s.count}>{g.items.length}</span>
+            </h3>
+            <ul className={s.list}>
+              {g.items.map((item) => (
+                <li key={item.path} title={item.path}>
+                  {editable(item.path) ? (
+                    <button
+                      type="button"
+                      className={s.item}
+                      onClick={() => {
+                        onOpen(item.path);
+                      }}
+                    >
+                      {item.label}
+                    </button>
+                  ) : (
+                    item.label
+                  )}
+                  {state.drafts.has(item.path) && (
+                    <span className={s.draft}>下書き</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </section>
+    </div>
   );
 }
