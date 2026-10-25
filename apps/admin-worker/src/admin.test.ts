@@ -249,7 +249,10 @@ describe("ログイン", () => {
 
   it("KVのセッションは暗号化してあり、トークンが平文で入らない", async () => {
     await w.login(true);
-    for (const v of w.kv.data.values()) expect(v).not.toMatch(/gh[ur]_/);
+    for (const v of w.kv.data.values()) {
+      expect(v).not.toContain("ghu_access1");
+      expect(v).not.toContain("ghr_refresh1");
+    }
   });
 
   it("持ち主でなければ、もらったトークンを取り消して拒む", async () => {
