@@ -101,3 +101,85 @@ globalStyle(`${list} li`, {
   borderBottom: `1px solid ${vars.color.line}`,
   overflowWrap: "anywhere",
 });
+
+export const editor = style({
+  display: "grid",
+  gap: "1.25rem",
+  marginTop: "2rem",
+});
+
+export const path = style({
+  fontFamily: vars.font.mono,
+  fontSize: "0.8125rem",
+  color: vars.color.muted,
+  overflowWrap: "anywhere",
+});
+
+export const dirty = style({
+  padding: "0.15rem 0.5rem",
+  borderRadius: vars.radius.md,
+  background: vars.color.tatami,
+  color: vars.color.mike,
+  fontFamily: vars.font.jp,
+  fontSize: "0.75rem",
+  fontWeight: 700,
+});
+
+export const fields = style({
+  display: "grid",
+  gap: "1rem",
+});
+
+export const pair = style({
+  display: "grid",
+  gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+  gap: "1rem",
+  "@media": {
+    "(max-width: 640px)": { gridTemplateColumns: "minmax(0, 1fr)" },
+  },
+});
+
+export const field = style({
+  display: "grid",
+  gap: "0.35rem",
+  fontFamily: vars.font.jp,
+  fontSize: "0.8125rem",
+  color: vars.color.muted,
+});
+
+export const input = style({
+  padding: "0.55rem 0.75rem",
+  border: `1px solid ${vars.color.line}`,
+  borderRadius: vars.radius.md,
+  background: vars.color.paper,
+  color: vars.color.ink,
+  fontFamily: vars.font.jp,
+  fontSize: "0.9375rem",
+  ":focus": { outline: `2px solid ${vars.color.mike}`, outlineOffset: "1px" },
+});
+
+export const textarea = style([
+  input,
+  {
+    resize: "vertical",
+    lineHeight: 1.8,
+  },
+]);
+
+export const code = style({
+  fontFamily: vars.font.mono,
+  fontSize: "0.8125rem",
+  lineHeight: 1.7,
+});
+
+export const item = style({
+  width: "100%",
+  padding: 0,
+  border: 0,
+  background: "none",
+  color: vars.color.ink,
+  font: "inherit",
+  textAlign: "left",
+  cursor: "pointer",
+  ":hover": { color: vars.color.mike },
+});
