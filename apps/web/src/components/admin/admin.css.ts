@@ -313,3 +313,45 @@ globalStyle(`${checks} li`, {
 export const checkState = style({ color: vars.color.muted });
 
 export const checkFailed = style({ color: vars.color.mike, fontWeight: 700 });
+/** 写真を足す */
+export const upload = style({
+  display: "grid",
+  gap: "0.9rem",
+  marginBottom: "1.25rem",
+});
+
+/** ドロップするところ */
+export const drop = style({
+  display: "grid",
+  justifyItems: "start",
+  gap: "0.6rem",
+  padding: "1rem",
+  border: `1.5px dashed ${vars.color.ink}`,
+  borderRadius: vars.radius.md,
+});
+
+/** 見せないが、ラベルから押せる入力(ファイルを選ぶ) */
+export const hidden = style({
+  position: "absolute",
+  width: 1,
+  height: 1,
+  overflow: "hidden",
+  clipPath: "inset(50%)",
+});
+
+export const photo = style({
+  maxWidth: "min(100%, 320px)",
+  height: "auto",
+  borderRadius: vars.radius.md,
+});
+
+export const coats = style({
+  display: "flex",
+  flexWrap: "wrap",
+  gap: "0.9rem",
+  margin: 0,
+  padding: 0,
+  border: 0,
+  fontFamily: vars.font.jp,
+  fontSize: "0.875rem",
+});
