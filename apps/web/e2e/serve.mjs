@@ -1,6 +1,7 @@
 // out/を配信する小さな静的サーバー。e2eテストで使う。
 import { createReadStream, readFileSync, statSync } from "node:fs";
 import { createServer } from "node:http";
+import { createSecureServer } from "node:http2";
 import { dirname, extname, join, normalize } from "node:path";
 import { createBrotliCompress, createGzip } from "node:zlib";
 
@@ -77,7 +78,25 @@ function send(req, res, status, file, headers) {
   else body.pipe(res);
 }
 
-createServer((req, res) => {
+/**
+ * TLS_KEYとTLS_CERTがあれば、本番(Cloudflare)と同じくHTTPSのHTTP/2で出す。Lighthouseで使う。
+ * HTTP/1.1だと、ファイルごとに接続を取り合うものとして見積もられ、本番よりずっと遅く出る
+ */
+function serve(handler) {
+  const { TLS_KEY, TLS_CERT } = process.env;
+  return TLS_KEY && TLS_CERT
+    ? createSecureServer(
+        {
+          allowHTTP1: true,
+          key: readFileSync(TLS_KEY),
+          cert: readFileSync(TLS_CERT),
+        },
+        handler,
+      )
+    : createServer(handler);
+}
+
+serve((req, res) => {
   const { pathname } = new URL(req.url ?? "/", "http://localhost");
   const file = resolve(pathname);
   if (!file) {
