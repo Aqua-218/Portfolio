@@ -100,7 +100,7 @@ export function Upload({
   };
 
   return (
-    <details className={s.upload}>
+    <details className={s.upload} id="admin-upload">
       <summary className={s.groupTitle}>写真を足す</summary>
       <div
         className={s.drop}
