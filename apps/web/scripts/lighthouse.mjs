@@ -167,6 +167,14 @@ try {
     writeFileSync(`${out}${name}.json`, JSON.stringify(lhr));
 
     console.log(`\n${page}`);
+    // 測れなかった回は、点がなく数字がNaNになる。理由を出す
+    for (const { lhr: run } of runs) {
+      if (run.runtimeError) {
+        console.log(
+          `  測れなかった: ${run.runtimeError.code} ${run.runtimeError.message}`,
+        );
+      }
+    }
     for (const b of BUDGETS) {
       const value = b.value(lhr);
       const within = (line) => (b.higher ? value >= line : value <= line);
