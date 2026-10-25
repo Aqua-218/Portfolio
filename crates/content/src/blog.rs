@@ -54,6 +54,9 @@ pub struct Post {
     pub body: String,
 }
 
+/// 記法の見本のページ(`/blog/sample/`)のURL。記事のファイル名には使えない
+pub const SAMPLE: &str = "sample";
+
 /// Qiitaのタグは1〜5個
 const MAX_TAGS: usize = 5;
 
@@ -131,6 +134,12 @@ pub fn parse(slug: &str, src: &str) -> Result<Post, Vec<Problem>> {
     let front = doc.front;
     let mut problems = Vec::new();
 
+    if slug == SAMPLE {
+        problems.push(Problem::new(
+            None,
+            "ファイル名 sample は、記法の見本のページ(/blog/sample/)で使うので使えません",
+        ));
+    }
     if !valid_slug(slug) {
         problems.push(Problem::new(
             None,
