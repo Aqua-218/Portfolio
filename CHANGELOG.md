@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.0.0](https://github.com/Aqua-218/Portfolio/compare/v0.10.1...v1.0.0) (2026-10-26)
+
+
+### 直したこと
+
+* **web:** 全ページをaxeにかけ、見つかった違反を直す ([#298](https://github.com/Aqua-218/Portfolio/issues/298)) ([fc8ac5e](https://github.com/Aqua-218/Portfolio/commit/fc8ac5e3f024c45d11fdfb96eec56298d1fd35e5)), closes [#95](https://github.com/Aqua-218/Portfolio/issues/95)
+
+
+### 設定や道具
+
+* v1.0.0として出す ([#300](https://github.com/Aqua-218/Portfolio/issues/300)) ([7592325](https://github.com/Aqua-218/Portfolio/commit/7592325861b28137de045a43f72cab79cf2c2842)), closes [#96](https://github.com/Aqua-218/Portfolio/issues/96)
+
 ## [0.10.1](https://github.com/Aqua-218/Portfolio/compare/v0.10.0...v0.10.1) (2026-10-25)
 
 
