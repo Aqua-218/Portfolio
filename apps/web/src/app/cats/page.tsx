@@ -17,9 +17,9 @@ export default function Cats() {
     <section className={c.section} aria-labelledby="h-cats">
       <div className={c.head}>
         <Reveal>
-          <h2 className={s.heading} id="h-cats">
+          <h1 className={s.heading} id="h-cats">
             Cats
-          </h2>
+          </h1>
           <p className={s.subtitle}>猫たち</p>
         </Reveal>
         <Reveal as="p" delay={0.08}>
