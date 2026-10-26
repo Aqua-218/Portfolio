@@ -38,6 +38,25 @@
 - 見張り: 毎日、Actions(`.github/workflows/origin-cert.yml`)がロリポップ側の証明書の期限を見て、残りが14日を切ったらIssueを立てる。つなぎ先は、Actionsの変数`ORIGIN_HOST`(ロリポップの初期ドメイン)に入れる
 - 更新がうまくいかないことが続くなら、SSL/TLSをFullにする(切れてもサイトは止まらないが、相手の確かめはしない)
 
+### Cloudflareの設定
+
+ダッシュボード(またはAPI)で変えたもの。リポジトリには入っていないので、ここに控える。
+
+| どこ                 | 中身                                                                                                                       |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| SSL/TLS              | Full (strict)。TLSは1.2から(1.0・1.1は断る)。HTTPはHTTPSへ移す(Always Use HTTPS)                                           |
+| HTMLを書き換えるもの | メールアドレスの難読化・Server Side Excludes・Rocket Loaderは使わない(スクリプトを足してCSPに止められる・中身が変わる)     |
+| ブラウザのキャッシュ | ロリポップのヘッダーのまま(Respect Existing Headers)                                                                       |
+| Cache Rules          | `komineko.jp`の`/admin/`のほかは、ページもCloudflareに30日置く。300〜599は置かない。ブラウザにはロリポップのヘッダーのまま |
+| キャッシュを消す     | デプロイのたびに全部消す(`deploy.yml`、トークンはCache Purgeだけ)                                                          |
+| Tiered Cache         | オン。Cloudflareのデータセンターどうしで分け合い、ロリポップへ行く回数を減らす                                             |
+| Redirect Rules       | `www.komineko.jp`は`https://komineko.jp`へ301(パスとクエリはそのまま)                                                      |
+| CAA                  | `letsencrypt.org`(ロリポップの独自SSL)。Cloudflareが使う認証局は、Cloudflareが自動で足す                                   |
+| DNSSEC               | Cloudflareでオン。レジストラにDSレコードを登録して効く                                                                     |
+| 0-RTT                | オフ(送り直されても困らないGETだけだが、使わない)                                                                          |
+
+ページをCloudflareに置くので、管理画面の公開やcontent/だけのマージも、デプロイのジョブを通る(キャッシュを消す)ようにしてある。手でロリポップに置いたときは、Cloudflareのキャッシュを消す。
+
 ### キャッシュ
 
 同じ`.htaccess`で`Cache-Control`もつける。
