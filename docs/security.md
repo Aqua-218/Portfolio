@@ -95,16 +95,18 @@ e2e(`e2e/csp.spec.ts`)で、全部のページをCSPの下で開き、違反や�
 - サーバーの鍵は`known_hosts`として控え、鍵が違うサーバーにはつながない(`StrictHostKeyChecking=yes`)。ロリポップの鍵はRSA `SHA256:1Rt0rvYV+xZGCMAzm6BKjqAIPWXYYDX0bYK5CikAvCE`
 - 接続情報はEnvironment `production`のシークレットにだけ置く。`production`は`main`ブランチと`v*`のタグからしか使えない
 
-  | シークレット          | 中身                                       |
-  | --------------------- | ------------------------------------------ |
-  | `LOLIPOP_SSH_KEY`     | 秘密鍵                                     |
-  | `LOLIPOP_KNOWN_HOSTS` | サーバーの鍵(`ssh-keyscan -p 2222 -t rsa`) |
-  | `LOLIPOP_HOST`        | `ssh.lolipop.jp`                           |
-  | `LOLIPOP_USER`        | アカウント                                 |
-  | `LOLIPOP_PORT`        | `2222`                                     |
-  | `LOLIPOP_PATH`        | `/home/users/…/web/komineko/`              |
+  | シークレット             | 中身                                                               |
+  | ------------------------ | ------------------------------------------------------------------ |
+  | `LOLIPOP_SSH_KEY`        | 秘密鍵                                                             |
+  | `LOLIPOP_KNOWN_HOSTS`    | サーバーの鍵(`ssh-keyscan -p 2222 -t rsa`)                         |
+  | `LOLIPOP_HOST`           | `ssh.lolipop.jp`                                                   |
+  | `LOLIPOP_USER`           | アカウント                                                         |
+  | `LOLIPOP_PORT`           | `2222`                                                             |
+  | `LOLIPOP_PATH`           | `/home/users/…/web/komineko/`                                      |
+  | `CLOUDFLARE_PURGE_TOKEN` | Cloudflareのキャッシュを消すトークン(komineko.jpのCache Purgeだけ) |
 
-- ビルドするジョブには秘密を渡さず、キャッシュも使わない。送るジョブはコードを動かさず、rsyncだけ
+- ビルドするジョブには秘密を渡さず、キャッシュも使わない。送るジョブはコードを動かさず、rsyncとCloudflareのキャッシュを消すことだけ
 - 中身の変わったファイルだけ送り(`--checksum`)、なくなったファイルは消す。`.well-known/`(無料SSLの更新に使う)は消さない。送り先が`~/web/`の下のフォルダでなければ止まる
 - 権限はディレクトリ705・ファイル604(ロリポップのおすすめ)
+- 送ったあと、Cloudflareのキャッシュを全部消す。ページもCloudflareに置くので、消さないと古いページが残る
 - 鍵を替えるときは、新しい鍵を`authorized_keys`に足して`LOLIPOP_SSH_KEY`を差し替え、古い行を消す
