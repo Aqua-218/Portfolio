@@ -31,6 +31,11 @@ export interface SectionProps {
   more?: string;
   /** 各ページのいちばん上のセクション */
   page?: boolean;
+  /**
+   * 見出しをページの見出し(h1)にするか。既定は各ページのとき。
+   * ブログの記事のように、中身に自分のh1があるページではfalseにする
+   */
+  h1?: boolean;
   children: ReactNode;
 }
 
@@ -42,8 +47,10 @@ export function Section({
   subtitle,
   more,
   page,
+  h1 = page,
   children,
 }: SectionProps) {
+  const Heading = h1 ? "h1" : "h2";
   const photo = site().cats.sections[name];
   return (
     <InViewSection
@@ -55,9 +62,9 @@ export function Section({
     >
       <div className={s.title}>
         <Reveal>
-          <h2 className={s.heading} id={id}>
+          <Heading className={s.heading} id={id}>
             {title}
-          </h2>
+          </Heading>
           <p className={s.subtitle}>{subtitle}</p>
           {more && (
             <Link className={s.more} href={more}>
@@ -108,8 +115,8 @@ export function Lead({ children }: { children: ReactNode }) {
 
 export function Sub({ id, children }: { id: string; children: ReactNode }) {
   return (
-    <h3 className={s.sub} id={id}>
+    <h2 className={s.sub} id={id}>
       {children}
-    </h3>
+    </h2>
   );
 }
