@@ -38,7 +38,12 @@ export function Affiliations({ detail = false }: { detail?: boolean }) {
         const items = all.filter((a) => a.group === group);
         return (
           <div key={group} id={detail ? id : undefined}>
-            <h3 className={groupHeading}>{label}</h3>
+            {/* ページでは、ページの見出し(h1)のすぐ下 */}
+            {detail ? (
+              <h2 className={groupHeading}>{label}</h2>
+            ) : (
+              <h3 className={groupHeading}>{label}</h3>
+            )}
             {detail ? (
               <ul className={s.orgList}>
                 {items.map((a, i) => (
