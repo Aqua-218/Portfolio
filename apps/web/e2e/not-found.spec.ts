@@ -13,6 +13,6 @@ test("ないページでは迷子の猫が出て、トップに戻れる", async
   ).toBeVisible();
   await expect(page.locator("main svg.px-svg")).toBeVisible();
 
-  await page.getByRole("link", { name: "とっぷへ" }).click();
+  await page.getByRole("link", { name: "とっぷへ", exact: true }).click();
   await expect(page).toHaveURL("/");
 });
