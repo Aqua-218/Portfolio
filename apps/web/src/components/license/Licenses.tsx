@@ -27,7 +27,7 @@ function Libraries({
 }) {
   return (
     <div id={id}>
-      <h3 className={groupHeading}>{label}</h3>
+      <h2 className={groupHeading}>{label}</h2>
       <details className={s.libs}>
         <summary className={s.libsSummary}>
           {/* 数は依存の更新のたびに変わるので、たたんだところには出さない(見た目テストを揺らさない) */}
@@ -71,7 +71,7 @@ export function Licenses() {
     <div className={a.groups}>
       {GROUPS.map(({ group, id, label }) => (
         <div key={group} id={id}>
-          <h3 className={groupHeading}>{label}</h3>
+          <h2 className={groupHeading}>{label}</h2>
           <ul className={a.orgList}>
             {site()
               .licenses.filter((l) => l.group === group)
