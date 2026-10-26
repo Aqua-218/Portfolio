@@ -34,7 +34,7 @@ test("右クリックでは出さない", async ({ page }) => {
 
 test("キーボードの操作では出さない", async ({ page }) => {
   await open(page);
-  await page.getByRole("link", { name: "小峯圭也（ホームへ）" }).focus();
+  await page.getByRole("link", { name: "とっぷへ（小峯圭也）" }).focus();
   await page.keyboard.press("Enter");
   await page.waitForTimeout(200);
   await expect(page.locator(paws)).toHaveCount(0);
