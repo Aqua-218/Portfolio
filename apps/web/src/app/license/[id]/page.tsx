@@ -40,7 +40,7 @@ export default async function LicenseText({ params }: Props) {
       subtitle="ライセンスの原文"
       page
     >
-      <h3 className={l.textTitle}>{t.name}</h3>
+      <h2 className={l.textTitle}>{t.name}</h2>
       <p className={l.users}>
         使っているもの({t.users.length}): {t.users.join("・")}
       </p>

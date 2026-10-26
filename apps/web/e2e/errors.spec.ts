@@ -9,9 +9,8 @@ for (const [code, { message }] of Object.entries(ERRORS)) {
     await expect(page.getByRole("heading", { name: code })).toBeVisible();
     await expect(page.getByText(message)).toBeVisible();
     await expect(page.locator("main svg.px-svg")).toBeVisible();
-    await expect(page.getByRole("link", { name: "とっぷへ" })).toHaveAttribute(
-      "href",
-      "/",
-    );
+    await expect(
+      page.getByRole("link", { name: "とっぷへ", exact: true }),
+    ).toHaveAttribute("href", "/");
   });
 }

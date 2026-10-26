@@ -24,7 +24,7 @@ export function Header() {
 
   return (
     <header className={s.top}>
-      <Link className={s.logo} href="/" aria-label="小峯圭也（ホームへ）">
+      <Link className={s.logo} href="/" aria-label="とっぷへ（小峯圭也）">
         <PxCat
           className={s.logoCat}
           frames={PEEK}

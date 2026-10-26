@@ -9,7 +9,7 @@ globalStyle("pre.shiki", {
   vars: {
     "--shiki-foreground": vars.color.ink,
     "--shiki-background": vars.color.tatami,
-    "--shiki-token-keyword": vars.color.mike,
+    "--shiki-token-keyword": vars.color.mikeText,
     "--shiki-token-function": vars.color.ink,
     "--shiki-token-constant": vars.color.leaf,
     "--shiki-token-type": vars.color.leaf,
@@ -18,7 +18,7 @@ globalStyle("pre.shiki", {
     "--shiki-token-comment": vars.color.muted,
     "--shiki-token-parameter": vars.color.ink,
     "--shiki-token-punctuation": vars.color.ink,
-    "--shiki-token-link": vars.color.mike,
+    "--shiki-token-link": vars.color.mikeText,
     // 差分の足した行と消した行の文字。行の背景に色をつけるので、文字は墨のまま
     "--shiki-token-inserted": vars.color.ink,
     "--shiki-token-deleted": vars.color.ink,

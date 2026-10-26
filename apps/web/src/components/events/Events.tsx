@@ -45,7 +45,7 @@ export function EventYears() {
         const note = site().eventYears.find((n) => n.year === y)?.note;
         return (
           <div key={y} className={s.year} id={`ev-${String(y)}`}>
-            <Reveal as="h3" className={s.yearHeading}>
+            <Reveal as="h2" className={s.yearHeading}>
               {y}
               {note && <small>{note}</small>}
             </Reveal>

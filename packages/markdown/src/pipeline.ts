@@ -56,6 +56,8 @@ async function processor() {
       .use(rehypeLinkCards)
       // GitHubのアラートを、猫のついた注意書きにする
       .use(rehypeAlerts)
+      // チェックリストの箱に、読み上げ用の名前(済み・まだ)をつける
+      .use(rehypeQiitaTasks)
       // 見出しにidをつけ、見出しそのものをそのidへのリンクにする
       .use(rehypeSlug)
       .use(rehypeAutolinkHeadings, { behavior: "wrap" })

@@ -52,7 +52,7 @@ export function Shelf() {
         const works = site().shelf.filter((w) => w.kind === kind);
         return (
           <div key={kind} className={s.block} id={`shelf-${kind}`}>
-            <Reveal as="h3" className={s.heading}>
+            <Reveal as="h2" className={s.heading}>
               {label}
               <small>{works.length}作品</small>
               {note && <small>{note}</small>}

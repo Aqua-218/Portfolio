@@ -18,6 +18,12 @@ describe("render", () => {
     expect(html).toContain("<del>消す</del>");
   });
 
+  it("チェックリストの箱に、読み上げ用の名前をつける", async () => {
+    const html = await render("- [x] 済んだこと\n- [ ] まだのこと");
+    expect(html).toContain('aria-label="済み"');
+    expect(html).toContain('aria-label="まだ"');
+  });
+
   it("生のHTMLは通さない", async () => {
     expect(await render('<script>alert("にゃ")</script>')).not.toContain(
       "<script>",

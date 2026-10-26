@@ -24,6 +24,16 @@ describe.each([
     ).toBeGreaterThanOrEqual(4.5);
   });
 
+  // コード・注意書きの地はtatami。キーワード(mikeText)と文字列・型(leaf)、コメント(muted)がのる
+  it.each(["mikeText", "leaf", "muted"] as const)(
+    "コードの色(%s)とコードの地(tatami)のコントラスト比が4.5:1以上",
+    (name) => {
+      expect(
+        contrastRatio(palette[name], palette.tatami),
+      ).toBeGreaterThanOrEqual(4.5);
+    },
+  );
+
   it("タグの文字(ink)とタグ地(tatami)のコントラスト比が4.5:1以上", () => {
     expect(contrastRatio(palette.ink, palette.tatami)).toBeGreaterThanOrEqual(
       4.5,
