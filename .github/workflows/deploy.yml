@@ -4,7 +4,7 @@ name: Deploy
 # - content/ だけが変わったマージ: リリースを待たずに送る。コードは最新のリリースのまま、content/ だけ main のものにする
 #   (まだリリースしていないコードを出さないため)
 # - 手で動かすとき(workflow_dispatch): 最新のリリースをそのまま送り直す
-# ビルドするジョブには秘密を渡さない。送るジョブはコードを動かさない(rsyncだけ)。
+# ビルドするジョブには秘密を渡さない。送るジョブはコードを動かさない(rsyncとCloudflareのキャッシュを消すことだけ)。
 # 接続情報は Environment production のシークレットにだけ置く(main と v* のタグからしか使えない。docs/security.md)
 on:
   release:
@@ -125,7 +125,7 @@ jobs:
           (cd site && zip -qr -X "../komineko-$TAG.zip" .)
           gh release upload "$TAG" "komineko-$TAG.zip" --clobber --repo "$GITHUB_REPOSITORY"
 
-  # ロリポップへ送る。コードは動かさず、rsyncだけ
+  # ロリポップへ送り、Cloudflareのキャッシュを消す。コードは動かさない
   upload:
     needs: build
     runs-on: ubuntu-latest
@@ -174,3 +174,21 @@ jobs:
             -e "$ssh" \
             site/ "$USER_NAME@$HOST:$DEST"
           rm -rf "$dir"
+      # Cloudflareにキャッシュしたページを捨て、新しいものを出す。
+      # トークンはこのゾーンのキャッシュを消すことしかできない(Cache Purgeだけ)
+      - name: Cloudflareのキャッシュを消す
+        env:
+          TOKEN: ${{ secrets.CLOUDFLARE_PURGE_TOKEN }}
+          # komineko.jp のゾーン(秘密ではない)
+          ZONE: 7d18b055207cb70100121601cdbe7217
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "::error::Environment production のシークレットが足りない: CLOUDFLARE_PURGE_TOKEN(docs/security.md)"
+            exit 1
+          fi
+          curl -fsS -X POST \
+            -H "Authorization: Bearer $TOKEN" \
+            -H "Content-Type: application/json" \
+            --data '{"purge_everything":true}' \
+            "https://api.cloudflare.com/client/v4/zones/$ZONE/purge_cache" |
+            jq -e '.success' > /dev/null
