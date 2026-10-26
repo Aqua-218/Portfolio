@@ -64,7 +64,14 @@ export default async function PostPage({ params }: Props) {
       ? { published: "2026-10-25", updated: "2026-10-25" }
       : dates(post.slug);
   return (
-    <Section name="blog" id="p-post" title="Blog" subtitle="技術ブログ" page>
+    <Section
+      name="blog"
+      id="p-post"
+      title="Blog"
+      subtitle="技術ブログ"
+      page
+      h1={false}
+    >
       <PostView post={post} dates={when} html={html} toc={toc} />
       <Link className={s.more} href="/blog/">
         記事の一覧へ
