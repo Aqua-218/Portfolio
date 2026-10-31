@@ -8,6 +8,6 @@ allowBuilds:
   "@swc/core": false
 overrides:
   # GHSA-238p-pmpm-9mq7(プロトタイプ汚染)。micromark-extension-mathが古いKaTeXを引くので、直った版にそろえる
-  katex: 0.18.11
+  katex: 0.19.1
   # 出て3日のharfbuzzjs 1.6.4は避け、しばらく使われた版にする
-  harfbuzzjs: 1.6.3
+  harfbuzzjs: 1.6.4
