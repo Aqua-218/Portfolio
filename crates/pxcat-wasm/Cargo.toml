@@ -16,4 +16,4 @@ doc_markdown = "allow"
 
 [dependencies]
 pxcat-core = { path = "../pxcat-core" }
-wasm-bindgen = "0.2.129"
+wasm-bindgen = "=0.2.129"
