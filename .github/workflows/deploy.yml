@@ -89,7 +89,7 @@ jobs:
           git restore --source="$TAG" --worktree -- . ':(exclude)content'
           echo "コードは $TAG、content/ は $(git rev-parse --short HEAD)"
       # 公開するものを作るので、キャッシュは使わない(汚されたキャッシュから入り込まれないように)
-      - uses: jdx/mise-action@8418fedb1110381a0d3ba51a7a415d7c1b884550 # v5.2.2
+      - uses: jdx/mise-action@236a21c3b91f5db6d4e174b348674a0f0caac06d # v5.2.9
         with:
           install_args: node pnpm rust github:wasm-bindgen/wasm-bindgen
           cache: false
